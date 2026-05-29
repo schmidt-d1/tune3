@@ -1,0 +1,16 @@
+dataset:
+  name: tabular
+model:
+  name: rf
+experiment:
+  name: tune3_v2_full
+  bo:
+    num_trials: 30
+  ref_point_loss_factor: 1.5
+  ref_point_trace_factor: 5.0
+  seeds:
+    primary: 20
+    ablations: 10
+seed: 42
+core:
+  output_dir: ${hydra:runtime.cwd}/results/${now:%Y-%m-%d}/${now:%H-%M-%S}

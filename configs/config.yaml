@@ -1,0 +1,9 @@
+﻿defaults:
+  - dataset: tabular
+  - model: rf
+  - experiment: tune3_full
+  - _self_
+
+seed: 42
+core:
+  output_dir: ${hydra:runtime.cwd}/results/${now:%Y-%m-%d}/${now:%H-%M-%S}

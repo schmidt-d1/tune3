@@ -1,0 +1,15 @@
+[2m2026-05-29 16:23:08[0m [[32m[1minfo     [0m] [1mModelo TabularMLP inicializado[0m [36mhidden_dims[0m=[35m[68][0m [36minput_dim[0m=[35m10[0m [36moutput_dim[0m=[35m2[0m
+[2m2026-05-29 16:23:08[0m [[32m[1minfo     [0m] [1mModelTrainer inicializado     [0m [36mdevice[0m=[35mcpu[0m
+[2m2026-05-29 16:23:08[0m [[32m[1mdebug    [0m] [1mÉpoca de treinamento finalizada[0m [36mavg_train_loss[0m=[35m0.7107452273368835[0m
+[2m2026-05-29 16:23:08[0m [[32m[1mdebug    [0m] [1mÉpoca de treinamento finalizada[0m [36mavg_train_loss[0m=[35m0.6999582171440124[0m
+[2m2026-05-29 16:23:08[0m [[32m[1mdebug    [0m] [1mÉpoca de treinamento finalizada[0m [36mavg_train_loss[0m=[35m0.691261601448059[0m
+[2m2026-05-29 16:23:08[0m [[32m[1mdebug    [0m] [1mÉpoca de treinamento finalizada[0m [36mavg_train_loss[0m=[35m0.6831466317176819[0m
+[2m2026-05-29 16:23:08[0m [[32m[1mdebug    [0m] [1mÉpoca de treinamento finalizada[0m [36mavg_train_loss[0m=[35m0.6860189437866211[0m
+[2m2026-05-29 16:23:08[0m [[32m[1mdebug    [0m] [1mÉpoca de treinamento finalizada[0m [36mavg_train_loss[0m=[35m0.6828107357025146[0m
+[2m2026-05-29 16:23:08[0m [[32m[1mdebug    [0m] [1mÉpoca de treinamento finalizada[0m [36mavg_train_loss[0m=[35m0.6776594758033753[0m
+[2m2026-05-29 16:23:08[0m [[32m[1mdebug    [0m] [1mÉpoca de treinamento finalizada[0m [36mavg_train_loss[0m=[35m0.673847758769989[0m
+[2m2026-05-29 16:23:08[0m [[32m[1mdebug    [0m] [1mÉpoca de treinamento finalizada[0m [36mavg_train_loss[0m=[35m0.6652954697608948[0m
+[2m2026-05-29 16:23:08[0m [[32m[1mdebug    [0m] [1mÉpoca de treinamento finalizada[0m [36mavg_train_loss[0m=[35m0.6660114169120789[0m
+[2m2026-05-29 16:23:08[0m [[32m[1minfo     [0m] [1mAvaliação concluída           [0m [36mval_accuracy[0m=[35m0.5[0m [36mval_loss[0m=[35m0.7065540552139282[0m
+[2m2026-05-29 16:23:08[0m [[32m[1mdebug    [0m] [1mTraço da Hessiana estimado    [0m [36mestimativa[0m=[35m7.2230559349060055[0m [36mnum_vetores[0m=[35m5[0m
+[2m2026-05-29 16:23:08[0m [[32m[1minfo     [0m] [1mTrial 9 Concluída             [0m [36mscore[0m=[35m36.8218[0m [36mtrace[0m=[35m7.2231[0m [36mval_loss[0m=[35m0.7066[0m

@@ -1,0 +1,14 @@
+# Ambiente Virtual
+.venv/
+__pycache__/
+
+# Logs e dados do W&B
+wandb/
+
+# Resultados do Hydra
+results/
+data/sample.csv
+
+# Outros
+.pytest_cache/
+.DS_Store

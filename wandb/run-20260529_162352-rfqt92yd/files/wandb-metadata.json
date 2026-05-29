@@ -1,0 +1,24 @@
+{
+  "os":  "Windows-11-10.0.26200-SP0",
+  "python":  "CPython 3.12.2",
+  "startedAt":  "2026-05-29T19:23:52.300088Z",
+  "program":  "C:\\dev\\tune3\\main.py",
+  "codePath":  "main.py",
+  "codePathLocal":  "main.py",
+  "email":  "dionatanschmidt@unipampa.edu.br",
+  "root":  "C:\\dev\\tune3",
+  "host":  "Schmidt",
+  "executable":  "C:\\dev\\tune3\\.venv\\Scripts\\python.exe",
+  "cpu_count":  10,
+  "cpu_count_logical":  12,
+  "disk":  {
+    "/":  {
+      "total":  "259368415232",
+      "used":  "231662489600"
+    }
+  },
+  "memory":  {
+    "total":  "16849293312"
+  },
+  "writerId":  "1m6pgg97knxoubicw64rm32q9sbp935o"
+}

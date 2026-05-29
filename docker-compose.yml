@@ -1,0 +1,46 @@
+version: "3.9"
+services:
+  tune3:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: tune3:v2.0
+    container_name: tune3-runner
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - WANDB_API_KEY=${WANDB_API_KEY:-}
+      - WANDB_MODE=${WANDB_MODE:-online}
+      - HYDRA_FULL_ERROR=1
+    volumes:
+      - .:/workspace
+      - tune3-data:/workspace/data
+      - tune3-results:/workspace/results
+      - tune3-checkpoints:/workspace/checkpoints
+      - tune3-logs:/workspace/logs
+    working_dir: /workspace
+    shm_size: 8gb
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  wandb-local:
+    image: wandb/local:latest
+    container_name: wandb-local
+    ports:
+      - "8080:8080"
+    volumes:
+      - wandb-data:/vol
+    profiles:
+      - offline
+
+volumes:
+  tune3-data:
+  tune3-results:
+  tune3-checkpoints:
+  tune3-logs:
+  wandb-data:
