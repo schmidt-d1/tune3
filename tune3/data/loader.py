@@ -3,6 +3,8 @@ import structlog
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from typing import Tuple
+from sklearn.datasets import load_breast_cancer
+
 
 logger = structlog.get_logger()
 
@@ -46,3 +48,21 @@ class DataLoader:
         except Exception as e:
             logger.error("Erro inesperado ao carregar dados", erro=str(e))
             raise
+
+
+class BreastCancerLoader:
+    def __init__(self):
+        self.target_column = "target"
+
+    def load_and_split(self, test_size=0.2):
+        data = load_breast_cancer()
+        df = pd.DataFrame(data.data, columns=data.feature_names)
+        df[self.target_column] = data.target
+
+        # Separar features (X) e target (y)
+        X = df.drop(columns=[self.target_column])
+        y = df[self.target_column]
+
+        # Split padrão
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
+        return X_train, X_test, y_train, y_test

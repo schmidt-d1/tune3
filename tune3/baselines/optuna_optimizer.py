@@ -70,12 +70,16 @@ class CurvatureAwareOptuna:
         val_loss = val_metrics["val_loss"]
 
         # 5. Penalidade de Curvatura (Nível 2)
-        X_val_batch, y_val_batch = next(iter(self.test_loader))
-        X_val_batch, y_val_batch = X_val_batch.to(self.device), y_val_batch.to(self.device)
+        # CRÍTICO: medir curvatura em TREINO, nunca no test_loader.
+        # Usar test set aqui seria data leak: o sinal de curvatura influenciaria
+        # a seleção de hiperparâmetros usando dados reservados para avaliação.
+        X_curv_batch, y_curv_batch = next(iter(self.train_loader))
+        X_curv_batch = X_curv_batch.to(self.device)
+        y_curv_batch = y_curv_batch.to(self.device)
 
         model.train()
-        outputs = model(X_val_batch)
-        base_val_loss = criterion(outputs, y_val_batch)
+        outputs = model(X_curv_batch)
+        base_val_loss = criterion(outputs, y_curv_batch)
 
         trace_penalty = hutchinson_trace_estimator(model, base_val_loss, num_vectors=5)
 

@@ -1,14 +1,25 @@
-# Ambiente Virtual
 .venv/
 __pycache__/
-
-# Logs e dados do W&B
 wandb/
-
-# Resultados do Hydra
 results/
-data/sample.csv
-
-# Outros
 .pytest_cache/
 .DS_Store
+
+# Saídas e logs de execução
+outputs/
+multirun/
+*.log
+codigo_completo.txt
+
+# Python
+*.py[cod]
+venv/
+*.egg-info/
+
+# Dados (não versionar datasets brutos)
+data/*.csv
+data/*.parquet
+
+# IDE
+.idea/
+codigo_completo.txt

@@ -18,17 +18,23 @@ logger = structlog.get_logger()
 def main(cfg: DictConfig) -> float:
     logger.info("Iniciando Pipeline Tune3 v2 com Loop Bayesiano", config=OmegaConf.to_container(cfg, resolve=True))
 
-    # 1. Geração de Dados Sintéticos (Dummy)
-    data_path = "data/sample.csv"
-    target_col = "target"
-    if not os.path.exists(data_path):
-        os.makedirs("data", exist_ok=True)
-        df = pd.DataFrame(np.random.randn(200, 10), columns=[f"feat_{i}" for i in range(10)])
-        df[target_col] = np.random.randint(0, 2, 200)
-        df.to_csv(data_path, index=False)
+    # 1. Carregamento do Dataset Real (Breast Cancer)
+    from tune3.data.loader import BreastCancerLoader
+    import pandas as pd
+
+    logger.info("Carregando dataset real: Breast Cancer Wisconsin")
+
+    # Inicializa o loader e obtém os dados
+    loader = BreastCancerLoader()
+    target_col = loader.target_column
+    X_train, X_test, y_train, y_test = loader.load_and_split(test_size=0.2)
+
+    # Validação estrutural do dataset
+    val_df = pd.concat([X_train, y_train], axis=1)
+    validate_dataset(val_df, target_col)
 
     # 2. Pipeline de Dados
-    loader = DataLoader(data_path=data_path, target_column=target_col)
+
     X_train, X_test, y_train, y_test = loader.load_and_split(test_size=0.2)
     validate_dataset(pd.concat([X_train, y_train], axis=1), target_col)
 
