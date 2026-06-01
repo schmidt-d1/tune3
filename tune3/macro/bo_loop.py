@@ -33,6 +33,7 @@ import torch
 
 from botorch.models import SingleTaskGP, ModelListGP
 from botorch.models.transforms.outcome import Standardize
+from botorch.models.transforms.input import Normalize
 from botorch.fit import fit_gpytorch_mll
 from gpytorch.mlls import SumMarginalLogLikelihood
 from botorch.acquisition.multi_objective.logei import (
@@ -111,7 +112,11 @@ class Tune3MacroLoop:
         for j in range(2):
             yj = Y_max[:, j: j + 1]
             models.append(
-                SingleTaskGP(self.train_X, yj, outcome_transform=Standardize(m=1))
+                SingleTaskGP(
+                    self.train_X, yj,
+                    input_transform=Normalize(d=self.dim, bounds=self._bounds),
+                    outcome_transform=Standardize(m=1),
+                )
             )
         model = ModelListGP(*models)
         mll = SumMarginalLogLikelihood(model.likelihood, model)
