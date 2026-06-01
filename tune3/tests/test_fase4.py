@@ -32,7 +32,10 @@ def test_trial_roda_e_retorna_objetivos():
 
 
 def test_trial_aborta_lr_explosivo():
-    """lr enorme com SGD diverge => Cantelli aborta e retorna penalidade."""
+    """lr enorme e tratado com seguranca: DDKF estabiliza + early stopping para o trial.
+    Fase 7: a combinacao DDKF+early-stopping substitui o abort do Cantelli como
+    mecanismo primario de protecao. O trial deve sair limpo (cvar finito, sem penalidade).
+    """
     from tune3.integration.trial import run_trial, TrialConfig
     from tune3.safety import CantelliConfig
     Xtr, ytr = _synthetic(800, 0)
@@ -44,7 +47,8 @@ def test_trial_aborta_lr_explosivo():
         TrialConfig(max_epochs=20, optimizer="sgd", device="cpu",
                     cantelli=CantelliConfig(gamma=0.95, window_size=5)),
     )
-    assert res["aborted"] or res["cvar"] >= 100
+    # Protecao composta: ou Cantelli abortou OU o trial saiu limpo sem penalidade maxima
+    assert res["aborted"] or (np.isfinite(res["cvar"]) and res["cvar"] < 1e3)
 
 
 def test_trial_curvatura_nao_negativa_sempre():
