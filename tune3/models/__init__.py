@@ -1,5 +1,4 @@
-# tune3/models/__init__.py
+from .factory import build_model, build_mlp
 from .mlp import TabularMLP
 from .resnet import VisionResNet
-
-__all__ = ["TabularMLP", "VisionResNet"]
+__all__ = ["build_model", "build_mlp", "TabularMLP", "VisionResNet"]

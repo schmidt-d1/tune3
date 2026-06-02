@@ -1,9 +1,7 @@
-# tune3/baselines/plain_trial.py  (ATUALIZADO Fase 7)
-"""
-Trial SIMPLES para baselines -- SEM componentes MICRO do Tune3 (lr fixo).
-ATUALIZADO: early stopping (paciencia), dataset residente na GPU, batch grande,
-TF32, CVaR da MELHOR epoca. Mantem PARIDADE com o trial do Tune3 -> comparacao justa.
-"""
+# tune3/baselines/plain_trial.py  (ATUALIZADO: return_scores p/ metricas de seguranca)
+"""Trial SIMPLES para baselines -- early stopping, GPU-resident, best-epoch CVaR.
+Agora pode devolver as PROBABILIDADES de teste (return_scores=True) para que o
+protocolo de seguranca calcule AUC-ROC, AUC-PR, FPR@TPR, etc."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -12,6 +10,7 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 from tune3.models.factory import build_model
 from tune3.curvature import HutchinsonEstimator, HutchinsonConfig
@@ -30,7 +29,7 @@ class PlainTrialConfig:
     optimizer: str = "sgd"
     momentum: float = 0.9
     sam_rho: float = 0.05
-    patience: int = 10               # PARIDADE com o Tune3
+    patience: int = 10
     min_delta: float = 1e-4
     enable_tf32: bool = True
     use_class_weight: bool = True
@@ -44,7 +43,7 @@ def _class_weights(y, k, device):
 
 
 def plain_trial(hparams, data, config=None, max_epochs_override=None,
-                report_intermediate=False) -> Dict:
+                report_intermediate=False, return_scores=False) -> Dict:
     cfg = config or PlainTrialConfig()
     torch.manual_seed(cfg.seed); np.random.seed(cfg.seed)
     device = torch.device(cfg.device)
@@ -80,7 +79,7 @@ def plain_trial(hparams, data, config=None, max_epochs_override=None,
     n = Xtr_t.shape[0]; bs = min(cfg.batch_size, n)
 
     inter: List[float] = []
-    best_val = np.inf; best_val_ps = None; wait = 0
+    best_val = np.inf; best_val_ps = None; best_scores = None; wait = 0
     for ep in range(n_epochs):
         model.train()
         perm = torch.randperm(n, device=device)
@@ -94,22 +93,25 @@ def plain_trial(hparams, data, config=None, max_epochs_override=None,
         model.eval()
         with torch.no_grad():
             vout = model(Xv); vl = float(crit(vout, yv)); vps = crit_ps(vout, yv).cpu().numpy()
+            vprobs = F.softmax(vout, dim=1)[:, 1].cpu().numpy() if return_scores else None
         if report_intermediate:
             inter.append(vl)
         if vl < best_val - cfg.min_delta:
-            best_val = vl; best_val_ps = vps; wait = 0
+            best_val = vl; best_val_ps = vps; best_scores = vprobs; wait = 0
         else:
             wait += 1
             if wait >= cfg.patience:
                 break
 
     if best_val_ps is None:
-        best_val_ps = vps; best_val = vl
-    # curvatura final
+        best_val_ps = vps; best_val = vl; best_scores = vprobs
     perm = torch.randperm(n, device=device)[:bs]
     model.train()
     curv = HutchinsonEstimator(HutchinsonConfig(num_probes=cfg.curvature_probes)).estimate(
         model, crit(model(Xtr_t[perm]), ytr_t[perm]))
     cv = float(cvar(best_val_ps, cfg.gamma)) if np.isfinite(best_val) else 1e3
-    return {"cvar": cv, "curvature": float(curv) if np.isfinite(curv) else 1e3,
-            "final_val_loss": float(best_val), "intermediate_val_losses": inter}
+    out = {"cvar": cv, "curvature": float(curv) if np.isfinite(curv) else 1e3,
+           "final_val_loss": float(best_val), "intermediate_val_losses": inter}
+    if return_scores:
+        out["scores"] = best_scores
+    return out

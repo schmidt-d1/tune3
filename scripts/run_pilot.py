@@ -48,7 +48,7 @@ def main():
     scores = results["cvar_test_by_method"]
 
     # analise estatistica: Tune3 vs cada baseline
-    baselines = {k: v for k, v in scores.items() if not k.startswith("tune3")}
+    baselines = {k: v for k, v in scores.items() if k != "tune3"}
     stats = compare_paired(scores["tune3"], baselines, lower_is_better=True)
 
     # relatorio
