@@ -50,7 +50,7 @@ def run_seed(seed, loader_fn, cfg):
     out = {}
 
     run_cfg = Tune3RunConfig(
-        macro=MacroConfig(n_init=cfg.n_init, n_iter=cfg.n_iter, device="cpu", seed=seed),
+        macro=MacroConfig(n_init=cfg.n_init, n_iter=cfg.n_iter, device="cuda", seed=seed),
         trial=TrialConfig(max_epochs=cfg.epochs, patience=cfg.patience, optimizer="sgd",
                           device=cfg.device, gamma=cfg.gamma, seed=seed),
         search_space=dict(cfg.search_space))
