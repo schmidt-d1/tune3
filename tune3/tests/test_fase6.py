@@ -97,5 +97,5 @@ def test_protocolo_ponta_a_ponta():
     cfg = ProtocolConfig(seeds=[0, 1], epochs=4, n_init=3, n_iter=1,
                          asha_configs=4, device="cpu")
     res = run_protocol(loader_fn, cfg)
-    assert set(res["methods"]) == {"tune3", "random_search", "asha", "sam"}
+    assert set(res["methods"]) == {"tune3", "tune3_bestcvar", "random_search", "asha", "sam"}
     assert all(len(v) == 2 for v in res["cvar_test_by_method"].values())
