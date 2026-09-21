@@ -63,21 +63,27 @@ O prompt passa a mostrar \code{(.venv)} no início. Se o PowerShell recusar por 
 Se você usa PyCharm, ele pode criar um \code{.venv} próprio na pasta \emph{acima} do repositório. Confirme sempre qual está ativo: no PowerShell, \code{\$env:VIRTUAL\_ENV} deve terminar em \code{\textbackslash tune3\textbackslash .venv}; no Linux, \code{echo \$VIRTUAL\_ENV}. O prompt \code{(.venv)} sozinho não garante nada.
 \end{alerta}
 
-\subsection{Instalar o PyTorch (com ou sem GPU) e o pacote}
+\subsection{Instalar o PyTorch (com ou sem GPU) e o pacote}\label{sec:instalar}
 \begin{lstlisting}
 python -m pip install --upgrade pip
-# (a) COM GPU NVIDIA -- escolha o indice compativel com o seu driver (cu124 serve para drivers recentes):
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+# (a) COM GPU NVIDIA -- veja abaixo como escolher o indice:
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu130
 # (b) SEM GPU (ou notebook sem NVIDIA):
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 # em ambos os casos, depois:
 pip install -e ".[dev,vision]"
 \end{lstlisting}
-Confirme:
+
+\begin{alerta}[O \code{cuXXX} não é a versão do seu driver]
+O número no \code{--index-url} é o \emph{build} do PyTorch, não o CUDA instalado na máquina. Ele precisa cobrir a \emph{arquitetura} da sua GPU: placas RTX~50xx são Blackwell (\code{sm\_120}) e exigem \code{cu128} ou superior --- um build \code{cu124} instala sem erro e depois falha em toda operação. RTX~40xx aceita \code{cu121+}; RTX~30xx, \code{cu118+}. Além disso, cada índice só publica \emph{wheels} para algumas versões de Python: com \textbf{Python 3.14} hoje só o \code{cu130} tem. Na dúvida, abra \code{https://download.pytorch.org/whl/cu130/torch/} e procure a linha com o seu \code{cp3XX} e sistema operacional.
+\end{alerta}
+
+Confirme --- e note que \code{cuda.is\_available()} pode dizer \code{True} com um build incompatível, então o teste tem que \emph{calcular} alguma coisa:
 \begin{lstlisting}
-python -c "import torch; print(torch.__version__, torch.cuda.is_available())"
+python -c "import torch; print(torch.__version__, torch.version.cuda, torch.cuda.is_available()); print(torch.cuda.get_device_name(0), torch.cuda.get_device_capability(0)); x=torch.randn(1000,1000,device='cuda'); print('matmul ok:', float((x@x).sum()))"
 python scripts/verify_setup.py
 \end{lstlisting}
+Se aparecer \code{no kernel image is available for execution on the device}, o build não cobre a sua GPU: volte ao alerta acima e instale de um índice mais novo.
 A segunda linha imprime \code{[ OK ]} para cada módulo do Tune3 e avisa o que falta. É normal aparecer \code{[FALTA] data/drebin215.csv} nesta etapa.
 
 \subsection{Baixar o DREBIN-215}
@@ -278,7 +284,8 @@ Isso varre \code{results/} e monta uma tabela (terminal e \code{results/SUMMARY.
 Sintoma & O que fazer \\ \midrule
 \code{pytest: comando não reconhecido} & O ambiente virtual não está ativo, ou o \code{pip install -e ".[dev,vision]"} não rodou nele. Ative e reinstale. \\
 \code{No module named 'tune3'} & Você está fora da pasta do repositório ou o pacote não foi instalado (\code{pip install -e .}). \\
-\code{torch.cuda.is\_available()} $=$ \code{False} & Instalou o torch de CPU. Desinstale (\code{pip uninstall torch torchvision}) e reinstale com \code{--index-url .../cu124}. Confira o driver com \code{nvidia-smi}. \\
+\code{torch.cuda.is\_available()} $=$ \code{False} & Instalou o torch de CPU (confirme: \code{torch.version.cuda} vem \code{None}). Desinstale (\code{pip uninstall -y torch torchvision}) e reinstale pelo índice certo da Seção~\ref{sec:instalar}. Confira o driver com \code{nvidia-smi}. \\
+\code{no kernel image is available} & O build do torch não cobre a arquitetura da sua GPU (típico de RTX~50xx com \code{cu124}). Reinstale de um índice \code{cu128} ou superior. \\
 \code{CUDA out of memory} & Reduza \code{--workers} (H1) para 2 ou 1. Não mude \code{batch\_size}. \\
 Um método mostra CVaR $=1000$ & Trials abortados (penalidade). Um ou dois por semente é normal em lr alto; se for a maioria, pare e reporte. \\
 \code{[AVISO] arvore git SUJA} & Algum arquivo do repositório foi alterado. \code{git status}; \code{git checkout -- <arquivo>} se foi sem querer; rode de novo. \\

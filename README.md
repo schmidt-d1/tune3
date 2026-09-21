@@ -17,14 +17,42 @@ cd tune3
 python -m venv .venv
 # Windows:  .\.venv\Scripts\Activate.ps1      Linux/macOS:  source .venv/bin/activate
 python -m pip install --upgrade pip
+# GPU NVIDIA: instale o torch com CUDA ANTES do passo seguinte (veja a tabela abaixo)
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu130
 pip install -e ".[dev,vision]"        # dev = pytest; vision = torchvision (trilha CIFAR)
-# GPU NVIDIA: instale o torch com CUDA ANTES do comando acima, ex.:
-#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
-python -c "import torch; print(torch.__version__, torch.cuda.is_available())"
 ```
 
 Requer Python ≥ 3.10 (testado em 3.11 e 3.14). `requirements.txt` é um espelho de
 `pyproject.toml` para quem preferir `pip install -r`.
+
+### Escolher o índice CUDA certo
+
+O `cuXXX` do `--index-url` **não** é o CUDA do seu driver: é o build do PyTorch. Escolha pela
+arquitetura da GPU e pela versão do Python (cada índice só publica wheels para alguns Pythons):
+
+| GPU | Arquitetura | Índice mínimo |
+|---|---|---|
+| RTX 50xx (5070/5080/5090…) | Blackwell, `sm_120` | **cu128 ou superior** — cu124 não roda |
+| RTX 40xx | Ada, `sm_89` | cu121+ |
+| RTX 30xx / A100 | Ampere, `sm_80`/`sm_86` | cu118+ |
+
+Com **Python 3.14** hoje só o índice `cu130` publica wheels (`cp314`); com Python 3.11 há mais
+opções. Se não souber, abra `https://download.pytorch.org/whl/cu130/torch/` e procure a wheel com
+a sua versão de Python (`cp3XX`) e sistema.
+
+**Sem GPU:** `pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu`.
+
+### Confirmar que a GPU funciona de verdade
+
+`torch.cuda.is_available()` pode devolver `True` e ainda assim toda operação falhar, se o build não
+tiver kernel para a sua arquitetura. Teste com uma conta real:
+
+```bash
+python -c "import torch; print(torch.__version__, torch.version.cuda, torch.cuda.is_available()); print(torch.cuda.get_device_name(0), torch.cuda.get_device_capability(0)); x=torch.randn(1000,1000,device='cuda'); print('matmul ok:', float((x@x).sum()))"
+```
+
+Se aparecer `no kernel image is available for execution on the device`, o build é incompatível com
+a GPU — volte à tabela acima e instale de um índice mais novo.
 
 ## Verificação em três níveis (faça nesta ordem)
 
