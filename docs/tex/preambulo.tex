@@ -1,0 +1,64 @@
+% preâmbulo comum — ambiente sem lmodern: ae + aecompl (regras do projeto)
+\documentclass[11pt,a4paper]{article}
+\usepackage{ae,aecompl}
+\usepackage[utf8]{inputenc}
+\IfFileExists{brazil.ldf}{\usepackage[brazil]{babel}}{}
+\usepackage[a4paper,margin=2.3cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,array,longtable}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,calc}
+\usepackage[most]{tcolorbox}
+\usepackage{listings}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+\usepackage{microtype}
+\usepackage{fancyhdr}
+\usepackage{float}
+\usepackage[colorlinks=true,linkcolor=blue!60!black,citecolor=blue!60!black,urlcolor=blue!60!black]{hyperref}
+\setlength{\emergencystretch}{1.5em}
+% marcadores em modo matemático (TS1 sem face vetorial sob ae)
+\renewcommand{\labelitemi}{$\bullet$}
+\renewcommand{\labelitemii}{$\circ$}
+\renewcommand{\labelitemiii}{$\ast$}
+% nomes em português sem depender do babel
+\renewcommand{\contentsname}{Sumário}
+\renewcommand{\refname}{Referências}
+\renewcommand{\figurename}{Figura}
+\renewcommand{\tablename}{Tabela}
+\renewcommand{\abstractname}{Resumo}
+\renewcommand{\proofname}{Demonstração}
+\SetAlgorithmName{Algoritmo}{Algoritmo}{Lista de Algoritmos}
+\definecolor{tune3blue}{RGB}{31,73,125}
+\definecolor{okgreen}{RGB}{20,110,60}
+\definecolor{warnred}{RGB}{160,30,30}
+\definecolor{codebg}{RGB}{245,246,248}
+\lstset{basicstyle=\ttfamily\small,backgroundcolor=\color{codebg},frame=single,rulecolor=\color{gray!40},
+  breaklines=true,columns=fullflexible,keepspaces=true,showstringspaces=false,
+  language=Python,keywordstyle=\color{tune3blue}\bfseries,commentstyle=\color{gray!70!black}\itshape,
+  literate={á}{{\'a}}1 {à}{{\`a}}1 {ã}{{\~a}}1 {â}{{\^a}}1 {é}{{\'e}}1 {ê}{{\^e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ô}{{\^o}}1 {õ}{{\~o}}1 {ú}{{\'u}}1 {ç}{{\c{c}}}1 {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1 {Ç}{{\c{C}}}1 {Ã}{{\~A}}1 {Õ}{{\~O}}1 {Ê}{{\^E}}1 {Ô}{{\^O}}1 {Â}{{\^A}}1 {²}{{$^2$}}1 {·}{{$\cdot$}}1 {≥}{{$\geq$}}1 {≤}{{$\leq$}}1 {→}{{$\to$}}1 {∈}{{$\in$}}1 {∞}{{$\infty$}}1 {σ}{{$\sigma$}}1 {ρ}{{$\rho$}}1 {γ}{{$\gamma$}}1 {η}{{$\eta$}}1 {θ}{{$\theta$}}1 {Σ}{{$\Sigma$}}1 {λ}{{$\lambda$}}1 {ε}{{$\varepsilon$}}1 {–}{{--}}1 {—}{{---}}1 {×}{{$\times$}}1}
+\newtcolorbox{ideia}[1][]{colback=tune3blue!5,colframe=tune3blue,fonttitle=\bfseries,title={#1},breakable}
+\newtcolorbox{alerta}[1][]{colback=warnred!5,colframe=warnred,fonttitle=\bfseries,title={#1},breakable}
+\newtcolorbox{codigo}[1][]{colback=okgreen!4,colframe=okgreen,fonttitle=\bfseries,title={#1},breakable}
+\theoremstyle{definition}
+\newtheorem{definicao}{Definição}[section]
+\newtheorem{proposicao}{Proposição}[section]
+\newtheorem{exemplo}{Exemplo}[section]
+\newtheorem{observacao}{Observação}[section]
+\DeclareMathOperator{\Tr}{Tr}
+\DeclareMathOperator{\CVaR}{CVaR}
+\DeclareMathOperator{\VaR}{VaR}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\GSNR}{GSNR}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\code}[1]{\texttt{#1}}
+\pagestyle{fancy}\fancyhf{}
+\rhead{\small Tune3 — \docshort}
+\lhead{\small UNIPAMPA / AI Horizon Labs}
+\cfoot{\thepage}

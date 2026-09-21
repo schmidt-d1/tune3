@@ -1,50 +1,96 @@
 # tune3/experiments/stats.py
 """
-Protocolo estatistico do Tune3 (manual, secao de analise estatistica).
+Protocolo estatistico do Tune3 (PRE-REGISTRADO -- ver PREREGISTRATION.md).
 
-Comparacoes PAREADAS por seed: cada metodo e' rodado nas MESMAS seeds, e
-comparamos Tune3 vs cada baseline par a par.
+Comparacoes PAREADAS por seed: cada metodo e' rodado nas MESMAS seeds (mesmos
+splits), e comparamos Tune3 vs cada baseline par a par.
 
 Componentes:
   - Wilcoxon signed-rank (pareado, nao-parametrico): nao assume normalidade.
   - Correcao Bonferroni-Holm: controla o erro familiar (FWER) sobre a familia
-    de comparacoes (Tune3 vs B1, vs B2, vs B3, ...).
+    de comparacoes (Tune3 vs B1, vs B2, ...).
   - d_z de Cohen pareado: tamanho de efeito = media(dif)/desvio(dif).
-  - IC bootstrap da diferenca media.
+  - IC 95% bootstrap **BCa** (bias-corrected and accelerated) para d_z e para
+    a diferenca media. O percentilico fica disponivel (ci_method="percentile")
+    apenas para comparacao com resultados antigos.
+  - REGRA DE DECISAO pre-registrada: "vitoria" exige, simultaneamente,
+        p_Holm < alpha   E   |d_z| >= dz_min (0.30)   E   direcao favoravel.
 
 ATENCAO SOBRE PODER (importante para o piloto):
   Wilcoxon two-sided com n pares tem p-minimo = 2 / 2^n (todos com mesmo sinal).
   n=3 -> p_min = 0.25;  n=5 -> 0.0625;  n=6 -> 0.03125.
   Ou seja, com < 6 seeds e' IMPOSSIVEL atingir p < 0.05. O piloto de 3 seeds
-  valida o PIPELINE, nao produz significancia. Por isso o protocolo usa N=20
-  nas comparacoes primarias (ver analise de poder do artigo).
+  valida o PIPELINE, nao produz significancia. O protocolo usa N=20 nas
+  comparacoes primarias, com caminho pre-planejado para N=40 em caso inconclusivo.
 """
 from __future__ import annotations
 
-from typing import Dict, List
+import warnings
+from typing import Dict, List, Tuple
 
 import numpy as np
-from scipy.stats import wilcoxon
+from scipy.stats import wilcoxon, bootstrap as _sp_bootstrap
 from statsmodels.stats.multitest import multipletests
+
+DZ_MIN_DEFAULT = 0.30   # limiar pre-registrado de efeito pratico minimo
 
 
 def cohens_dz(diffs) -> float:
     """d_z de Cohen pareado = media(dif) / desvio-padrao(dif) (ddof=1)."""
     d = np.asarray(diffs, dtype=float)
+    if d.size < 2:
+        return 0.0
     sd = d.std(ddof=1)
     return float(d.mean() / sd) if sd > 1e-12 else 0.0
 
 
-def bootstrap_ci(diffs, n_boot: int = 10000, alpha: float = 0.05,
-                 seed: int = 0) -> tuple:
-    """IC (1-alpha) bootstrap percentil para a media das diferencas."""
+def _stat_mean(x, axis=-1):
+    return np.mean(x, axis=axis)
+
+
+def _stat_dz(x, axis=-1):
+    x = np.asarray(x, dtype=float)
+    sd = x.std(axis=axis, ddof=1)
+    m = x.mean(axis=axis)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        out = np.where(sd > 1e-12, m / np.where(sd > 1e-12, sd, 1.0), 0.0)
+    return out
+
+
+def bootstrap_ci(diffs, n_boot: int = 10000, alpha: float = 0.05, seed: int = 0,
+                 statistic: str = "mean", ci_method: str = "bca") -> Tuple[float, float]:
+    """
+    IC (1-alpha) bootstrap para a estatistica das diferencas pareadas.
+
+    statistic: "mean" (diferenca media) ou "dz" (d_z de Cohen).
+    ci_method: "bca" (padrao, pre-registrado) ou "percentile" (legado).
+
+    Se o BCa for indefinido (amostra degenerada: todas as diferencas iguais, ou
+    n < 3), cai para o percentilico com aviso -- nunca falha silenciosamente.
+    """
     d = np.asarray(diffs, dtype=float)
+    stat = _stat_mean if statistic == "mean" else _stat_dz
+    if statistic not in ("mean", "dz"):
+        raise ValueError("statistic deve ser 'mean' ou 'dz'")
+    if d.size < 2 or np.allclose(d, d[0]):
+        v = float(stat(d)) if d.size else 0.0
+        return v, v
+    method = {"bca": "BCa", "percentile": "percentile"}[ci_method]
     rng = np.random.default_rng(seed)
-    n = len(d)
-    boots = np.array([rng.choice(d, size=n, replace=True).mean()
-                      for _ in range(n_boot)])
-    lo, hi = np.percentile(boots, [100 * alpha / 2, 100 * (1 - alpha / 2)])
-    return float(lo), float(hi)
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            res = _sp_bootstrap((d,), stat, n_resamples=n_boot, confidence_level=1 - alpha,
+                                method=method, random_state=rng, vectorized=True, axis=-1)
+        lo, hi = float(res.confidence_interval.low), float(res.confidence_interval.high)
+        if not (np.isfinite(lo) and np.isfinite(hi)):
+            raise FloatingPointError("BCa indefinido")
+        return lo, hi
+    except Exception as e:                       # fallback explicito e avisado
+        if method == "BCa":
+            warnings.warn(f"BCa indefinido ({e}); usando percentilico.", RuntimeWarning)
+            return bootstrap_ci(d, n_boot, alpha, seed, statistic, ci_method="percentile")
+        raise
 
 
 def min_achievable_p(n_pairs: int) -> float:
@@ -59,6 +105,10 @@ def compare_paired(
     baseline_scores: Dict[str, List[float]],
     alpha: float = 0.05,
     lower_is_better: bool = True,
+    dz_min: float = DZ_MIN_DEFAULT,
+    ci_method: str = "bca",
+    n_boot: int = 10000,
+    seed: int = 0,
 ) -> Dict:
     """
     Compara Tune3 vs cada baseline (pareado por seed).
@@ -67,7 +117,10 @@ def compare_paired(
     baseline_scores: {nome_baseline: lista de scores por seed}.
     lower_is_better: True para CVaR/loss (menor e' melhor).
 
-    Retorna, por baseline: diff_mean, dz, ci, p_raw, p_holm, significant, win.
+    Retorna, por baseline:
+      diff_mean, dz, ci95 (dif. media, BCa), dz_ci95 (BCa), p_raw, p_holm,
+      significant (p_holm < alpha), practical (|dz| >= dz_min), win (direcao),
+      prereg_win (significant AND practical AND win)  <- a regra pre-registrada.
     Convencao: diff = (baseline - tune3) se lower_is_better, de modo que
     diff > 0 e dz > 0 significam TUNE3 MELHOR.
     """
@@ -81,7 +134,6 @@ def compare_paired(
         if len(b) != n:
             raise ValueError(f"baseline '{name}' tem {len(b)} seeds, Tune3 tem {n}")
         diff = (b - t) if lower_is_better else (t - b)  # >0 => Tune3 melhor
-        # Wilcoxon signed-rank (two-sided); trata diffs todas nulas
         if np.allclose(diff, 0.0):
             p = 1.0
         else:
@@ -90,25 +142,33 @@ def compare_paired(
             except ValueError:
                 p = 1.0
         raw_p.append(p)
+        dz = cohens_dz(diff)
         rows[name] = {
             "diff_mean": float(diff.mean()),
-            "dz": cohens_dz(diff),
-            "ci95": bootstrap_ci(diff),
+            "dz": dz,
+            "ci95": bootstrap_ci(diff, n_boot=n_boot, alpha=alpha, seed=seed,
+                                 statistic="mean", ci_method=ci_method),
+            "dz_ci95": bootstrap_ci(diff, n_boot=n_boot, alpha=alpha, seed=seed,
+                                    statistic="dz", ci_method=ci_method),
             "p_raw": float(p),
             "win": bool(diff.mean() > 0),
+            "practical": bool(abs(dz) >= dz_min),
         }
 
-    # Bonferroni-Holm sobre a familia de comparacoes
     if raw_p:
         reject, p_corr, _, _ = multipletests(raw_p, alpha=alpha, method="holm")
         for i, name in enumerate(names):
             rows[name]["p_holm"] = float(p_corr[i])
             rows[name]["significant"] = bool(reject[i])
+            rows[name]["prereg_win"] = bool(reject[i] and rows[name]["practical"] and rows[name]["win"])
 
     return {
         "n_seeds": n,
         "min_achievable_p": min_achievable_p(n),
         "alpha": alpha,
+        "dz_min": dz_min,
+        "ci_method": ci_method,
+        "underpowered": bool(min_achievable_p(n) >= alpha),
         "comparisons": rows,
     }
 
@@ -120,3 +180,20 @@ def summarize(scores: List[float]) -> Dict:
     return {"median": float(med), "iqr": float(q3 - q1),
             "mean": float(a.mean()), "std": float(a.std(ddof=1)) if len(a) > 1 else 0.0,
             "n": len(a)}
+
+
+def aggregate_per_seed(results_by_fold: Dict[str, Dict], method: str,
+                       metric: str = "cvar_test") -> List[float]:
+    """
+    Agrega resultados de S2 (leave-one-cluster-out) POR SEED: media sobre os
+    folds, devolvendo UM valor por seed. Evita pseudo-replicacao: os N seeds de
+    um mesmo fold compartilham o mesmo conjunto de teste e NAO sao observacoes
+    independentes; tratar folds x seeds como F*N pares infla o n do Wilcoxon.
+    results_by_fold[fold]["by_metric"][method][metric] e' uma lista alinhada a seeds.
+    """
+    folds = list(results_by_fold.values())
+    n_seeds = len(folds[0]["seeds"])
+    out = []
+    for i in range(n_seeds):
+        out.append(float(np.mean([f["by_metric"][method][metric][i] for f in folds])))
+    return out

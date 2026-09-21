@@ -1,12 +1,15 @@
 # tune3/baselines/hpo.py
 """
 Estrategias de HPO baseline (Fase 5):
-  B1 RandomSearchHPO -- amostra configs aleatorias (controle ingenuo).
-  B2 ASHA            -- successive halving (early-stopping de configs ruins).
-  B3 (SAM)           -- nao e' HPO; e' RandomSearch + otimizador SAM no plain_trial.
+  RandomSearchHPO -- amostra configs aleatorias (controle ingenuo)      [RS]
+  ASHA            -- successive halving (early-stopping de configs ruins) [ASHA]
+  SAM             -- nao e' HPO; e' RandomSearch + otimizador SAM no plain_trial.
+  B4 (BO mono-objetivo em CVaR) esta em tune3/baselines/bo_mono.py.
 
-Todos compartilham o MESMO plain_trial, dados e objetivo (CVaR) que o Tune3,
-garantindo comparacao justa. O espaco de busca e' o mesmo do runner do Tune3.
+Todos compartilham o MESMO plain_trial, dados e objetivo (CVaR de VALIDACAO)
+que o Tune3, garantindo comparacao justa. O espaco de busca e' o mesmo do
+runner do Tune3. A avaliacao final no TESTE e' feita pelo protocolo, uma unica
+vez, com o modelo da melhor epoca de validacao (ver plain_trial.test_data).
 """
 from __future__ import annotations
 

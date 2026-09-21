@@ -1,4 +1,5 @@
 # tune3/tests/test_models.py
+import pytest
 import torch
 from tune3.models import TabularMLP, VisionResNet
 
@@ -20,6 +21,7 @@ def test_tabular_mlp_forward_shape():
 
 def test_vision_resnet_forward_shape():
     """Garante que o wrapper da ResNet se adapta ao número de classes especificado."""
+    pytest.importorskip("torchvision")   # extra opcional: pip install -e ".[vision]"
     batch_size = 2
     num_classes = 5
 

@@ -15,8 +15,7 @@ Use --device cuda na maquina com GPU.
 """
 from __future__ import annotations
 
-import argparse
-import json
+import argparse, json, time
 
 import numpy as np
 
@@ -24,6 +23,7 @@ from tune3.data.drebin import DrebinLoader, DrebinConfig
 from tune3.integration.runner import run_tune3, Tune3RunConfig
 from tune3.integration.trial import TrialConfig
 from tune3.macro.bo_loop import MacroConfig
+from tune3.experiments.results_io import save_result
 
 
 def main():
@@ -38,8 +38,10 @@ def main():
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--gamma", type=float, default=0.95)
     ap.add_argument("--wandb", action="store_true", help="logar no Weights & Biases")
-    ap.add_argument("--out", default="tune3_resultado.json")
+    ap.add_argument("--tag", default=None, help="identificador de quem roda")
+    ap.add_argument("--out", default=None, help="(opcional) copia extra do JSON")
     args = ap.parse_args()
+    t0 = time.time()
 
     # 1) dados
     loader = DrebinLoader(DrebinConfig(csv_path=args.csv))
@@ -70,10 +72,16 @@ def main():
     print(f"pontos na frente de Pareto: {len(out['pareto']['X'])}")
     print("hiperparametros recomendados (knee point):")
     print(json.dumps(out["knee_hparams"], indent=2))
+    print("hiperparametros de melhor CVaR (best-CVaR):")
+    print(json.dumps(out["best_cvar_hparams"], indent=2))
+    tel = out["trials"]
+    print(f"telemetria: DDKF ativo em {sum(t['n_ddkf_active_epochs'] for t in tel)}/"
+          f"{sum(t['n_epochs_run'] for t in tel)} epocas; EoS disparos={sum(t['n_eos_triggers'] for t in tel)}")
 
-    with open(args.out, "w") as f:
-        json.dump({"pareto": out["pareto"], "knee_hparams": out["knee_hparams"]}, f, indent=2)
-    print(f"\n[salvo] {args.out}")
+    save_result({"pareto": out["pareto"], "knee_hparams": out["knee_hparams"],
+                 "best_cvar_hparams": out["best_cvar_hparams"], "trials": tel},
+                experiment="tune3_drebin", tag=args.tag, args=vars(args), started_at=t0,
+                extra_path=args.out)
 
     if wandb_run is not None:
         wandb_run.summary["pareto_size"] = len(out["pareto"]["X"])

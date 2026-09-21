@@ -1,9 +1,25 @@
-# tune3/baselines/plain_trial.py  (ATUALIZADO: return_scores p/ metricas de seguranca)
+# tune3/baselines/plain_trial.py
 """Trial SIMPLES para baselines -- early stopping, GPU-resident, best-epoch CVaR.
-Agora pode devolver as PROBABILIDADES de teste (return_scores=True) para que o
-protocolo de seguranca calcule AUC-ROC, AUC-PR, FPR@TPR, etc."""
+
+CORRECAO (set/2026, auditoria): separacao estrita validacao x teste.
+  - `data` = (X_tr, y_tr, X_val, y_val): o early stopping e a escolha da melhor
+    epoca usam APENAS a validacao. O "cvar" devolvido e' o CVaR de VALIDACAO na
+    melhor epoca (e' o que RS/ASHA/B4 usam para selecionar configuracoes).
+  - `test_data` = (X_te, y_te) OPCIONAL: se fornecido, o modelo da MELHOR EPOCA
+    DE VALIDACAO (estado restaurado) e' avaliado UMA vez no teste, devolvendo
+    "cvar_test", "test_loss" e (se return_scores) "scores_test".
+    O teste NUNCA influencia early stopping, escolha de epoca ou curvatura.
+  - A curvatura Tr(H^2) e' medida no modelo da melhor epoca, em model.eval()
+    (dropout desligado -- o estimador mede a rede determinística, nao uma
+    sub-rede aleatoria), sobre um batch de TREINO.
+
+Antes desta correcao, protocol.py/security_protocol.py passavam o TESTE no lugar
+da validacao, de modo que a melhor epoca era escolhida olhando o teste
+(vazamento). Os numeros produzidos por aquela versao nao devem ser reportados.
+"""
 from __future__ import annotations
 
+import copy
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
@@ -42,8 +58,20 @@ def _class_weights(y, k, device):
     return torch.tensor(c.sum() / (k * c), dtype=torch.float32, device=device)
 
 
+@torch.no_grad()
+def _eval_split(model, crit, crit_ps, X, y, want_scores: bool):
+    """Avalia um split em model.eval(): (loss media, perdas por amostra, prob. classe 1)."""
+    model.eval()
+    out = model(X)
+    loss = float(crit(out, y))
+    ps = crit_ps(out, y).cpu().numpy()
+    scores = F.softmax(out, dim=1)[:, 1].cpu().numpy() if want_scores else None
+    return loss, ps, scores
+
+
 def plain_trial(hparams, data, config=None, max_epochs_override=None,
-                report_intermediate=False, return_scores=False) -> Dict:
+                report_intermediate=False, return_scores=False,
+                test_data: Optional[Tuple[np.ndarray, np.ndarray]] = None) -> Dict:
     cfg = config or PlainTrialConfig()
     torch.manual_seed(cfg.seed); np.random.seed(cfg.seed)
     device = torch.device(cfg.device)
@@ -79,7 +107,8 @@ def plain_trial(hparams, data, config=None, max_epochs_override=None,
     n = Xtr_t.shape[0]; bs = min(cfg.batch_size, n)
 
     inter: List[float] = []
-    best_val = np.inf; best_val_ps = None; best_scores = None; wait = 0
+    best_val = np.inf; best_val_ps = None; best_scores = None; best_state = None
+    best_epoch = -1; wait = 0
     for ep in range(n_epochs):
         model.train()
         perm = torch.randperm(n, device=device)
@@ -90,28 +119,45 @@ def plain_trial(hparams, data, config=None, max_epochs_override=None,
                 crit(model(xb), yb).backward(); opt.second_step(zero_grad=True)
             else:
                 opt.zero_grad(); crit(model(xb), yb).backward(); opt.step()
-        model.eval()
-        with torch.no_grad():
-            vout = model(Xv); vl = float(crit(vout, yv)); vps = crit_ps(vout, yv).cpu().numpy()
-            vprobs = F.softmax(vout, dim=1)[:, 1].cpu().numpy() if return_scores else None
+        vl, vps, vprobs = _eval_split(model, crit, crit_ps, Xv, yv, return_scores)
         if report_intermediate:
             inter.append(vl)
         if vl < best_val - cfg.min_delta:
-            best_val = vl; best_val_ps = vps; best_scores = vprobs; wait = 0
+            best_val = vl; best_val_ps = vps; best_scores = vprobs; best_epoch = ep; wait = 0
+            best_state = copy.deepcopy(model.state_dict())
         else:
             wait += 1
             if wait >= cfg.patience:
                 break
 
-    if best_val_ps is None:
-        best_val_ps = vps; best_val = vl; best_scores = vprobs
+    if best_state is None:           # nenhuma epoca melhorou (ex.: NaN desde o inicio)
+        best_val_ps = vps; best_val = vl; best_scores = vprobs; best_epoch = ep
+        best_state = copy.deepcopy(model.state_dict())
+
+    # --- restaura o modelo da MELHOR EPOCA DE VALIDACAO ---
+    model.load_state_dict(best_state)
+
+    # curvatura no modelo da melhor epoca, em eval() (sem dropout), batch de TREINO
     perm = torch.randperm(n, device=device)[:bs]
-    model.train()
+    model.eval()
     curv = HutchinsonEstimator(HutchinsonConfig(num_probes=cfg.curvature_probes)).estimate(
         model, crit(model(Xtr_t[perm]), ytr_t[perm]))
+
     cv = float(cvar(best_val_ps, cfg.gamma)) if np.isfinite(best_val) else 1e3
     out = {"cvar": cv, "curvature": float(curv) if np.isfinite(curv) else 1e3,
-           "final_val_loss": float(best_val), "intermediate_val_losses": inter}
+           "final_val_loss": float(best_val), "best_epoch": int(best_epoch),
+           "intermediate_val_losses": inter}
     if return_scores:
         out["scores"] = best_scores
+
+    # --- avaliacao UNICA no teste, so' se pedida, com o modelo ja escolhido ---
+    if test_data is not None:
+        X_te, y_te = test_data
+        Xte = torch.as_tensor(X_te, dtype=torch.float32, device=device)
+        yte = torch.as_tensor(y_te, dtype=torch.long, device=device)
+        tl, tps, tscores = _eval_split(model, crit, crit_ps, Xte, yte, return_scores)
+        out["test_loss"] = float(tl)
+        out["cvar_test"] = float(cvar(tps, cfg.gamma)) if np.isfinite(tl) else 1e3
+        if return_scores:
+            out["scores_test"] = tscores
     return out

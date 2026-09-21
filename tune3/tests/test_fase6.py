@@ -94,8 +94,10 @@ def test_protocolo_ponta_a_ponta():
         Xtr, ytr = make(600); Xv, yv = make(200); Xte, yte = make(200)
         return (Xtr, ytr, Xv, yv, Xte, yte)
 
+    from tune3.experiments.protocol import ALL_METHODS
     cfg = ProtocolConfig(seeds=[0, 1], epochs=4, n_init=3, n_iter=1,
-                         asha_configs=4, device="cpu")
+                         asha_configs=4, device="cpu")          # todos os 8 metodos (E1/E2 inclusos)
     res = run_protocol(loader_fn, cfg)
-    assert set(res["methods"]) == {"tune3", "tune3_bestcvar", "random_search", "asha", "sam"}
+    assert set(res["methods"]) == set(ALL_METHODS)
     assert all(len(v) == 2 for v in res["cvar_test_by_method"].values())
+    assert "_telemetry" in res["per_seed"][0] and "tune3" in res["per_seed"][0]["_telemetry"]

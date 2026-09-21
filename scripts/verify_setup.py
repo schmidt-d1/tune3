@@ -30,16 +30,29 @@ def main():
     print("=" * 64)
 
     print("\n-- Dependencias --")
-    deps = ["numpy", "torch", "pandas", "sklearn", "structlog",
-            "botorch", "gpytorch", "optuna", "hydra", "wandb", "pytest"]
+    deps = ["numpy", "scipy", "torch", "pandas", "sklearn", "statsmodels", "structlog",
+            "botorch", "gpytorch", "pytest"]
+    opcionais = {"torchvision": 'pip install -e ".[vision]"  (trilha CIFAR/ResNet)',
+                 "optuna": 'pip install -e ".[extras]"', "wandb": 'pip install -e ".[extras]"'}
     faltam_deps = []
     for d in deps:
         try:
             importlib.import_module(d)
             print(f"  {OK} {d}")
         except Exception:
-            print(f"  {NO} {d}  -> pip install {d}")
+            print(f"  {NO} {d}  -> pip install -e \".[dev]\"")
             faltam_deps.append(d)
+    for d, how in opcionais.items():
+        try:
+            importlib.import_module(d); print(f"  {OK} {d} (opcional)")
+        except Exception:
+            print(f"  {WARN} {d} ausente (opcional) -> {how}")
+    try:
+        import torch
+        print(f"  {OK} torch {torch.__version__} | CUDA: {torch.cuda.is_available()}"
+              + (f" | GPU: {torch.cuda.get_device_name(0)}" if torch.cuda.is_available() else ""))
+    except Exception:
+        pass
 
     print("\n-- Fase 0: estimador de curvatura --")
     print("  " + " ".join(check_import("tune3.curvature", ["HutchinsonEstimator", "HutchinsonConfig"])))
@@ -59,6 +72,13 @@ def main():
     print("\n-- Fase 3: CVaR + MACRO --")
     print("  " + " ".join(check_import("tune3.core", ["cvar", "value_at_risk"])))
     print("  " + " ".join(check_import("tune3.macro", ["Tune3MacroLoop", "MacroConfig"])))
+
+    print("\n-- Fases 4-6: integracao, baselines (inclui B4), protocolo --")
+    print("  " + " ".join(check_import("tune3.integration", ["run_trial", "run_tune3"])))
+    print("  " + " ".join(check_import("tune3.baselines", ["MonoObjectiveBO", "RandomSearchHPO", "ASHA", "SAM"])))
+    print("  " + " ".join(check_import("tune3.experiments", ["compare_paired", "run_protocol", "save_result"])))
+    from pathlib import Path as _P
+    print(f"  {OK if _P('PREREGISTRATION.md').exists() else NO} PREREGISTRATION.md")
 
     print("\n-- Dados: arquivo DREBIN-215 --")
     candidates = ["data/drebin215.csv", "data/drebin-215-dataset-5560malware-9476-benign.csv"]
@@ -86,11 +106,11 @@ def main():
 
     print("\n" + "=" * 64)
     if faltam_deps:
-        print(f" ACAO: instale dependencias faltantes: pip install {' '.join(faltam_deps)}")
+        print(f" ACAO: instale dependencias faltantes: pip install -e \".[dev]\"  (faltam: {' '.join(faltam_deps)})")
     if not found:
         print(" ACAO: baixe o DREBIN-215 para data/drebin215.csv (gate da Fase 4)")
     if not faltam_deps and found:
-        print(" TUDO PRONTO para a Fase 4 (integracao).")
+        print(" TUDO PRONTO. Proximo passo: pytest -q  e  python scripts/validate_theory.py")
     print("=" * 64)
 
 

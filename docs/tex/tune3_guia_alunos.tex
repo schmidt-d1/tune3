@@ -1,0 +1,319 @@
+\newcommand{\docshort}{Guia de execução (alunos)}
+\input{preambulo}
+\lstset{language={},keywordstyle={}}
+
+\title{\textbf{Tune3 --- Guia de execução dos experimentos}\\[6pt]
+\large O que rodar, por que rodar, como rodar e como entregar}
+\author{Projeto Tune3 --- coordenação: Prof.\ Dionatan R.\ Schmidt\\ UNIPAMPA, Campus Alegrete --- AI Horizon Labs}
+\date{Versão de 21 de setembro de 2026 (revisão 2) --- válida para o repositório a partir da tag \code{auditoria-2026-09-16}}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Este guia é para quem vai \emph{executar} os experimentos do Tune3. Ele não pressupõe que você conheça o método (para isso existe o documento \emph{Fundamentos e arquitetura}), mas pressupõe que você vai seguir o protocolo à letra: os experimentos estão pré-registrados, e um resultado obtido fora do protocolo não pode ser usado. Cada teste tem um \emph{propósito}, um \emph{comando exato}, uma \emph{saída esperada} e um \emph{critério de aceitação}. Os resultados são entregues pelo próprio repositório, em arquivos JSON padronizados que o coordenador confere com um único comando.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+% =====================================================================
+\section{Regras do jogo (leia antes de instalar qualquer coisa)}
+
+\begin{alerta}[Cinco regras não negociáveis]
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Não altere parâmetros.} Sementes, épocas, orçamento, espaço de busca e limiares estão em \code{PREREGISTRATION.md}. Rodar ``só para ver'' com outros valores é permitido \emph{apenas} com a flag \code{--tag exploratorio-<seu-nome>}, e o resultado não conta.
+\item \textbf{Rode sempre de uma árvore limpa.} Antes de qualquer experimento: \code{git status} tem que estar vazio e \code{git pull} atualizado. Cada JSON grava o commit e se a árvore estava suja; resultado com \code{dirty = true} não é aceito.
+\item \textbf{Nunca edite um JSON de resultado.} Se algo saiu errado, rode de novo com outra \code{--tag}. O histórico de tentativas é informação, não vergonha.
+\item \textbf{Reporte o que aconteceu, não o que gostaria que tivesse acontecido.} Um experimento em que o Tune3 perde é um resultado científico; um em que o Tune3 ``ganha'' porque você trocou uma semente é fraude.
+\item \textbf{Quando travar, pare e pergunte.} Erro que você não entende, tempo três vezes maior que o previsto, GPU sem memória: anote a mensagem completa e envie ao coordenador. Não ``dê um jeito''.
+\end{enumerate}
+\end{alerta}
+
+\paragraph{O que você vai produzir.} (i) Arquivos \code{results/<experimento>/<data>\_<commit>\_<seu-nome>.json}, commitados e enviados ao repositório; (ii) um relatório curto por rodada, a partir de \code{docs/TEMPLATE\_RELATORIO\_ALUNO.md}, salvo em \code{results/relatorios/}. Nada mais. Não é preciso mandar planilha, print de tela nem e-mail com números.
+
+% =====================================================================
+\section{Instalação passo a passo}
+
+\subsection{Pré-requisitos}
+\begin{itemize}
+\item \textbf{Python 3.10 ou superior} (testado em 3.11 e 3.14). No Windows, instale pelo site python.org marcando ``Add to PATH''. Verifique com \code{python --version}.
+\item \textbf{Git.} Verifique com \code{git --version}.
+\item \textbf{GPU NVIDIA} é recomendada para os experimentos oficiais (H1/H2/H3), mas \emph{não} é necessária para o Teste 0 e o Teste 1. Verifique o driver com \code{nvidia-smi}.
+\item Cerca de 5\,GB de disco (PyTorch com CUDA ocupa a maior parte).
+\end{itemize}
+
+\subsection{Clonar e criar o ambiente virtual}
+Abra o PowerShell (Windows) ou um terminal (Linux/macOS) numa pasta de trabalho.
+\begin{lstlisting}
+git clone https://github.com/dionatanschmidt/tune3.git
+cd tune3
+python -m venv .venv
+\end{lstlisting}
+Ative o ambiente --- \textbf{este passo precisa ser repetido toda vez que abrir um terminal novo}:
+\begin{lstlisting}
+# Windows (PowerShell)
+.\.venv\Scripts\Activate.ps1
+# Linux / macOS
+source .venv/bin/activate
+\end{lstlisting}
+O prompt passa a mostrar \code{(.venv)} no início. Se o PowerShell recusar por política de execução, rode uma vez \code{Set-ExecutionPolicy -Scope CurrentUser RemoteSigned} e tente de novo.
+
+\begin{alerta}[Armadilha comum: dois ambientes]
+Se você usa PyCharm, ele pode criar um \code{.venv} próprio na pasta \emph{acima} do repositório. Confirme sempre qual está ativo: no PowerShell, \code{\$env:VIRTUAL\_ENV} deve terminar em \code{\textbackslash tune3\textbackslash .venv}; no Linux, \code{echo \$VIRTUAL\_ENV}. O prompt \code{(.venv)} sozinho não garante nada.
+\end{alerta}
+
+\subsection{Instalar o PyTorch (com ou sem GPU) e o pacote}
+\begin{lstlisting}
+python -m pip install --upgrade pip
+# (a) COM GPU NVIDIA -- escolha o indice compativel com o seu driver (cu124 serve para drivers recentes):
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+# (b) SEM GPU (ou notebook sem NVIDIA):
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+# em ambos os casos, depois:
+pip install -e ".[dev,vision]"
+\end{lstlisting}
+Confirme:
+\begin{lstlisting}
+python -c "import torch; print(torch.__version__, torch.cuda.is_available())"
+python scripts/verify_setup.py
+\end{lstlisting}
+A segunda linha imprime \code{[ OK ]} para cada módulo do Tune3 e avisa o que falta. É normal aparecer \code{[FALTA] data/drebin215.csv} nesta etapa.
+
+\subsection{Baixar o DREBIN-215}
+O conjunto de dados não fica no repositório (é ignorado pelo git). Baixe o CSV do DREBIN-215 ---
+figshare, \emph{Android malware dataset for machine learning 2} (id 5854653), ou a cópia no Kaggle (``drebin 215 dataset'') --- e salve como \code{data/drebin215.csv} dentro da pasta do repositório. Rode de novo:
+\begin{lstlisting}
+python scripts/verify_setup.py
+\end{lstlisting}
+Saída esperada na seção de dados: \code{load\_splits(): treino=(9622, 215) val=(2406, 215) teste=(3008, 215)}, \code{features=215}, \code{frac\_malware} $\approx0{,}37$. Se o número de atributos não for 215, o CSV está errado (coluna de classe mal identificada) --- avise antes de continuar.
+
+\begin{alerta}[Quantas amostras o CSV deve ter --- ponto em aberto]
+Os três números acima somam $15\,036$ aplicativos, que é o tamanho da distribuição mais comum do DREBIN-215. Documentos internos antigos do projeto mencionam $24\,507$ amostras, o que corresponde a \emph{outra} distribuição do mesmo conjunto. As duas existem na internet. \textbf{Anote no relatório o total de linhas do seu CSV} (\code{python -c "import pandas as pd; print(pd.read\_csv('data/drebin215.csv').shape)"}). Todos os alunos precisam usar o \emph{mesmo} arquivo; o coordenador fixa qual é antes do início dos experimentos oficiais.
+\end{alerta}
+
+% =====================================================================
+\section{Teste 0 --- sanidade: o código faz o que a teoria diz?}\label{sec:t0}
+
+\paragraph{Por quê.} Antes de gastar horas de GPU, precisamos saber que a instalação está íntegra e que cada componente matemático (estimador de curvatura, GSNR, CVaR, Cantelli, DDKF, EoS, estatística) se comporta como a teoria prevê \emph{na sua máquina}. Este teste também é o que o coordenador vai olhar primeiro se algum resultado seu parecer estranho.
+
+\paragraph{Passo 0.1 --- suíte de testes} (20--60\,s):
+\begin{lstlisting}
+pytest -q
+\end{lstlisting}
+Saída esperada: \code{89 passed} (um \emph{warning} sobre \code{torch.jit.script} em Python 3.14 é normal). Qualquer \code{failed} ou \code{error}: copie a saída inteira e pare.
+
+\paragraph{Passo 0.2 --- validação teoria $\times$ implementação, dados sintéticos} (1--3\,min, CPU):
+\begin{lstlisting}
+python scripts/validate_theory.py --tag <seu-nome>
+\end{lstlisting}
+\paragraph{Passo 0.3 --- a mesma validação com o DREBIN e a GPU} (2--5\,min):
+\begin{lstlisting}
+python scripts/validate_theory.py --csv data/drebin215.csv --device cuda --tag <seu-nome>
+\end{lstlisting}
+
+\subsection{Como ler a saída}
+O script imprime um veredito por item, no formato do projeto:
+\begin{lstlisting}
+  [PROVADO             ] V1 Hutchinson == Tr(H^2) exato (n=194 params)
+      max|HVP - Hv|=1.5e-07; estimador(M=4000)=1.5858 vs exato=1.5872, z=-0.09
+  [VERIFICADO(escopo: este MLP)] V1b Hutchinson em model.train() (dropout=0.3) desvia do exato
+      razao train/exato = 1.324 -> por isso o trial usa model.eval()
+  ...
+  [VERIFICADO(escopo: t3, janela 10)] V5b Cantelli na janela REAL do trial
+      taxa empirica=0.0087 (cota nominal 0.05; 24000 testes). Sem garantia formal
+      com localizacao/escala estimadas -- e' verificacao empirica.
+  ...
+=== RESUMO: 13 itens, 0 REFUTADO(s), 2.5 min ===
+[salvo] results/validation/20260921-171328_a1b2c3d_<seu-nome>.json
+\end{lstlisting}
+
+\begin{center}\small
+\begin{tabular}{@{}lp{6.2cm}p{5.6cm}@{}}
+\toprule
+Item & O que testa & Aceitação \\ \midrule
+V1 & o estimador de $\Tr(H^2)$ contra a Hessiana exata & PROVADO; $|z|<4$ \\
+V1b & efeito do dropout na estimativa & VERIFICADO (razão $\ne1$) --- é informativo \\
+V2 & desvio do estimador cai como $1/\sqrt M$ & razões entre $1{,}4$ e $2{,}8$ \\
+V3a/V3b & GSNR $=$ definição; GSNR $\propto B$ & PROVADO; razão em $[3,20]$ \\
+V4 & CVaR: duas fórmulas concordam; valor teórico & PROVADO \\
+V5 & Cantelli: alarme falso $\le5\%$ sob cauda pesada (janela $30$) & VERIFICADO \\
+V5b & o mesmo na janela que o \emph{trial} usa de fato ($30$ épocas $\to$ janela $10$) & VERIFICADO --- é verificação empírica, não garantia formal \\
+V6a & DDKF corrige na direção certa & VERIFICADO \\
+V6b & engajamento do DDKF ao longo do tempo & \textbf{EM ABERTO} por desenho --- não é erro \\
+V7 & EoS dispara no cenário certo e não no errado & PROVADO \\
+V8 & protocolo estatístico: FWER $\le\alpha$, poder em $d_z=0{,}8$ & VERIFICADO \\
+V9 & ponta a ponta: 8 métodos rodam, Pareto, telemetria & VERIFICADO; anote a \emph{duração} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Critério de aceitação do Teste 0:} \code{0 REFUTADO(s)}. Se aparecer um REFUTADO, não siga: copie a linha inteira (item + evidência) para o relatório e avise o coordenador. O JSON em \code{results/validation/} é parte da entrega.
+
+\begin{ideia}[O que o V9 já está lhe dizendo]
+A linha do V9 termina com algo como \code{DDKF ativo em 0/85 epocas (regime A medio=1.00); EoS disparos=0}. Esse número vem de \emph{uma} semente com orçamento mínimo (o V9 é um teste de integração, não uma medida do método), então não o leia como resultado --- leia como o formato da telemetria de engajamento que o experimento E2 vai medir em escala, com 20 sementes e orçamento cheio. Anote no relatório.
+\end{ideia}
+
+% =====================================================================
+\section{Teste 1 --- piloto rápido: o pipeline completo roda?}\label{sec:t1}
+
+\paragraph{Por quê.} O Teste 0 valida componentes. O Teste 1 roda o experimento H1 inteiro em miniatura (3 sementes, 20 épocas, orçamento reduzido) para (i) confirmar que os 8 métodos rodam de ponta a ponta com o DREBIN, (ii) medir o \emph{tempo por semente} na sua máquina, do qual você vai extrapolar a duração dos experimentos oficiais, e (iii) você ver com os próprios olhos o formato da saída e do JSON. \textbf{Ele não produz significância} --- com 3 sementes o menor $p$ possível do Wilcoxon é $0{,}25$; o script avisa isso.
+
+\begin{lstlisting}
+python scripts/run_pilot.py --csv data/drebin215.csv --seeds 0 1 2 --epochs 20 --device cuda --tag <seu-nome>
+\end{lstlisting}
+(Sem GPU: \code{--device cpu}; leva mais tempo, mas funciona.)
+
+\paragraph{Saída esperada} (números ilustrativos):
+\begin{lstlisting}
+===== RESULTADO DO PILOTO (CVaR no TESTE, menor=melhor) =====
+  tune3                   : mediana=0.9813  IQR=...
+  tune3_bestcvar          : mediana=...
+  ...
+  Seeds: 3 | p-minimo atingivel (Wilcoxon): 0.2500
+  AVISO: com este no de seeds e' IMPOSSIVEL atingir p<0.05.
+  tune3_bestcvar vs demais (pareado; regra pre-registrada = p_holm<0.05 E |d_z|>=0.30):
+    vs bo_mono_cvar            : diff=..., d_z=..., IC95[...], p_holm=... [n.s.]
+[salvo] results/pilot_h1/20260916-...json
+\end{lstlisting}
+
+\textbf{Critério de aceitação:} termina sem exceção; oito métodos listados; nenhum CVaR igual a $1000$ (isso indicaria trials abortados em massa); JSON salvo. Anote a \textbf{duração} impressa (também está em \code{meta.duration\_s} no JSON) --- ela alimenta a tabela da Seção~\ref{sec:tempo}.
+
+% =====================================================================
+\section{Os experimentos oficiais}
+
+\begin{alerta}[Cada comando abaixo é \emph{uma linha só}]
+Os comandos são longos e a caixa os quebra visualmente em mais de uma linha; essa quebra é \textbf{só da formatação}. Cole cada comando numa linha única --- se o seu editor quebrou, junte antes de executar. Não use \code{\^{}} para continuar linha (isso é do \code{cmd.exe} antigo, não do PowerShell) nem \code{\textbackslash} (isso é do \emph{bash}); no PowerShell o caractere de continuação seria a crase, que falha silenciosamente se sobrar qualquer espaço depois dela. Linha única funciona igual nos três terminais, e é por isso que os comandos estão assim.
+\end{alerta}
+
+Todos os comandos abaixo usam \emph{todos os oito métodos} por padrão (Tune3 em três variantes, B4, RS, ASHA, SAM), o que cobre H1/H2/H3 \emph{e} os controles da Linha 1 (E1, E2) de uma vez. Se o coordenador pedir um subconjunto, use \code{--methods} (ex.: \code{--methods tune3\_bestcvar tune3\_placebo\_bestcvar bo\_mono\_cvar}).
+
+\subsection{H1 --- in-distribution (20 sementes)}\label{sec:h1}
+\paragraph{Pergunta.} Em dados da mesma distribuição, o Tune3 tem vantagem? (Expectativa registrada: \emph{não}; é um controle negativo.)
+\begin{lstlisting}
+python scripts/run_pilot_parallel.py --csv data/drebin215.csv --seeds 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 --epochs 100 --n-init 8 --n-iter 20 --device cuda --workers 4 --tag <seu-nome>
+\end{lstlisting}
+\code{--workers 4} lança 4 processos que dividem as sementes e compartilham a GPU; se a memória da GPU estourar, use \code{--workers 2}.
+
+\subsection{H2 --- desbalanceamento (S1, 20 sementes)}
+\paragraph{Pergunta.} A vantagem em CVaR cresce quando o malware fica raro no treino (5\%, 2\%, 1\%)? A predição falsificável é a \emph{ordem} dos $d_z$ nas três razões.
+\begin{lstlisting}
+python scripts/run_s1_imbalance.py --csv data/drebin215.csv --seeds 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 --ratios 0.05 0.02 0.01 --epochs 100 --device cuda --tag <seu-nome>
+\end{lstlisting}
+Além do CVaR, observe \code{test\_auc\_pr} e \code{test\_fpr\_at\_95tpr}: sob forte desbalanceamento, F1 e MCC com limiar fixo degeneram e não devem ser interpretados.
+
+\subsection{H3 --- zero-day por cluster (S2, 10 sementes $\times$ 5 folds)}
+\paragraph{Pergunta.} Em malware de um ``grupo'' nunca visto no treino, o Tune3 best-CVaR vence RS, ASHA e SAM? É o cenário em que a tese prevê vantagem --- e o único em que ela apareceu antes.
+\begin{lstlisting}
+python scripts/run_s2_zeroday.py --csv data/drebin215.csv --seeds 0 1 2 3 4 5 6 7 8 9 --n-clusters 5 --epochs 100 --device cuda --tag <seu-nome>
+\end{lstlisting}
+O script imprime duas análises. A \textbf{primária} usa \emph{uma observação por semente} (média sobre os 5 folds). A ``pooled'' (folds $\times$ sementes) é \textbf{exploratória}: sementes do mesmo fold compartilham o conjunto de teste e não são independentes. Reporte a primária.
+
+\subsection{Linha 1 --- o que E1 e E2 significam nas saídas}
+Você não precisa rodar nada a mais: os controles já estão nos comandos acima. Ao ler as tabelas, saiba o que cada linha responde:
+\begin{itemize}
+\item \code{bo\_mono\_cvar} (B4): a mesma otimização bayesiana e o mesmo trial interno do Tune3, mas otimizando \emph{só} o CVaR. Se ele empata ou vence o Tune3, o segundo objetivo (curvatura) não está ajudando.
+\item \code{tune3\_placebo\_bestcvar}: o Tune3 com a curvatura trocada por \emph{ruído}. Se empata com o Tune3 real, o ganho vem de ter dois objetivos, não da geometria.
+\item \code{tune3\_noddkf\_bestcvar}: o Tune3 com o controlador de learning rate desligado. Compare com \code{tune3\_bestcvar} e olhe a telemetria no JSON (chave \code{\_telemetry}: épocas com DDKF ativo e frações de regime).
+\end{itemize}
+
+\subsection{E0 --- reanálise (custo zero, depois do H3)}
+\begin{lstlisting}
+python scripts/analyze_e0.py --tag <seu-nome>
+\end{lstlisting}
+Lê os JSONs de \code{results/s2\_zeroday/} e calcula, por fold e no total, a correlação parcial entre CVaR e $\log\Tr(H^2)$ controlando $\log\eta$ e $\log\lambda_{wd}$. Funciona \emph{apenas} sobre JSONs gerados pelo código corrigido (os antigos do Drive têm um defeito de avaliação e não servem).
+
+% =====================================================================
+\section{Quanto tempo isso leva}\label{sec:tempo}
+
+O tempo depende da GPU. Use o Teste 1 para calibrar: seja $T_1$ a duração (em minutos) do piloto de 3 sementes $\times$ 20 épocas $\times$ orçamento $5+8$. Os experimentos oficiais usam 100 épocas (com parada antecipada, tipicamente 30--60 efetivas) e orçamento $8+20$, logo cada semente custa cerca de $2{,}2\times$ (orçamento) $\times$ $2$--$3\times$ (épocas) $\approx5$--$7\times$ uma semente do piloto. Estimativas:
+
+\begin{center}\small
+\begin{tabular}{@{}lrl@{}}
+\toprule
+Experimento & Sementes $\times$ cenários & Estimativa \\ \midrule
+H1 (\code{run\_pilot\_parallel}, 4 workers) & 20 & $\approx (20/3)\times6\times T_1/4$ \\
+H2 (S1) & $20\times3$ razões & $\approx (60/3)\times6\times T_1$ \\
+H3 (S2) & $10\times5$ folds & $\approx (50/3)\times6\times T_1$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+Com $T_1\approx3$\,min numa GPU de mesa recente: H1 $\approx30$\,min, H2 $\approx6$\,h, H3 $\approx5$\,h. Planeje H2 e H3 para rodar à noite; não feche o terminal nem deixe o computador hibernar (no Windows: Configurações $\to$ Energia $\to$ ``Nunca'' suspender enquanto conectado).
+
+% =====================================================================
+\section{Como registrar e entregar os resultados}
+
+\subsection{O que cada script grava}
+Todo experimento grava \code{results/<experimento>/<AAAAMMDD-HHMMSS>\_<commit>\_<tag>.json} com dois blocos:
+\begin{itemize}
+\item \code{meta}: experimento, sua \code{--tag}, data, duração, \emph{argumentos exatos}, commit do git e se a árvore estava suja, versão do Python/torch, GPU. É isso que torna o resultado auditável.
+\item \code{payload}: o resultado bruto (scores por método e semente, estatística pré-registrada, telemetria por trial).
+\end{itemize}
+Se você viu \code{[AVISO] arvore git SUJA} ao final, o resultado \emph{não} é oficial: faça \code{git status}, resolva (normalmente é um arquivo que você editou sem querer), e rode de novo.
+
+\subsection{Entrega pelo git (é só isso)}
+\begin{lstlisting}
+git pull --rebase
+git add results/
+git commit -m "resultados: s2 zero-day, seeds 0-9 (<seu-nome>)"
+git push
+\end{lstlisting}
+Os JSONs em \code{results/} são versionados de propósito (é a exceção no \code{.gitignore}). Não adicione nada fora de \code{results/} --- se \code{git status} mostrar outros arquivos modificados, você mexeu em algo que não devia; avise.
+
+\subsection{O relatório curto}
+Copie \code{docs/TEMPLATE\_RELATORIO\_ALUNO.md} para \code{results/relatorios/<seu-nome>\_<data>.md}, preencha e commite junto. Ele tem seis campos: identificação/máquina/commit; saída do Teste 0; tabela dos experimentos rodados (comando exato, duração, arquivo); o que você observou (fatos: medianas, $d_z$, \code{prereg\_win}, telemetria); o que deu errado; dúvidas. Cole números, não adjetivos.
+
+\subsection{O que o coordenador vai fazer}
+\begin{lstlisting}
+python scripts/collect_results.py
+\end{lstlisting}
+Isso varre \code{results/} e monta uma tabela (terminal e \code{results/SUMMARY.md}) com: experimento, quem rodou, data, commit, árvore suja?, GPU, número de sementes, e, para cada comparação, $d_z$, $p_{\text{Holm}}$ e \code{prereg\_win}. É por essa tabela que os resultados de todos os alunos são conferidos lado a lado.
+
+% =====================================================================
+\section{Problemas comuns}
+
+\begin{center}\small
+\begin{tabular}{@{}p{5.2cm}p{9.5cm}@{}}
+\toprule
+Sintoma & O que fazer \\ \midrule
+\code{pytest: comando não reconhecido} & O ambiente virtual não está ativo, ou o \code{pip install -e ".[dev,vision]"} não rodou nele. Ative e reinstale. \\
+\code{No module named 'tune3'} & Você está fora da pasta do repositório ou o pacote não foi instalado (\code{pip install -e .}). \\
+\code{torch.cuda.is\_available()} $=$ \code{False} & Instalou o torch de CPU. Desinstale (\code{pip uninstall torch torchvision}) e reinstale com \code{--index-url .../cu124}. Confira o driver com \code{nvidia-smi}. \\
+\code{CUDA out of memory} & Reduza \code{--workers} (H1) para 2 ou 1. Não mude \code{batch\_size}. \\
+Um método mostra CVaR $=1000$ & Trials abortados (penalidade). Um ou dois por semente é normal em lr alto; se for a maioria, pare e reporte. \\
+\code{[AVISO] arvore git SUJA} & Algum arquivo do repositório foi alterado. \code{git status}; \code{git checkout -- <arquivo>} se foi sem querer; rode de novo. \\
+Muito mais lento que a estimativa & Confira se está em \code{--device cuda} e se outra coisa usa a GPU (\code{nvidia-smi}). \\
+\code{git push} rejeitado & \code{git pull --rebase} e tente de novo; resultados de outros alunos chegaram antes. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% =====================================================================
+\section{Resumo em uma página}
+\begin{enumerate}
+\item Instalar: clonar, \code{.venv}, torch (CUDA ou CPU), \code{pip install -e ".[dev,vision]"}, \code{verify\_setup.py}, baixar \code{data/drebin215.csv}.
+\item Teste 0: \code{pytest -q} (89 passed) e \code{validate\_theory.py} sintético e com DREBIN (0 REFUTADO).
+\item Teste 1: \code{run\_pilot.py --seeds 0 1 2 --epochs 20}; anotar a duração.
+\item Oficiais, com a árvore limpa: H1 (\code{run\_pilot\_parallel}), H2 (\code{run\_s1\_imbalance}), H3 (\code{run\_s2\_zeroday}); por fim, E0 (\code{analyze\_e0}).
+\item Entregar: \code{git add results/ \&\& git commit \&\& git push} + relatório curto em \code{results/relatorios/}.
+\end{enumerate}
+
+\appendix
+\section{Campos do JSON que valem a pena conhecer}
+\begin{center}\small
+\begin{tabular}{@{}p{6.4cm}p{8.6cm}@{}}
+\toprule
+Caminho no JSON & Significado \\ \midrule
+\code{meta.git.commit\_short}, \code{meta.git.dirty} & commit usado; \code{true} = resultado não oficial \\
+\code{meta.args} & argumentos exatos da linha de comando \\
+\code{payload.scores[m]} (piloto) & CVaR de teste por semente, para o método \code{m} \\
+\code{payload.stats.comparisons[b]} & \code{dz}, \code{dz\_ci95} (BCa), \code{p\_raw}, \code{p\_holm}, \code{practical}, \code{prereg\_win} \\
+\code{payload.stats.underpowered} & \code{true} se o nº de sementes não permite $p<0{,}05$ \\
+\code{payload.primary\_per\_seed} (S2) & análise primária por semente \\
+\code{payload.results\_by\_fold[f]} \code{.per\_seed[i].\_telemetry.tune3} & lista de trials do Tune3: \code{hparams}, \code{cvar}, \code{curvature}, \code{n\_ddkf\_active\_epochs}, \code{regime\_fractions}, \code{n\_eos\_triggers} \\
+\code{payload.report} (validation) & vereditos V1--V9 com as evidências numéricas \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\end{document}

@@ -3,16 +3,28 @@
 Trial de treino do Tune3 -- integracao de todos os componentes.
 ATUALIZADO (Fase 7): early stopping, dataset residente na GPU, batches grandes,
 TF32, e CVaR avaliado na MELHOR epoca (nao na ultima).
+CORRIGIDO (set/2026, auditoria):
+  (a) EoSDetector so' recebe a curvatura quando ela e' RE-ESTIMADA. Antes, recebia
+      o mesmo valor repetido `curvature_every` vezes, e a condicao de "subidas
+      estritamente consecutivas" nunca era satisfeita: o detector NUNCA disparava
+      (n_eos_triggers == 0 em todos os experimentos anteriores).
+  (b) Hutchinson roda em model.eval(): com dropout ativo o estimador media a
+      curvatura de uma sub-rede aleatoria (viés e variancia extras).
+  (c) Flag `ddkf_enabled` (ablacao E2) + telemetria de engajamento do controlador.
 
 Dado hiperparametros (do MACRO/BO), treina o modelo com:
   - DDKFController ajustando o log-lr ONLINE (gated por RegimeGate);
-  - HutchinsonEstimator medindo Tr(H^2) (treino, nunca teste);
+  - HutchinsonEstimator medindo Tr(H^2) (batch de treino, nunca teste);
   - GSNREstimator (3a observacao do DDKF);
   - CantelliGuard (aborto em spike catastrofico);
   - EoSDetector (reduz lr em progressive sharpening);
   - class_weight (desbalanceamento, coerente com CVaR);
   - EARLY STOPPING (paciencia): para se val_loss nao melhora.
-Retorna (CVaR_gamma da MELHOR epoca, Tr(H^2)).
+Retorna (CVaR_gamma da MELHOR epoca de validacao, Tr(H^2)) + telemetria.
+
+OBSERVACAO DO DDKF (decisao de projeto, documentada): z_t = (train_loss,
+val_loss, log GSNR). A curvatura Tr(H^2) NAO entra no vetor de observacao do
+filtro; ela atua (i) como objetivo do nivel MACRO e (ii) via EoSDetector.
 """
 from __future__ import annotations
 
@@ -56,7 +68,12 @@ class TrialConfig:
     gsnr_batches: int = 4
     abort_penalty: float = 1e3
     use_class_weight: bool = True
+    # A curvatura e' re-estimada a cada `curvature_every` epocas. O EoSDetector
+    # conta "passos" em unidades de ESTIMATIVAS (window=6, patience=4 => precisa
+    # de >= 6 estimativas = 6*curvature_every epocas antes de poder disparar).
     curvature_every: int = 5
+    # Ablacao E2: False => lr fixo em lr0 (Cantelli/EoS continuam ativos).
+    ddkf_enabled: bool = True
 
 
 def _class_weights(y, k, device):
@@ -116,8 +133,11 @@ def run_trial(hparams, data, config=None, wandb_run=None) -> Dict:
     gsnr_est = GSNREstimator(GSNRConfig(num_batches=cfg.gsnr_batches))
 
     last_curv = 0.0
-    best_val = np.inf; best_val_ps = None; best_curv = 0.0; wait = 0
+    best_val = np.inf; best_val_ps = None; best_curv = 0.0; best_epoch = -1; wait = 0
     aborted = False
+    # telemetria de engajamento (E2): o controlador realmente mexeu no lr?
+    lr_traj = []; n_ddkf_active = 0; n_curv_estimates = 0
+    curv_traj = []
 
     for epoch in range(cfg.max_epochs):
         model.train()
@@ -144,27 +164,40 @@ def run_trial(hparams, data, config=None, wandb_run=None) -> Dict:
             val_loss = float(crit(val_out, yv).detach())
             val_ps = crit_ps(val_out, yv).cpu().numpy()
 
+        # --- curvatura: re-estimada esparsamente; EoS so' ve' valores NOVOS ---
+        eos_fired = False
         if epoch % cfg.curvature_every == 0 or epoch == cfg.max_epochs - 1:
-            idx = perm[:bs]
-            model.train()
+            idx = perm[:bs]                    # batch de TREINO (novo a cada epoca)
+            model.eval()                       # sem dropout: curvatura da rede determinística
             last_curv = hutch.estimate(model, crit(model(Xtr_t[idx]), ytr_t[idx]))
+            model.train()
+            n_curv_estimates += 1; curv_traj.append(float(last_curv))
+            eos_fired = eos.update(last_curv)
 
+        # --- controle MICRO do lr ---
         log_gsnr = gsnr_est.log_gsnr(grads_for_gsnr) if len(grads_for_gsnr) >= 2 else 0.0
         ddkf.update(np.array([train_loss, val_loss, log_gsnr]))
         r2 = ddkf.information_ratio(); factor = gate.gating_factor(r2); gate.observe(r2)
-        new_log_lr = ddkf.x_hat if factor > 0 else np.log(lr0)
-        applied = (1 - factor) * np.log(max(_current_lr(opt), 1e-12)) + factor * new_log_lr
+        cur_lr = max(_current_lr(opt), 1e-12)
+        if cfg.ddkf_enabled:
+            new_log_lr = ddkf.x_hat if factor > 0 else np.log(lr0)
+            applied = (1 - factor) * np.log(cur_lr) + factor * new_log_lr
+            if factor > 0: n_ddkf_active += 1
+        else:
+            applied = np.log(cur_lr)           # ablacao: DDKF nao atua
         new_lr = float(np.exp(applied))
-        if eos.update(last_curv):
+        if eos_fired:
             new_lr *= eos.suggested_lr_factor()
         _set_lr(opt, new_lr)
+        lr_traj.append(new_lr)
 
         if cantelli.should_abort(val_loss):
             aborted = True; break
 
-        # --- EARLY STOPPING: rastreia melhor epoca ---
+        # --- EARLY STOPPING: rastreia melhor epoca (VALIDACAO) ---
         if val_loss < best_val - cfg.min_delta:
-            best_val = val_loss; best_val_ps = val_ps; best_curv = last_curv; wait = 0
+            best_val = val_loss; best_val_ps = val_ps; best_curv = last_curv
+            best_epoch = epoch; wait = 0
         else:
             wait += 1
             if wait >= cfg.patience:
@@ -175,12 +208,28 @@ def run_trial(hparams, data, config=None, wandb_run=None) -> Dict:
             wandb_run.log({"epoch": epoch, "train_loss": train_loss, "val_loss": val_loss,
                            "lr": new_lr, "trace_h2": last_curv, "R2": r2})
 
+    lr_arr = np.asarray(lr_traj, dtype=float)
+    telemetry = {
+        "regime_fractions": gate.fractions(),
+        "n_eos_triggers": eos.n_triggers,
+        "n_epochs_run": len(lr_traj),
+        "n_ddkf_active_epochs": n_ddkf_active,
+        "n_curvature_estimates": n_curv_estimates,
+        "lr0": lr0,
+        "lr_final": float(lr_arr[-1]) if lr_arr.size else lr0,
+        "lr_min": float(lr_arr.min()) if lr_arr.size else lr0,
+        "lr_max": float(lr_arr.max()) if lr_arr.size else lr0,
+        # fracao de epocas em que o lr efetivamente mudou (>0.1% relativo)
+        "lr_change_fraction": float(np.mean(np.abs(np.diff(np.log(lr_arr))) > 1e-3)) if lr_arr.size > 1 else 0.0,
+        "curvature_trajectory": curv_traj,
+    }
+
     if aborted or best_val_ps is None:
         return {"cvar": cfg.abort_penalty, "curvature": cfg.abort_penalty,
-                "aborted": True, "regime_fractions": gate.fractions()}
+                "aborted": True, **telemetry}
 
-    # CVaR na MELHOR epoca (consistente com early stopping)
+    # CVaR na MELHOR epoca de validacao (consistente com early stopping)
     return {"cvar": float(cvar(best_val_ps, cfg.gamma)),
             "curvature": float(best_curv),
             "aborted": False, "final_val_loss": float(best_val),
-            "regime_fractions": gate.fractions(), "n_eos_triggers": eos.n_triggers}
+            "best_epoch": int(best_epoch), **telemetry}

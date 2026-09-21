@@ -32,22 +32,27 @@ def test_trial_roda_e_retorna_objetivos():
 
 
 def test_trial_aborta_lr_explosivo():
-    """lr enorme com SGD diverge => Cantelli aborta e retorna penalidade."""
+    """lr absurdo com SGD => overflow numerico (loss nao-finita) OU spike detectado
+    pelo Cantelli => trial devolve a penalidade de aborto.
+
+    Nota (auditoria set/2026): com lr=50 o MLP nao diverge -- ele COLAPSA em ReLUs
+    mortas e a loss fica constante (sem spike, Cantelli nao dispara). O teste
+    antigo passava por acaso do caminho aleatorio. Usamos lr=1e3, que estoura
+    para inf/NaN deterministicamente ja na 1a epoca.
+    """
     from tune3.integration.trial import run_trial, TrialConfig
     from tune3.safety import CantelliConfig
     Xtr, ytr = _synthetic(800, 0)
     Xv, yv = _synthetic(300, 1)
     res = run_trial(
-        {"learning_rate": 50.0, "weight_decay": 0.0, "dropout": 0.1,
+        {"learning_rate": 1e3, "weight_decay": 0.0, "dropout": 0.1,
          "hidden_dim": 64, "n_layers": 2},
         (Xtr, ytr, Xv, yv),
-        TrialConfig(max_epochs=20, optimizer="sgd", device="cpu",
-                    batch_size=32,  # mini-batch: lr alto diverge de verdade
+        TrialConfig(max_epochs=20, optimizer="sgd", device="cpu", batch_size=32,
                     cantelli=CantelliConfig(gamma=0.95, window_size=5)),
     )
-    # com mini-batch e lr=50, SGD diverge -> Cantelli aborta OU penalidade alta
-    # (com full-batch seria estavel; o guard isolado e' testado em test_cantelli)
-    assert res["aborted"] or res["cvar"] >= 100 or not np.isfinite(res["final_val_loss"])
+    assert res["aborted"]
+    assert res["cvar"] >= 100 and res["curvature"] >= 100   # penalidade de aborto
 
 
 def test_trial_curvatura_nao_negativa_sempre():

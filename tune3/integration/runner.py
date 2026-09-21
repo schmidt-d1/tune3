@@ -1,6 +1,14 @@
-# tune3/integration/runner.py  (ATUALIZADO Fase 8)
-"""Runner do Tune3 -- conecta MACRO ao trial. Agora reporta DUAS selecoes:
-knee point (equilibrio CVaR/curvatura) e best_cvar (Pareto de melhor CVaR)."""
+# tune3/integration/runner.py  (ATUALIZADO Fase 8 + auditoria set/2026)
+"""Runner do Tune3 -- conecta MACRO ao trial. Reporta DUAS selecoes:
+knee point (equilibrio CVaR/curvatura) e best_cvar (Pareto de melhor CVaR).
+
+NOVO (E1 -- controle placebo): `Tune3RunConfig.objective2` escolhe o 2o objetivo
+do nivel MACRO:
+  - "curvature" (padrao): Tr(H^2) medido no trial -- o Tune3 real.
+  - "random":  Z ~ N(0,1) i.i.d. por trial, no lugar da curvatura. Se o placebo
+    empata com o Tune3 real em CVaR de teste, o ganho vem da EXPLORACAO
+    bi-objetivo, nao da geometria (cenario C2 da arvore de decisao).
+"""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -25,6 +33,11 @@ class Tune3RunConfig:
     macro: MacroConfig = field(default_factory=lambda: MacroConfig(n_init=8, n_iter=20))
     trial: TrialConfig = field(default_factory=TrialConfig)
     search_space: Dict[str, Tuple[float, float]] = field(default_factory=lambda: dict(DEFAULT_SEARCH_SPACE))
+    objective2: str = "curvature"   # "curvature" | "random" (placebo, E1)
+
+    def __post_init__(self):
+        if self.objective2 not in ("curvature", "random"):
+            raise ValueError("objective2 deve ser 'curvature' ou 'random'")
 
 
 def _decode(raw):
@@ -37,16 +50,32 @@ def _decode(raw):
 
 def run_tune3(data, config=None, wandb_run=None):
     cfg = config or Tune3RunConfig()
+    placebo_rng = np.random.default_rng(10_000 + cfg.macro.seed)
+    trial_log = []   # telemetria por trial (E2: engajamento do DDKF)
 
     def evaluate(raw):
         hp = _decode(raw); res = run_trial(hp, data, cfg.trial, wandb_run=wandb_run)
-        return res["cvar"], res["curvature"]
+        trial_log.append({"hparams": hp, "cvar": res["cvar"], "curvature": res["curvature"],
+                          "aborted": res["aborted"],
+                          "regime_fractions": res.get("regime_fractions"),
+                          "n_eos_triggers": res.get("n_eos_triggers"),
+                          "n_ddkf_active_epochs": res.get("n_ddkf_active_epochs"),
+                          "n_epochs_run": res.get("n_epochs_run"),
+                          "lr_change_fraction": res.get("lr_change_fraction"),
+                          "lr0": res.get("lr0"), "lr_final": res.get("lr_final")})
+        if cfg.objective2 == "random":
+            second = float(placebo_rng.normal())      # placebo: ruido no lugar da curvatura
+        else:
+            second = res["curvature"]
+        return res["cvar"], second
 
     loop = Tune3MacroLoop(cfg.search_space, evaluate, cfg.macro)
     pareto = loop.run()
     knee = loop.knee_point()
-    best_cvar = loop.best_objective_point(obj_index=0)   # NOVO: melhor CVaR
+    best_cvar = loop.best_objective_point(obj_index=0)   # melhor CVaR (metrica de deploy)
     return {"pareto": pareto,
+            "objective2": cfg.objective2,
             "knee_raw": knee, "knee_hparams": _decode(knee["x"]) if knee else {},
             "best_cvar_raw": best_cvar,
-            "best_cvar_hparams": _decode(best_cvar["x"]) if best_cvar else {}}
+            "best_cvar_hparams": _decode(best_cvar["x"]) if best_cvar else {},
+            "trials": trial_log}
