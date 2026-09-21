@@ -23,3 +23,5 @@ _tmp_worker_*.json
 !configs/*.json
 # ...mas os resultados padronizados de results/ SAO (e' assim que o aluno entrega)
 !results/**/*.json
+# pasta onde o app do Claude salva os arquivos enviados no chat (fica dentro do repo)
+Claude outputs/

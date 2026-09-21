@@ -9,7 +9,7 @@ arquivo for commitado com a data e o hash abaixo preenchidos e nenhuma execuçã
 | Coordenador | Prof. Dionatan R. Schmidt (UNIPAMPA / AI Horizon Labs) |
 | Data de congelamento | `____/____/2026` |
 | Commit vinculante | `________` (`git rev-parse --short HEAD` após este arquivo ser commitado) |
-| Repositório | github.com/dionatanschmidt/tune3 |
+| Repositório | github.com/schmidt-d1/tune3 |
 | Substitui | nenhum pré-registro anterior versionado (não existia `PREREGISTRATION.md` no repositório) |
 
 > Regra do projeto: **ajustes de protocolo post-hoc são proibidos.** Qualquer mudança

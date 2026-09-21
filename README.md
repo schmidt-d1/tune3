@@ -12,7 +12,7 @@ aplicado à detecção de malware Android (DREBIN-215).
 ## Instalação (Windows PowerShell / Linux / macOS)
 
 ```bash
-git clone https://github.com/dionatanschmidt/tune3.git
+git clone https://github.com/schmidt-d1/tune3.git
 cd tune3
 python -m venv .venv
 # Windows:  .\.venv\Scripts\Activate.ps1      Linux/macOS:  source .venv/bin/activate
