@@ -1,6 +1,27 @@
 Metadata-Version: 2.4
 Name: tune3
-Version: 0.1.0
+Version: 0.2.0
+Summary: Tune3 -- HPO bi-nivel consciente de curvatura para deteccao de malware Android (SecOps)
 Requires-Python: >=3.10
 License-File: LICENSE
+Requires-Dist: torch>=2.2
+Requires-Dist: numpy>=1.24
+Requires-Dist: pandas>=2.0
+Requires-Dist: scikit-learn>=1.3
+Requires-Dist: scipy>=1.11
+Requires-Dist: statsmodels>=0.14
+Requires-Dist: botorch>=0.10
+Requires-Dist: gpytorch>=1.11
+Requires-Dist: structlog>=24.1
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4; extra == "dev"
+Requires-Dist: pytest-cov>=4.0; extra == "dev"
+Provides-Extra: vision
+Requires-Dist: torchvision>=0.17; extra == "vision"
+Provides-Extra: extras
+Requires-Dist: optuna>=3.5; extra == "extras"
+Requires-Dist: wandb>=0.16; extra == "extras"
+Requires-Dist: hydra-core>=1.3; extra == "extras"
+Provides-Extra: all
+Requires-Dist: tune3[dev,extras,vision]; extra == "all"
 Dynamic: license-file

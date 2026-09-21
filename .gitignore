@@ -2,8 +2,24 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .venv/
+venv/
+.idea/
+*.egg-info/
+*.log
 data/*.csv
 outputs/
 wandb/
+_tmp_worker_*.json
+# artefatos de compilacao LaTeX (quem recompilar docs/tex/ nao suja o git status;
+# os PDFs em docs/ SAO versionados -- e' assim que o aluno recebe os documentos)
+*.aux
+*.toc
+*.out
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+# JSONs soltos na raiz nao sao versionados...
 *.json
 !configs/*.json
+# ...mas os resultados padronizados de results/ SAO (e' assim que o aluno entrega)
+!results/**/*.json
