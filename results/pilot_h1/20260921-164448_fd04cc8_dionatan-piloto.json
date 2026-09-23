@@ -1,0 +1,3310 @@
+{
+  "meta": {
+    "experiment": "pilot_h1",
+    "tag": "dionatan-piloto",
+    "timestamp": "2026-09-21T16:44:48",
+    "duration_s": 774.0,
+    "args": {
+      "csv": "data/drebin215.csv",
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "epochs": 20,
+      "n_init": 5,
+      "n_iter": 8,
+      "device": "cuda",
+      "curvature_every": 5,
+      "methods": [
+        "tune3",
+        "tune3_bestcvar",
+        "tune3_noddkf_bestcvar",
+        "tune3_placebo_bestcvar",
+        "bo_mono_cvar",
+        "random_search",
+        "asha",
+        "sam"
+      ],
+      "reference": "tune3_bestcvar",
+      "tag": "dionatan-piloto",
+      "out": null
+    },
+    "git": {
+      "commit": "fd04cc82db0d3bd53c3ec5e4e42aa87da27a8fc8",
+      "commit_short": "fd04cc8",
+      "branch": "main",
+      "dirty": false,
+      "dirty_files": []
+    },
+    "env": {
+      "python": "3.14.7",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "hostname": "DRS",
+      "user": "diona",
+      "torch": "2.14.0+cu130",
+      "cuda_available": true,
+      "gpu": "NVIDIA GeForce RTX 5070 Ti",
+      "numpy": "2.5.3",
+      "scipy": "1.18.1",
+      "botorch": "0.18.1",
+      "gpytorch": "1.15.2",
+      "statsmodels": "0.15.0",
+      "sklearn": "1.9.1"
+    },
+    "schema_version": 1
+  },
+  "payload": {
+    "scores": {
+      "tune3": [
+        0.9433817041207508,
+        0.9287238057875475,
+        0.9042650986191453
+      ],
+      "tune3_bestcvar": [
+        0.8204433100564139,
+        0.7877243571723533,
+        0.8643871857630496
+      ],
+      "tune3_noddkf_bestcvar": [
+        0.8204433100564139,
+        0.7877243571723533,
+        0.8643871857630496
+      ],
+      "tune3_placebo_bestcvar": [
+        0.8758562807215761,
+        0.9162529391168759,
+        0.8527923553984686
+      ],
+      "bo_mono_cvar": [
+        0.883509557768209,
+        0.9162529391168759,
+        0.8934817543396583
+      ],
+      "random_search": [
+        0.929027342951143,
+        0.9125300541520118,
+        0.9107097683363403
+      ],
+      "asha": [
+        0.929027342951143,
+        0.8728127597193969,
+        0.8553563719553663
+      ],
+      "sam": [
+        0.9290276014959657,
+        0.9288754739792519,
+        0.9171243890335685
+      ]
+    },
+    "stats": {
+      "n_seeds": 3,
+      "min_achievable_p": 0.25,
+      "alpha": 0.05,
+      "dz_min": 0.3,
+      "ci_method": "bca",
+      "underpowered": true,
+      "comparisons": {
+        "tune3": {
+          "diff_mean": 0.1012719185118756,
+          "dz": 1.8778325586811084,
+          "ci95": [
+            0.039877912856095654,
+            0.13497909709824177
+          ],
+          "dz_ci95": [
+            0.0,
+            12.944463097412585
+          ],
+          "p_raw": 0.25,
+          "win": true,
+          "practical": true,
+          "p_holm": 1.0,
+          "significant": false,
+          "prereg_win": false
+        },
+        "tune3_noddkf_bestcvar": {
+          "diff_mean": 0.0,
+          "dz": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "dz_ci95": [
+            0.0,
+            0.0
+          ],
+          "p_raw": 1.0,
+          "win": false,
+          "practical": false,
+          "p_holm": 1.0,
+          "significant": false,
+          "prereg_win": false
+        },
+        "tune3_placebo_bestcvar": {
+          "diff_mean": 0.05744890741503458,
+          "dz": 0.8197163217212173,
+          "ci95": [
+            -0.011594830364580977,
+            0.12852858194452255
+          ],
+          "dz_ci95": [
+            0.0,
+            2.4673898383930504
+          ],
+          "p_raw": 0.5,
+          "win": true,
+          "practical": true,
+          "p_holm": 1.0,
+          "significant": false,
+          "prereg_win": false
+        },
+        "bo_mono_cvar": {
+          "diff_mean": 0.07356313274430877,
+          "dz": 1.455506438119951,
+          "ci95": [
+            0.04041846162167081,
+            0.12852858194452255
+          ],
+          "dz_ci95": [
+            0.0,
+            2.823353918370443
+          ],
+          "p_raw": 0.25,
+          "win": true,
+          "practical": true,
+          "p_holm": 1.0,
+          "significant": false,
+          "prereg_win": false
+        },
+        "random_search": {
+          "diff_mean": 0.09323743748255942,
+          "dz": 2.2504200026048298,
+          "ci95": [
+            0.046322582573290694,
+            0.11939847561801537
+          ],
+          "dz_ci95": [
+            0.0,
+            12.74864434585388
+          ],
+          "p_raw": 0.25,
+          "win": true,
+          "practical": true,
+          "p_holm": 1.0,
+          "significant": false,
+          "prereg_win": false
+        },
+        "asha": {
+          "diff_mean": 0.061547207211363086,
+          "dz": 0.9888516079529649,
+          "ci95": [
+            -0.009030813807683336,
+            0.10075215611216722
+          ],
+          "dz_ci95": [
+            0.0,
+            7.427247142385134
+          ],
+          "p_raw": 0.5,
+          "win": true,
+          "practical": true,
+          "p_holm": 1.0,
+          "significant": false,
+          "prereg_win": false
+        },
+        "sam": {
+          "diff_mean": 0.10082420383898975,
+          "dz": 2.254825133845932,
+          "ci95": [
+            0.052737203270518895,
+            0.13029550835111628
+          ],
+          "dz_ci95": [
+            0.0,
+            6.929703399595903
+          ],
+          "p_raw": 0.25,
+          "win": true,
+          "practical": true,
+          "p_holm": 1.0,
+          "significant": false,
+          "prereg_win": false
+        }
+      }
+    },
+    "per_seed": [
+      {
+        "seed": 0,
+        "tune3": {
+          "cvar_test": 0.9433817041207508,
+          "cvar_val": 0.943193963736542,
+          "curvature_test": 0.9236384391784668,
+          "test_loss": 0.6907018423080444,
+          "best_epoch": 19,
+          "hparams": {
+            "learning_rate": 0.01,
+            "weight_decay": 0.01,
+            "dropout": 0.5,
+            "hidden_dim": 32,
+            "n_layers": 4
+          }
+        },
+        "tune3_bestcvar": {
+          "cvar_test": 0.8204433100564139,
+          "cvar_val": 0.820436769343437,
+          "curvature_test": 4.490818643569947,
+          "test_loss": 0.6981916427612305,
+          "best_epoch": 0,
+          "hparams": {
+            "learning_rate": 1.5211347864298967e-05,
+            "weight_decay": 0.01,
+            "dropout": 0.29464554886165356,
+            "hidden_dim": 82,
+            "n_layers": 4
+          }
+        },
+        "tune3_noddkf_bestcvar": {
+          "cvar_test": 0.8204433100564139,
+          "cvar_val": 0.820436769343437,
+          "curvature_test": 4.490818643569947,
+          "test_loss": 0.6981916427612305,
+          "best_epoch": 0,
+          "hparams": {
+            "learning_rate": 1.5211347864298967e-05,
+            "weight_decay": 0.01,
+            "dropout": 0.29464554886165356,
+            "hidden_dim": 82,
+            "n_layers": 4
+          }
+        },
+        "tune3_placebo_bestcvar": {
+          "cvar_test": 0.8758562807215761,
+          "cvar_val": 0.8752489482484213,
+          "curvature_test": 8.211512088775635,
+          "test_loss": 0.6975895166397095,
+          "best_epoch": 19,
+          "hparams": {
+            "learning_rate": 0.00016614987432881547,
+            "weight_decay": 0.0019575162826069746,
+            "dropout": 0.29821626989203226,
+            "hidden_dim": 90,
+            "n_layers": 3
+          }
+        },
+        "bo_mono_cvar": {
+          "cvar_test": 0.883509557768209,
+          "cvar_val": 0.8827129168943926,
+          "curvature_test": 9.42597484588623,
+          "test_loss": 0.6946769952774048,
+          "best_epoch": 0,
+          "hparams": {
+            "learning_rate": 1.4993626405361208e-05,
+            "weight_decay": 0.01,
+            "dropout": 0.4848568855621729,
+            "hidden_dim": 124,
+            "n_layers": 3
+          }
+        },
+        "random_search": {
+          "cvar_test": 0.929027342951143,
+          "cvar_val": 0.9297112384118325,
+          "curvature_test": 11.97977352142334,
+          "test_loss": 0.6921442151069641,
+          "best_epoch": 0,
+          "hparams": {
+            "learning_rate": 1.2160712284471832e-05,
+            "weight_decay": 3.141471369267711e-06,
+            "dropout": 0.33531220734681516,
+            "hidden_dim": 177,
+            "n_layers": 3
+          }
+        },
+        "asha": {
+          "cvar_test": 0.929027342951143,
+          "cvar_val": 0.9297112384118325,
+          "curvature_test": 11.97977352142334,
+          "test_loss": 0.6921442151069641,
+          "best_epoch": 0,
+          "hparams": {
+            "learning_rate": 1.2160712284471832e-05,
+            "weight_decay": 3.141471369267711e-06,
+            "dropout": 0.33531220734681516,
+            "hidden_dim": 177,
+            "n_layers": 3
+          }
+        },
+        "sam": {
+          "cvar_test": 0.9290276014959657,
+          "cvar_val": 0.9297113921031479,
+          "curvature_test": 11.839030265808105,
+          "test_loss": 0.6921440362930298,
+          "best_epoch": 0,
+          "hparams": {
+            "learning_rate": 1.2160712284471832e-05,
+            "weight_decay": 3.141471369267711e-06,
+            "dropout": 0.33531220734681516,
+            "hidden_dim": 177,
+            "n_layers": 3
+          }
+        },
+        "_telemetry": {
+          "tune3": [
+            {
+              "hparams": {
+                "learning_rate": 0.0002662695957762462,
+                "weight_decay": 0.0002344746888646804,
+                "dropout": 0.2472396045923233,
+                "hidden_dim": 102,
+                "n_layers": 4
+              },
+              "cvar": 0.9891743543671399,
+              "curvature": 2.4890454769134522,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.0002662695957762462,
+              "lr_final": 0.000266269595776246
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.0005712711019389343,
+                "weight_decay": 4.042882524406004e-05,
+                "dropout": 0.4676004648208618,
+                "hidden_dim": 214,
+                "n_layers": 1
+              },
+              "cvar": 1.0245427885016456,
+              "curvature": 130.8741424560547,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.0005712711019389343,
+              "lr_final": 0.0005712711019389343
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.006213055287158596,
+                "weight_decay": 0.0015834236245322062,
+                "dropout": 0.09614315629005432,
+                "hidden_dim": 72,
+                "n_layers": 2
+              },
+              "cvar": 1.011147388935089,
+              "curvature": 21.332709121704102,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.006213055287158596,
+              "lr_final": 0.006213055287158593
+            },
+            {
+              "hparams": {
+                "learning_rate": 1.0580099114260035e-05,
+                "weight_decay": 9.219249594089636e-06,
+                "dropout": 0.31401678919792175,
+                "hidden_dim": 188,
+                "n_layers": 3
+              },
+              "cvar": 0.9739304702144024,
+              "curvature": 18.569732093811034,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1.0580099114260035e-05,
+              "lr_final": 1.0580099114260028e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 3.328724571485551e-05,
+                "weight_decay": 0.0033918136674553102,
+                "dropout": 0.380540132522583,
+                "hidden_dim": 155,
+                "n_layers": 3
+              },
+              "cvar": 0.955832520792307,
+              "curvature": 11.696183586120606,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 3.328724571485551e-05,
+              "lr_final": 3.3287245714855535e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 2.1147707235033608e-05,
+                "weight_decay": 0.01,
+                "dropout": 0.29805631172563346,
+                "hidden_dim": 84,
+                "n_layers": 3
+              },
+              "cvar": 0.8454405788547736,
+              "curvature": 7.9292925834655765,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 2.1147707235033608e-05,
+              "lr_final": 2.1147707235033618e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 2.738717976050503e-05,
+                "weight_decay": 0.01,
+                "dropout": 0.41001333437733856,
+                "hidden_dim": 75,
+                "n_layers": 4
+              },
+              "cvar": 0.9707589234624591,
+              "curvature": 1.439342212677002,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 2.738717976050503e-05,
+              "lr_final": 2.7387179760505045e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 1.8081430363489646e-05,
+                "weight_decay": 0.01,
+                "dropout": 0.2839284632857381,
+                "hidden_dim": 154,
+                "n_layers": 4
+              },
+              "cvar": 1.0336649890773553,
+              "curvature": 4.044811773300171,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1.8081430363489646e-05,
+              "lr_final": 1.8081430363489662e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.0004898404297409107,
+                "weight_decay": 0.01,
+                "dropout": 0.28260057858971466,
+                "hidden_dim": 72,
+                "n_layers": 3
+              },
+              "cvar": 0.8832019039841948,
+              "curvature": 5.6126548767089846,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.0004898404297409107,
+              "lr_final": 0.0004898404297409108
+            },
+            {
+              "hparams": {
+                "learning_rate": 1e-05,
+                "weight_decay": 0.01,
+                "dropout": 0.34370136522445893,
+                "hidden_dim": 57,
+                "n_layers": 3
+              },
+              "cvar": 1.0151591392663808,
+              "curvature": 6.452342224121094,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1e-05,
+              "lr_final": 9.999999999999997e-06
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.01,
+                "weight_decay": 0.01,
+                "dropout": 0.5,
+                "hidden_dim": 32,
+                "n_layers": 4
+              },
+              "cvar": 0.9447183761714903,
+              "curvature": 1.3620646357536317,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.01,
+              "lr_final": 0.010000000000000004
+            },
+            {
+              "hparams": {
+                "learning_rate": 1.5211347864298967e-05,
+                "weight_decay": 0.01,
+                "dropout": 0.29464554886165356,
+                "hidden_dim": 82,
+                "n_layers": 4
+              },
+              "cvar": 0.820436769343437,
+              "curvature": 4.010351753234863,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1.5211347864298967e-05,
+              "lr_final": 1.5211347864298961e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.01,
+                "weight_decay": 0.0003589630044867496,
+                "dropout": 0.5,
+                "hidden_dim": 32,
+                "n_layers": 4
+              },
+              "cvar": 0.9482364817099138,
+              "curvature": 1.660264778137207,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.01,
+              "lr_final": 0.010000000000000004
+            }
+          ],
+          "tune3_noddkf": [
+            {
+              "hparams": {
+                "learning_rate": 0.0002662695957762462,
+                "weight_decay": 0.0002344746888646804,
+                "dropout": 0.2472396045923233,
+                "hidden_dim": 102,
+                "n_layers": 4
+              },
+              "cvar": 0.9891743543671399,
+              "curvature": 2.4890454769134522,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.0002662695957762462,
+              "lr_final": 0.000266269595776246
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.0005712711019389343,
+                "weight_decay": 4.042882524406004e-05,
+                "dropout": 0.4676004648208618,
+                "hidden_dim": 214,
+                "n_layers": 1
+              },
+              "cvar": 1.0245427885016456,
+              "curvature": 130.8741424560547,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.0005712711019389343,
+              "lr_final": 0.0005712711019389343
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.006213055287158596,
+                "weight_decay": 0.0015834236245322062,
+                "dropout": 0.09614315629005432,
+                "hidden_dim": 72,
+                "n_layers": 2
+              },
+              "cvar": 1.011147388935089,
+              "curvature": 21.332709121704102,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.006213055287158596,
+              "lr_final": 0.006213055287158593
+            },
+            {
+              "hparams": {
+                "learning_rate": 1.0580099114260035e-05,
+                "weight_decay": 9.219249594089636e-06,
+                "dropout": 0.31401678919792175,
+                "hidden_dim": 188,
+                "n_layers": 3
+              },
+              "cvar": 0.9739304702144024,
+              "curvature": 18.569732093811034,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1.0580099114260035e-05,
+              "lr_final": 1.0580099114260028e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 3.328724571485551e-05,
+                "weight_decay": 0.0033918136674553102,
+                "dropout": 0.380540132522583,
+                "hidden_dim": 155,
+                "n_layers": 3
+              },
+              "cvar": 0.955832520792307,
+              "curvature": 11.696183586120606,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 3.328724571485551e-05,
+              "lr_final": 3.3287245714855535e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 2.1147707235033608e-05,
+                "weight_decay": 0.01,
+                "dropout": 0.29805631172563346,
+                "hidden_dim": 84,
+                "n_layers": 3
+              },
+              "cvar": 0.8454405788547736,
+              "curvature": 7.9292925834655765,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 2.1147707235033608e-05,
+              "lr_final": 2.1147707235033618e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 2.738717976050503e-05,
+                "weight_decay": 0.01,
+                "dropout": 0.41001333437733856,
+                "hidden_dim": 75,
+                "n_layers": 4
+              },
+              "cvar": 0.9707589234624591,
+              "curvature": 1.439342212677002,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 2.738717976050503e-05,
+              "lr_final": 2.7387179760505045e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 1.8081430363489646e-05,
+                "weight_decay": 0.01,
+                "dropout": 0.2839284632857381,
+                "hidden_dim": 154,
+                "n_layers": 4
+              },
+              "cvar": 1.0336649890773553,
+              "curvature": 4.044811773300171,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1.8081430363489646e-05,
+              "lr_final": 1.8081430363489662e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.0004898404297409107,
+                "weight_decay": 0.01,
+                "dropout": 0.28260057858971466,
+                "hidden_dim": 72,
+                "n_layers": 3
+              },
+              "cvar": 0.8832019039841948,
+              "curvature": 5.6126548767089846,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.0004898404297409107,
+              "lr_final": 0.0004898404297409108
+            },
+            {
+              "hparams": {
+                "learning_rate": 1e-05,
+                "weight_decay": 0.01,
+                "dropout": 0.34370136522445893,
+                "hidden_dim": 57,
+                "n_layers": 3
+              },
+              "cvar": 1.0151591392663808,
+              "curvature": 6.452342224121094,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1e-05,
+              "lr_final": 9.999999999999997e-06
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.01,
+                "weight_decay": 0.01,
+                "dropout": 0.5,
+                "hidden_dim": 32,
+                "n_layers": 4
+              },
+              "cvar": 0.9447183761714903,
+              "curvature": 1.3620646357536317,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.01,
+              "lr_final": 0.010000000000000004
+            },
+            {
+              "hparams": {
+                "learning_rate": 1.5211347864298967e-05,
+                "weight_decay": 0.01,
+                "dropout": 0.29464554886165356,
+                "hidden_dim": 82,
+                "n_layers": 4
+              },
+              "cvar": 0.820436769343437,
+              "curvature": 4.010351753234863,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1.5211347864298967e-05,
+              "lr_final": 1.5211347864298961e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.01,
+                "weight_decay": 0.0003589630044867496,
+                "dropout": 0.5,
+                "hidden_dim": 32,
+                "n_layers": 4
+              },
+              "cvar": 0.9482364817099138,
+              "curvature": 1.660264778137207,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.01,
+              "lr_final": 0.010000000000000004
+            }
+          ],
+          "tune3_placebo": [
+            {
+              "hparams": {
+                "learning_rate": 0.0002662695957762462,
+                "weight_decay": 0.0002344746888646804,
+                "dropout": 0.2472396045923233,
+                "hidden_dim": 102,
+                "n_layers": 4
+              },
+              "cvar": 0.9891743543671399,
+              "curvature": 2.4890454769134522,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.0002662695957762462,
+              "lr_final": 0.000266269595776246
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.0005712711019389343,
+                "weight_decay": 4.042882524406004e-05,
+                "dropout": 0.4676004648208618,
+                "hidden_dim": 214,
+                "n_layers": 1
+              },
+              "cvar": 1.0245427885016456,
+              "curvature": 130.8741424560547,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.0005712711019389343,
+              "lr_final": 0.0005712711019389343
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.006213055287158596,
+                "weight_decay": 0.0015834236245322062,
+                "dropout": 0.09614315629005432,
+                "hidden_dim": 72,
+                "n_layers": 2
+              },
+              "cvar": 1.011147388935089,
+              "curvature": 21.332709121704102,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.006213055287158596,
+              "lr_final": 0.006213055287158593
+            },
+            {
+              "hparams": {
+                "learning_rate": 1.0580099114260035e-05,
+                "weight_decay": 9.219249594089636e-06,
+                "dropout": 0.31401678919792175,
+                "hidden_dim": 188,
+                "n_layers": 3
+              },
+              "cvar": 0.9739304702144024,
+              "curvature": 18.569732093811034,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1.0580099114260035e-05,
+              "lr_final": 1.0580099114260028e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 3.328724571485551e-05,
+                "weight_decay": 0.0033918136674553102,
+                "dropout": 0.380540132522583,
+                "hidden_dim": 155,
+                "n_layers": 3
+              },
+              "cvar": 0.955832520792307,
+              "curvature": 11.696183586120606,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 3.328724571485551e-05,
+              "lr_final": 3.3287245714855535e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 4.388019330571596e-05,
+                "weight_decay": 0.01,
+                "dropout": 0.23012717972162944,
+                "hidden_dim": 95,
+                "n_layers": 3
+              },
+              "cvar": 0.9658222902904857,
+              "curvature": 7.468589782714844,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 4.388019330571596e-05,
+              "lr_final": 4.388019330571595e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 7.115245215080875e-05,
+                "weight_decay": 0.0019601443432330154,
+                "dropout": 0.15988882953276545,
+                "hidden_dim": 233,
+                "n_layers": 3
+              },
+              "cvar": 0.9502971142776742,
+              "curvature": 20.841776275634764,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 7.115245215080875e-05,
+              "lr_final": 7.115245215080876e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.00016614987432881547,
+                "weight_decay": 0.0019575162826069746,
+                "dropout": 0.29821626989203226,
+                "hidden_dim": 90,
+                "n_layers": 3
+              },
+              "cvar": 0.8750061446089086,
+              "curvature": 9.145271301269531,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.00016614987432881547,
+              "lr_final": 0.0001661498743288156
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.00011026618144868453,
+                "weight_decay": 0.01,
+                "dropout": 0.4853869995500034,
+                "hidden_dim": 174,
+                "n_layers": 3
+              },
+              "cvar": 1.0431746310657926,
+              "curvature": 14.903596687316895,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.00011026618144868453,
+              "lr_final": 0.00011026618144868456
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.0002614741554701661,
+                "weight_decay": 0.0025497478806353964,
+                "dropout": 0.3034529194381397,
+                "hidden_dim": 171,
+                "n_layers": 3
+              },
+              "cvar": 0.9060147535510179,
+              "curvature": 15.63282527923584,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.0002614741554701661,
+              "lr_final": 0.00026147415547016597
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.01,
+                "weight_decay": 0.0027474548719159486,
+                "dropout": 0.0,
+                "hidden_dim": 70,
+                "n_layers": 1
+              },
+              "cvar": 1.3174801059990875,
+              "curvature": 21.901046466827392,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.01,
+              "lr_final": 0.010000000000000004
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.0064332715718637395,
+                "weight_decay": 0.0003430848859863404,
+                "dropout": 0.3186034209609232,
+                "hidden_dim": 64,
+                "n_layers": 2
+              },
+              "cvar": 1.1127466632694494,
+              "curvature": 16.763709831237794,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.0064332715718637395,
+              "lr_final": 0.006433271571863739
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.01,
+                "weight_decay": 0.0017995237121101856,
+                "dropout": 0.027143394299612225,
+                "hidden_dim": 80,
+                "n_layers": 2
+              },
+              "cvar": 0.9672884320424608,
+              "curvature": 45.0906379699707,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.01,
+              "lr_final": 0.010000000000000004
+            }
+          ]
+        }
+      },
+      {
+        "seed": 1,
+        "tune3": {
+          "cvar_test": 0.9287238057875475,
+          "cvar_val": 0.9287974312285746,
+          "curvature_test": 1.4729913234710694,
+          "test_loss": 0.6864407062530518,
+          "best_epoch": 19,
+          "hparams": {
+            "learning_rate": 0.01,
+            "weight_decay": 1e-06,
+            "dropout": 0.5,
+            "hidden_dim": 32,
+            "n_layers": 3
+          }
+        },
+        "tune3_bestcvar": {
+          "cvar_test": 0.7877243571723533,
+          "cvar_val": 0.7883533002916446,
+          "curvature_test": 2.9204912185668945,
+          "test_loss": 0.700951099395752,
+          "best_epoch": 0,
+          "hparams": {
+            "learning_rate": 1e-05,
+            "weight_decay": 4.886065264651983e-05,
+            "dropout": 0.4873385699702653,
+            "hidden_dim": 42,
+            "n_layers": 3
+          }
+        },
+        "tune3_noddkf_bestcvar": {
+          "cvar_test": 0.7877243571723533,
+          "cvar_val": 0.7883533002916446,
+          "curvature_test": 2.9204912185668945,
+          "test_loss": 0.700951099395752,
+          "best_epoch": 0,
+          "hparams": {
+            "learning_rate": 1e-05,
+            "weight_decay": 4.886065264651983e-05,
+            "dropout": 0.4873385699702653,
+            "hidden_dim": 42,
+            "n_layers": 3
+          }
+        },
+        "tune3_placebo_bestcvar": {
+          "cvar_test": 0.9162529391168759,
+          "cvar_val": 0.9171636134139762,
+          "curvature_test": 3.920910692214966,
+          "test_loss": 0.6899930834770203,
+          "best_epoch": 0,
+          "hparams": {
+            "learning_rate": 6.355890449074499e-05,
+            "weight_decay": 2.7990982744184337e-05,
+            "dropout": 0.35617220401763916,
+            "hidden_dim": 39,
+            "n_layers": 3
+          }
+        },
+        "bo_mono_cvar": {
+          "cvar_test": 0.9162529391168759,
+          "cvar_val": 0.9171636134139762,
+          "curvature_test": 3.920910692214966,
+          "test_loss": 0.6899930834770203,
+          "best_epoch": 0,
+          "hparams": {
+            "learning_rate": 6.355890449074499e-05,
+            "weight_decay": 2.7990982744184337e-05,
+            "dropout": 0.35617220401763916,
+            "hidden_dim": 39,
+            "n_layers": 3
+          }
+        },
+        "random_search": {
+          "cvar_test": 0.9125300541520118,
+          "cvar_val": 0.9170340358718367,
+          "curvature_test": 123.04633483886718,
+          "test_loss": 0.6827403903007507,
+          "best_epoch": 19,
+          "hparams": {
+            "learning_rate": 0.00018619985863220043,
+            "weight_decay": 0.0020455512986830137,
+            "dropout": 0.20459956818458064,
+            "hidden_dim": 155,
+            "n_layers": 1
+          }
+        },
+        "asha": {
+          "cvar_test": 0.8728127597193969,
+          "cvar_val": 0.8729877432515799,
+          "curvature_test": 25.070882415771486,
+          "test_loss": 0.6934695839881897,
+          "best_epoch": 17,
+          "hparams": {
+            "learning_rate": 5.896609960071135e-05,
+            "weight_decay": 1.962276891928849e-06,
+            "dropout": 0.1289015594983683,
+            "hidden_dim": 203,
+            "n_layers": 3
+          }
+        },
+        "sam": {
+          "cvar_test": 0.9288754739792519,
+          "cvar_val": 0.9319952056427633,
+          "curvature_test": 123.89968872070312,
+          "test_loss": 0.6804345846176147,
+          "best_epoch": 19,
+          "hparams": {
+            "learning_rate": 0.00018619985863220043,
+            "weight_decay": 0.0020455512986830137,
+            "dropout": 0.20459956818458064,
+            "hidden_dim": 155,
+            "n_layers": 1
+          }
+        },
+        "_telemetry": {
+          "tune3": [
+            {
+              "hparams": {
+                "learning_rate": 6.355890449074499e-05,
+                "weight_decay": 2.7990982744184337e-05,
+                "dropout": 0.35617220401763916,
+                "hidden_dim": 39,
+                "n_layers": 3
+              },
+              "cvar": 0.9171636134139762,
+              "curvature": 3.357852745056152,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 6.355890449074499e-05,
+              "lr_final": 6.355890449074493e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.004171834347901462,
+                "weight_decay": 0.0023282272895433992,
+                "dropout": 0.17801472544670105,
+                "hidden_dim": 189,
+                "n_layers": 2
+              },
+              "cvar": 1.0922923866382315,
+              "curvature": 50.37788543701172,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.004171834347901462,
+              "lr_final": 0.004171834347901462
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.0005393731301622709,
+                "weight_decay": 9.092171855058269e-06,
+                "dropout": 0.42871329188346863,
+                "hidden_dim": 138,
+                "n_layers": 1
+              },
+              "cvar": 1.1663537202787793,
+              "curvature": 70.1365837097168,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.0005393731301622709,
+              "lr_final": 0.0005393731301622712
+            },
+            {
+              "hparams": {
+                "learning_rate": 1.2697813565578776e-05,
+                "weight_decay": 0.0007165543989400015,
+                "dropout": 0.1073666661977768,
+                "hidden_dim": 211,
+                "n_layers": 4
+              },
+              "cvar": 0.9566795062427679,
+              "curvature": 7.175149726867676,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1.2697813565578776e-05,
+              "lr_final": 1.2697813565578777e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 3.777782499363241e-05,
+                "weight_decay": 1.4892130191712321e-06,
+                "dropout": 0.2260327935218811,
+                "hidden_dim": 233,
+                "n_layers": 3
+              },
+              "cvar": 0.9260454714790849,
+              "curvature": 22.16138038635254,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 3.777782499363241e-05,
+              "lr_final": 3.777782499363244e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 2.5819896752077046e-05,
+                "weight_decay": 1.6187914914411294e-05,
+                "dropout": 0.33974545017397945,
+                "hidden_dim": 32,
+                "n_layers": 3
+              },
+              "cvar": 1.0603736179081473,
+              "curvature": 1.1958843350410462,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 2.5819896752077046e-05,
+              "lr_final": 2.5819896752077026e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 3.0229772065301978e-05,
+                "weight_decay": 0.00022199483441756203,
+                "dropout": 0.1964613878993418,
+                "hidden_dim": 32,
+                "n_layers": 2
+              },
+              "cvar": 0.9922428709873254,
+              "curvature": 6.417225646972656,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 3.0229772065301978e-05,
+              "lr_final": 3.0229772065301974e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 4.402192534574744e-05,
+                "weight_decay": 1e-06,
+                "dropout": 0.4867288539767471,
+                "hidden_dim": 32,
+                "n_layers": 3
+              },
+              "cvar": 1.0603663198591218,
+              "curvature": 1.1961110472679137,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 4.402192534574744e-05,
+              "lr_final": 4.402192534574747e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 1e-05,
+                "weight_decay": 4.886065264651983e-05,
+                "dropout": 0.4873385699702653,
+                "hidden_dim": 42,
+                "n_layers": 3
+              },
+              "cvar": 0.7883533002916446,
+              "curvature": 3.3061975955963137,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1e-05,
+              "lr_final": 9.999999999999997e-06
+            },
+            {
+              "hparams": {
+                "learning_rate": 1e-05,
+                "weight_decay": 1e-06,
+                "dropout": 0.2085706358062286,
+                "hidden_dim": 129,
+                "n_layers": 4
+              },
+              "cvar": 0.9410421001024483,
+              "curvature": 4.5882803440094,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1e-05,
+              "lr_final": 9.999999999999997e-06
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.01,
+                "weight_decay": 0.01,
+                "dropout": 0.5,
+                "hidden_dim": 129,
+                "n_layers": 4
+              },
+              "cvar": 0.9335492332119587,
+              "curvature": 4.024882745742798,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.01,
+              "lr_final": 0.010000000000000004
+            },
+            {
+              "hparams": {
+                "learning_rate": 1e-05,
+                "weight_decay": 9.020336311460437e-05,
+                "dropout": 0.5,
+                "hidden_dim": 32,
+                "n_layers": 3
+              },
+              "cvar": 1.0603800232954852,
+              "curvature": 1.1958085775375367,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1e-05,
+              "lr_final": 9.999999999999997e-06
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.01,
+                "weight_decay": 1e-06,
+                "dropout": 0.5,
+                "hidden_dim": 32,
+                "n_layers": 3
+              },
+              "cvar": 0.9296054175077391,
+              "curvature": 1.586809480190277,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.01,
+              "lr_final": 0.010000000000000004
+            }
+          ],
+          "tune3_noddkf": [
+            {
+              "hparams": {
+                "learning_rate": 6.355890449074499e-05,
+                "weight_decay": 2.7990982744184337e-05,
+                "dropout": 0.35617220401763916,
+                "hidden_dim": 39,
+                "n_layers": 3
+              },
+              "cvar": 0.9171636134139762,
+              "curvature": 3.357852745056152,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 6.355890449074499e-05,
+              "lr_final": 6.355890449074493e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.004171834347901462,
+                "weight_decay": 0.0023282272895433992,
+                "dropout": 0.17801472544670105,
+                "hidden_dim": 189,
+                "n_layers": 2
+              },
+              "cvar": 1.0922923866382315,
+              "curvature": 50.37788543701172,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.004171834347901462,
+              "lr_final": 0.004171834347901462
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.0005393731301622709,
+                "weight_decay": 9.092171855058269e-06,
+                "dropout": 0.42871329188346863,
+                "hidden_dim": 138,
+                "n_layers": 1
+              },
+              "cvar": 1.1663537202787793,
+              "curvature": 70.1365837097168,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.0005393731301622709,
+              "lr_final": 0.0005393731301622712
+            },
+            {
+              "hparams": {
+                "learning_rate": 1.2697813565578776e-05,
+                "weight_decay": 0.0007165543989400015,
+                "dropout": 0.1073666661977768,
+                "hidden_dim": 211,
+                "n_layers": 4
+              },
+              "cvar": 0.9566795062427679,
+              "curvature": 7.175149726867676,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1.2697813565578776e-05,
+              "lr_final": 1.2697813565578777e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 3.777782499363241e-05,
+                "weight_decay": 1.4892130191712321e-06,
+                "dropout": 0.2260327935218811,
+                "hidden_dim": 233,
+                "n_layers": 3
+              },
+              "cvar": 0.9260454714790849,
+              "curvature": 22.16138038635254,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 3.777782499363241e-05,
+              "lr_final": 3.777782499363244e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 2.5819896752077046e-05,
+                "weight_decay": 1.6187914914411294e-05,
+                "dropout": 0.33974545017397945,
+                "hidden_dim": 32,
+                "n_layers": 3
+              },
+              "cvar": 1.0603736179081473,
+              "curvature": 1.1958843350410462,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 2.5819896752077046e-05,
+              "lr_final": 2.5819896752077026e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 3.0229772065301978e-05,
+                "weight_decay": 0.00022199483441756203,
+                "dropout": 0.1964613878993418,
+                "hidden_dim": 32,
+                "n_layers": 2
+              },
+              "cvar": 0.9922428709873254,
+              "curvature": 6.417225646972656,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 3.0229772065301978e-05,
+              "lr_final": 3.0229772065301974e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 4.402192534574744e-05,
+                "weight_decay": 1e-06,
+                "dropout": 0.4867288539767471,
+                "hidden_dim": 32,
+                "n_layers": 3
+              },
+              "cvar": 1.0603663198591218,
+              "curvature": 1.1961110472679137,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 4.402192534574744e-05,
+              "lr_final": 4.402192534574747e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 1e-05,
+                "weight_decay": 4.886065264651983e-05,
+                "dropout": 0.4873385699702653,
+                "hidden_dim": 42,
+                "n_layers": 3
+              },
+              "cvar": 0.7883533002916446,
+              "curvature": 3.3061975955963137,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1e-05,
+              "lr_final": 9.999999999999997e-06
+            },
+            {
+              "hparams": {
+                "learning_rate": 1e-05,
+                "weight_decay": 1e-06,
+                "dropout": 0.2085706358062286,
+                "hidden_dim": 129,
+                "n_layers": 4
+              },
+              "cvar": 0.9410421001024483,
+              "curvature": 4.5882803440094,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1e-05,
+              "lr_final": 9.999999999999997e-06
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.01,
+                "weight_decay": 0.01,
+                "dropout": 0.5,
+                "hidden_dim": 129,
+                "n_layers": 4
+              },
+              "cvar": 0.9335492332119587,
+              "curvature": 4.024882745742798,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.01,
+              "lr_final": 0.010000000000000004
+            },
+            {
+              "hparams": {
+                "learning_rate": 1e-05,
+                "weight_decay": 9.020336311460437e-05,
+                "dropout": 0.5,
+                "hidden_dim": 32,
+                "n_layers": 3
+              },
+              "cvar": 1.0603800232954852,
+              "curvature": 1.1958085775375367,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1e-05,
+              "lr_final": 9.999999999999997e-06
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.01,
+                "weight_decay": 1e-06,
+                "dropout": 0.5,
+                "hidden_dim": 32,
+                "n_layers": 3
+              },
+              "cvar": 0.9296054175077391,
+              "curvature": 1.586809480190277,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.01,
+              "lr_final": 0.010000000000000004
+            }
+          ],
+          "tune3_placebo": [
+            {
+              "hparams": {
+                "learning_rate": 6.355890449074499e-05,
+                "weight_decay": 2.7990982744184337e-05,
+                "dropout": 0.35617220401763916,
+                "hidden_dim": 39,
+                "n_layers": 3
+              },
+              "cvar": 0.9171636134139762,
+              "curvature": 3.357852745056152,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 6.355890449074499e-05,
+              "lr_final": 6.355890449074493e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.004171834347901462,
+                "weight_decay": 0.0023282272895433992,
+                "dropout": 0.17801472544670105,
+                "hidden_dim": 189,
+                "n_layers": 2
+              },
+              "cvar": 1.0922923866382315,
+              "curvature": 50.37788543701172,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.004171834347901462,
+              "lr_final": 0.004171834347901462
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.0005393731301622709,
+                "weight_decay": 9.092171855058269e-06,
+                "dropout": 0.42871329188346863,
+                "hidden_dim": 138,
+                "n_layers": 1
+              },
+              "cvar": 1.1663537202787793,
+              "curvature": 70.1365837097168,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.0005393731301622709,
+              "lr_final": 0.0005393731301622712
+            },
+            {
+              "hparams": {
+                "learning_rate": 1.2697813565578776e-05,
+                "weight_decay": 0.0007165543989400015,
+                "dropout": 0.1073666661977768,
+                "hidden_dim": 211,
+                "n_layers": 4
+              },
+              "cvar": 0.9566795062427679,
+              "curvature": 7.175149726867676,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1.2697813565578776e-05,
+              "lr_final": 1.2697813565578777e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 3.777782499363241e-05,
+                "weight_decay": 1.4892130191712321e-06,
+                "dropout": 0.2260327935218811,
+                "hidden_dim": 233,
+                "n_layers": 3
+              },
+              "cvar": 0.9260454714790849,
+              "curvature": 22.16138038635254,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 3.777782499363241e-05,
+              "lr_final": 3.777782499363244e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 2.3078211323010402e-05,
+                "weight_decay": 5.314313968602856e-06,
+                "dropout": 0.32051903306385565,
+                "hidden_dim": 81,
+                "n_layers": 3
+              },
+              "cvar": 1.0574184050483089,
+              "curvature": 4.448726558685303,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 2.3078211323010402e-05,
+              "lr_final": 2.3078211323010423e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.0004928212412533047,
+                "weight_decay": 5.8692589511414144e-05,
+                "dropout": 0.3960558440522574,
+                "hidden_dim": 32,
+                "n_layers": 3
+              },
+              "cvar": 1.0401757098426503,
+              "curvature": 1.1045383930206298,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.0004928212412533047,
+              "lr_final": 0.0004928212412533048
+            },
+            {
+              "hparams": {
+                "learning_rate": 3.8802054889787125e-05,
+                "weight_decay": 3.158906507853825e-05,
+                "dropout": 0.3030455628207594,
+                "hidden_dim": 32,
+                "n_layers": 2
+              },
+              "cvar": 0.9920359348905259,
+              "curvature": 6.412476634979248,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 3.8802054889787125e-05,
+              "lr_final": 3.880205488978711e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 9.37859419051154e-05,
+                "weight_decay": 1.571659680458057e-05,
+                "dropout": 0.3748200103906278,
+                "hidden_dim": 32,
+                "n_layers": 3
+              },
+              "cvar": 1.0569939169772835,
+              "curvature": 1.2391068816184998,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 9.37859419051154e-05,
+              "lr_final": 9.378594190511533e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 4.086780826338122e-05,
+                "weight_decay": 4.6302689412300304e-05,
+                "dropout": 0.4454780122203669,
+                "hidden_dim": 32,
+                "n_layers": 2
+              },
+              "cvar": 0.9919144830841949,
+              "curvature": 6.413700580596924,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 4.086780826338122e-05,
+              "lr_final": 4.0867808263381226e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 8.224996013293735e-05,
+                "weight_decay": 1.995388136902289e-05,
+                "dropout": 0.2990680550041708,
+                "hidden_dim": 32,
+                "n_layers": 2
+              },
+              "cvar": 0.992642888845491,
+              "curvature": 7.326169204711914,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 8.224996013293735e-05,
+              "lr_final": 8.224996013293733e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 3.231434843659425e-05,
+                "weight_decay": 3.247068768847128e-05,
+                "dropout": 0.40728476333384883,
+                "hidden_dim": 43,
+                "n_layers": 3
+              },
+              "cvar": 1.0025451694216048,
+              "curvature": 2.814072275161743,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 3.231434843659425e-05,
+              "lr_final": 3.2314348436594243e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 1e-05,
+                "weight_decay": 3.1924546484960096e-05,
+                "dropout": 0.43597728134697644,
+                "hidden_dim": 62,
+                "n_layers": 3
+              },
+              "cvar": 1.0120937774989232,
+              "curvature": 6.355255603790283,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1e-05,
+              "lr_final": 9.999999999999997e-06
+            }
+          ]
+        }
+      },
+      {
+        "seed": 2,
+        "tune3": {
+          "cvar_test": 0.9042650986191453,
+          "cvar_val": 0.9038046689799232,
+          "curvature_test": 3.57086067199707,
+          "test_loss": 0.6924166679382324,
+          "best_epoch": 19,
+          "hparams": {
+            "learning_rate": 0.0008033361899641544,
+            "weight_decay": 0.00017677944051046904,
+            "dropout": 0.302197128534317,
+            "hidden_dim": 51,
+            "n_layers": 3
+          }
+        },
+        "tune3_bestcvar": {
+          "cvar_test": 0.8643871857630496,
+          "cvar_val": 0.86989025931713,
+          "curvature_test": 17.571922492980956,
+          "test_loss": 0.6896594166755676,
+          "best_epoch": 18,
+          "hparams": {
+            "learning_rate": 6.957576409713151e-05,
+            "weight_decay": 3.8785578737786815e-05,
+            "dropout": 0.37020704583611014,
+            "hidden_dim": 43,
+            "n_layers": 2
+          }
+        },
+        "tune3_noddkf_bestcvar": {
+          "cvar_test": 0.8643871857630496,
+          "cvar_val": 0.86989025931713,
+          "curvature_test": 17.571922492980956,
+          "test_loss": 0.6896594166755676,
+          "best_epoch": 18,
+          "hparams": {
+            "learning_rate": 6.957576409713151e-05,
+            "weight_decay": 3.8785578737786815e-05,
+            "dropout": 0.37020704583611014,
+            "hidden_dim": 43,
+            "n_layers": 2
+          }
+        },
+        "tune3_placebo_bestcvar": {
+          "cvar_test": 0.8527923553984686,
+          "cvar_val": 0.8529843316703546,
+          "curvature_test": 31.832032012939454,
+          "test_loss": 0.7037867903709412,
+          "best_epoch": 17,
+          "hparams": {
+            "learning_rate": 1e-05,
+            "weight_decay": 0.0012900133735236122,
+            "dropout": 0.31450749458483634,
+            "hidden_dim": 79,
+            "n_layers": 2
+          }
+        },
+        "bo_mono_cvar": {
+          "cvar_test": 0.8934817543396583,
+          "cvar_val": 0.8934495709245167,
+          "curvature_test": 36.37848052978516,
+          "test_loss": 0.6940296292304993,
+          "best_epoch": 17,
+          "hparams": {
+            "learning_rate": 1.6389146464576116e-05,
+            "weight_decay": 4.6662380355150284e-05,
+            "dropout": 0.35584157705307007,
+            "hidden_dim": 109,
+            "n_layers": 2
+          }
+        },
+        "random_search": {
+          "cvar_test": 0.9107097683363403,
+          "cvar_val": 0.9043432187846326,
+          "curvature_test": 54.278439331054685,
+          "test_loss": 0.6880355477333069,
+          "best_epoch": 19,
+          "hparams": {
+            "learning_rate": 0.0004861798869900239,
+            "weight_decay": 3.983355370476317e-06,
+            "dropout": 0.21631539540239358,
+            "hidden_dim": 182,
+            "n_layers": 2
+          }
+        },
+        "asha": {
+          "cvar_test": 0.8553563719553663,
+          "cvar_val": 0.8566023784153389,
+          "curvature_test": 19.587483215332032,
+          "test_loss": 0.6954717040061951,
+          "best_epoch": 0,
+          "hparams": {
+            "learning_rate": 1.822838952224193e-05,
+            "weight_decay": 7.583392257531014e-05,
+            "dropout": 0.2942454018450469,
+            "hidden_dim": 172,
+            "n_layers": 3
+          }
+        },
+        "sam": {
+          "cvar_test": 0.9171243890335685,
+          "cvar_val": 0.9107995889489613,
+          "curvature_test": 59.54111938476562,
+          "test_loss": 0.6879751682281494,
+          "best_epoch": 19,
+          "hparams": {
+            "learning_rate": 0.0004861798869900239,
+            "weight_decay": 3.983355370476317e-06,
+            "dropout": 0.21631539540239358,
+            "hidden_dim": 182,
+            "n_layers": 2
+          }
+        },
+        "_telemetry": {
+          "tune3": [
+            {
+              "hparams": {
+                "learning_rate": 0.0021515919799519707,
+                "weight_decay": 0.007506879291708755,
+                "dropout": 0.00988088920712471,
+                "hidden_dim": 175,
+                "n_layers": 4
+              },
+              "cvar": 0.9249300051105115,
+              "curvature": 5.91510009765625,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.0021515919799519707,
+              "lr_final": 0.0021515919799519707
+            },
+            {
+              "hparams": {
+                "learning_rate": 1.6389146464576116e-05,
+                "weight_decay": 4.6662380355150284e-05,
+                "dropout": 0.35584157705307007,
+                "hidden_dim": 109,
+                "n_layers": 2
+              },
+              "cvar": 0.8934515643687475,
+              "curvature": 42.07263031005859,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 1.6389146464576116e-05,
+              "lr_final": 1.6389146464576126e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 7.61082800261923e-05,
+                "weight_decay": 0.0009456136439129195,
+                "dropout": 0.24373938143253326,
+                "hidden_dim": 207,
+                "n_layers": 1
+              },
+              "cvar": 1.0587458334678461,
+              "curvature": 150.72553100585938,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 7.61082800261923e-05,
+              "lr_final": 7.610828002619232e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.0007195254949838832,
+                "weight_decay": 4.984458082109009e-06,
+                "dropout": 0.40616360306739807,
+                "hidden_dim": 85,
+                "n_layers": 3
+              },
+              "cvar": 0.9070566697198836,
+              "curvature": 7.610898208618164,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.0007195254949838832,
+              "lr_final": 0.0007195254949838831
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.0008033361899641544,
+                "weight_decay": 0.00017677944051046904,
+                "dropout": 0.302197128534317,
+                "hidden_dim": 51,
+                "n_layers": 3
+              },
+              "cvar": 0.9048345006894374,
+              "curvature": 3.6013798236846926,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.0008033361899641544,
+              "lr_final": 0.0008033361899641541
+            },
+            {
+              "hparams": {
+                "learning_rate": 1.6021201121590395e-05,
+                "weight_decay": 0.0001057193858127347,
+                "dropout": 0.256062008184412,
+                "hidden_dim": 100,
+                "n_layers": 3
+              },
+              "cvar": 0.9829173910716349,
+              "curvature": 9.346560096740722,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1.6021201121590395e-05,
+              "lr_final": 1.6021201121590388e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 6.957576409713151e-05,
+                "weight_decay": 3.8785578737786815e-05,
+                "dropout": 0.37020704583611014,
+                "hidden_dim": 43,
+                "n_layers": 2
+              },
+              "cvar": 0.8697846256011774,
+              "curvature": 20.5380220413208,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 6.957576409713151e-05,
+              "lr_final": 6.957576409713148e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.01,
+                "weight_decay": 0.004138510944499524,
+                "dropout": 0.38095988343361187,
+                "hidden_dim": 88,
+                "n_layers": 3
+              },
+              "cvar": 0.9602830224349851,
+              "curvature": 12.67279281616211,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.01,
+              "lr_final": 0.010000000000000004
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.01,
+                "weight_decay": 7.637897689034684e-06,
+                "dropout": 0.33147150892178745,
+                "hidden_dim": 62,
+                "n_layers": 3
+              },
+              "cvar": 1.0495557031355613,
+              "curvature": 13.397144889831543,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.01,
+              "lr_final": 0.010000000000000004
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.00016561988358266674,
+                "weight_decay": 0.0001231222073275812,
+                "dropout": 0.43220123415188433,
+                "hidden_dim": 79,
+                "n_layers": 3
+              },
+              "cvar": 1.0619196987921191,
+              "curvature": 8.49263401031494,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.00016561988358266674,
+              "lr_final": 0.00016561988358266676
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.00018237911901305875,
+                "weight_decay": 8.707431658168375e-05,
+                "dropout": 0.34763314550303015,
+                "hidden_dim": 80,
+                "n_layers": 3
+              },
+              "cvar": 0.9364049858298183,
+              "curvature": 7.306736469268799,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.00018237911901305875,
+              "lr_final": 0.0001823791190130587
+            },
+            {
+              "hparams": {
+                "learning_rate": 1.4079017865107993e-05,
+                "weight_decay": 1.5457989058747762e-05,
+                "dropout": 0.37830203564711257,
+                "hidden_dim": 63,
+                "n_layers": 3
+              },
+              "cvar": 1.0077814543542782,
+              "curvature": 4.9166747570037845,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1.4079017865107993e-05,
+              "lr_final": 1.4079017865107997e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 8.570908032290012e-05,
+                "weight_decay": 1.1693534301236365e-05,
+                "dropout": 0.37176182542782266,
+                "hidden_dim": 75,
+                "n_layers": 2
+              },
+              "cvar": 0.9346833673656963,
+              "curvature": 23.968800354003907,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 8.570908032290012e-05,
+              "lr_final": 8.570908032290004e-05
+            }
+          ],
+          "tune3_noddkf": [
+            {
+              "hparams": {
+                "learning_rate": 0.0021515919799519707,
+                "weight_decay": 0.007506879291708755,
+                "dropout": 0.00988088920712471,
+                "hidden_dim": 175,
+                "n_layers": 4
+              },
+              "cvar": 0.9249300051105115,
+              "curvature": 5.91510009765625,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.0021515919799519707,
+              "lr_final": 0.0021515919799519707
+            },
+            {
+              "hparams": {
+                "learning_rate": 1.6389146464576116e-05,
+                "weight_decay": 4.6662380355150284e-05,
+                "dropout": 0.35584157705307007,
+                "hidden_dim": 109,
+                "n_layers": 2
+              },
+              "cvar": 0.8934515643687475,
+              "curvature": 42.07263031005859,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 1.6389146464576116e-05,
+              "lr_final": 1.6389146464576126e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 7.61082800261923e-05,
+                "weight_decay": 0.0009456136439129195,
+                "dropout": 0.24373938143253326,
+                "hidden_dim": 207,
+                "n_layers": 1
+              },
+              "cvar": 1.0587458334678461,
+              "curvature": 150.72553100585938,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 7.61082800261923e-05,
+              "lr_final": 7.610828002619232e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.0007195254949838832,
+                "weight_decay": 4.984458082109009e-06,
+                "dropout": 0.40616360306739807,
+                "hidden_dim": 85,
+                "n_layers": 3
+              },
+              "cvar": 0.9070566697198836,
+              "curvature": 7.610898208618164,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.0007195254949838832,
+              "lr_final": 0.0007195254949838831
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.0008033361899641544,
+                "weight_decay": 0.00017677944051046904,
+                "dropout": 0.302197128534317,
+                "hidden_dim": 51,
+                "n_layers": 3
+              },
+              "cvar": 0.9048345006894374,
+              "curvature": 3.6013798236846926,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.0008033361899641544,
+              "lr_final": 0.0008033361899641541
+            },
+            {
+              "hparams": {
+                "learning_rate": 1.6021201121590395e-05,
+                "weight_decay": 0.0001057193858127347,
+                "dropout": 0.256062008184412,
+                "hidden_dim": 100,
+                "n_layers": 3
+              },
+              "cvar": 0.9829173910716349,
+              "curvature": 9.346560096740722,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1.6021201121590395e-05,
+              "lr_final": 1.6021201121590388e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 6.957576409713151e-05,
+                "weight_decay": 3.8785578737786815e-05,
+                "dropout": 0.37020704583611014,
+                "hidden_dim": 43,
+                "n_layers": 2
+              },
+              "cvar": 0.8697846256011774,
+              "curvature": 20.5380220413208,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 6.957576409713151e-05,
+              "lr_final": 6.957576409713148e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.01,
+                "weight_decay": 0.004138510944499524,
+                "dropout": 0.38095988343361187,
+                "hidden_dim": 88,
+                "n_layers": 3
+              },
+              "cvar": 0.9602830224349851,
+              "curvature": 12.67279281616211,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.01,
+              "lr_final": 0.010000000000000004
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.01,
+                "weight_decay": 7.637897689034684e-06,
+                "dropout": 0.33147150892178745,
+                "hidden_dim": 62,
+                "n_layers": 3
+              },
+              "cvar": 1.0495557031355613,
+              "curvature": 13.397144889831543,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.01,
+              "lr_final": 0.010000000000000004
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.00016561988358266674,
+                "weight_decay": 0.0001231222073275812,
+                "dropout": 0.43220123415188433,
+                "hidden_dim": 79,
+                "n_layers": 3
+              },
+              "cvar": 1.0619196987921191,
+              "curvature": 8.49263401031494,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.00016561988358266674,
+              "lr_final": 0.00016561988358266676
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.00018237911901305875,
+                "weight_decay": 8.707431658168375e-05,
+                "dropout": 0.34763314550303015,
+                "hidden_dim": 80,
+                "n_layers": 3
+              },
+              "cvar": 0.9364049858298183,
+              "curvature": 7.306736469268799,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.00018237911901305875,
+              "lr_final": 0.0001823791190130587
+            },
+            {
+              "hparams": {
+                "learning_rate": 1.4079017865107993e-05,
+                "weight_decay": 1.5457989058747762e-05,
+                "dropout": 0.37830203564711257,
+                "hidden_dim": 63,
+                "n_layers": 3
+              },
+              "cvar": 1.0077814543542782,
+              "curvature": 4.9166747570037845,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1.4079017865107993e-05,
+              "lr_final": 1.4079017865107997e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 8.570908032290012e-05,
+                "weight_decay": 1.1693534301236365e-05,
+                "dropout": 0.37176182542782266,
+                "hidden_dim": 75,
+                "n_layers": 2
+              },
+              "cvar": 0.9346833673656963,
+              "curvature": 23.968800354003907,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 8.570908032290012e-05,
+              "lr_final": 8.570908032290004e-05
+            }
+          ],
+          "tune3_placebo": [
+            {
+              "hparams": {
+                "learning_rate": 0.0021515919799519707,
+                "weight_decay": 0.007506879291708755,
+                "dropout": 0.00988088920712471,
+                "hidden_dim": 175,
+                "n_layers": 4
+              },
+              "cvar": 0.9249300051105115,
+              "curvature": 5.91510009765625,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.0021515919799519707,
+              "lr_final": 0.0021515919799519707
+            },
+            {
+              "hparams": {
+                "learning_rate": 1.6389146464576116e-05,
+                "weight_decay": 4.6662380355150284e-05,
+                "dropout": 0.35584157705307007,
+                "hidden_dim": 109,
+                "n_layers": 2
+              },
+              "cvar": 0.8934515643687475,
+              "curvature": 42.07263031005859,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 1.6389146464576116e-05,
+              "lr_final": 1.6389146464576126e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 7.61082800261923e-05,
+                "weight_decay": 0.0009456136439129195,
+                "dropout": 0.24373938143253326,
+                "hidden_dim": 207,
+                "n_layers": 1
+              },
+              "cvar": 1.0587458334678461,
+              "curvature": 150.72553100585938,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 7.61082800261923e-05,
+              "lr_final": 7.610828002619232e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.0007195254949838832,
+                "weight_decay": 4.984458082109009e-06,
+                "dropout": 0.40616360306739807,
+                "hidden_dim": 85,
+                "n_layers": 3
+              },
+              "cvar": 0.9070566697198836,
+              "curvature": 7.610898208618164,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.0007195254949838832,
+              "lr_final": 0.0007195254949838831
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.0008033361899641544,
+                "weight_decay": 0.00017677944051046904,
+                "dropout": 0.302197128534317,
+                "hidden_dim": 51,
+                "n_layers": 3
+              },
+              "cvar": 0.9048345006894374,
+              "curvature": 3.6013798236846926,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.0008033361899641544,
+              "lr_final": 0.0008033361899641541
+            },
+            {
+              "hparams": {
+                "learning_rate": 3.0385066029598572e-05,
+                "weight_decay": 0.01,
+                "dropout": 0.20020247484249543,
+                "hidden_dim": 32,
+                "n_layers": 4
+              },
+              "cvar": 0.9833525453717256,
+              "curvature": 0.514020812511444,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 3.0385066029598572e-05,
+              "lr_final": 3.03850660295986e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 8.839168002013599e-05,
+                "weight_decay": 0.0008849781316802846,
+                "dropout": 0.3062620440592585,
+                "hidden_dim": 91,
+                "n_layers": 2
+              },
+              "cvar": 1.052439585204952,
+              "curvature": 24.009377670288085,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 8.839168002013599e-05,
+              "lr_final": 8.839168002013605e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 0.0002737444461363279,
+                "weight_decay": 0.0002586696018520361,
+                "dropout": 0.32819154364331965,
+                "hidden_dim": 72,
+                "n_layers": 2
+              },
+              "cvar": 1.063864562355104,
+              "curvature": 21.677049446105958,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 0.0002737444461363279,
+              "lr_final": 0.0002737444461363279
+            },
+            {
+              "hparams": {
+                "learning_rate": 1.1476510418551126e-05,
+                "weight_decay": 0.0009044053009405596,
+                "dropout": 0.32761416225014817,
+                "hidden_dim": 79,
+                "n_layers": 2
+              },
+              "cvar": 0.8530065216979043,
+              "curvature": 32.73496856689453,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 1.1476510418551126e-05,
+              "lr_final": 1.1476510418551116e-05
+            },
+            {
+              "hparams": {
+                "learning_rate": 1e-05,
+                "weight_decay": 0.0012900133735236122,
+                "dropout": 0.31450749458483634,
+                "hidden_dim": 79,
+                "n_layers": 2
+              },
+              "cvar": 0.8529703920004797,
+              "curvature": 32.741767501831056,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 20,
+              "lr_change_fraction": 0.0,
+              "lr0": 1e-05,
+              "lr_final": 9.999999999999997e-06
+            },
+            {
+              "hparams": {
+                "learning_rate": 1e-05,
+                "weight_decay": 0.01,
+                "dropout": 0.5,
+                "hidden_dim": 32,
+                "n_layers": 2
+              },
+              "cvar": 0.8558193721422335,
+              "curvature": 11.807489395141602,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1e-05,
+              "lr_final": 9.999999999999997e-06
+            },
+            {
+              "hparams": {
+                "learning_rate": 1e-05,
+                "weight_decay": 0.01,
+                "dropout": 0.0,
+                "hidden_dim": 32,
+                "n_layers": 2
+              },
+              "cvar": 0.8558189796238411,
+              "curvature": 12.672180938720704,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1e-05,
+              "lr_final": 9.999999999999997e-06
+            },
+            {
+              "hparams": {
+                "learning_rate": 1e-05,
+                "weight_decay": 1e-06,
+                "dropout": 0.28919558995203304,
+                "hidden_dim": 225,
+                "n_layers": 4
+              },
+              "cvar": 0.9143965263835719,
+              "curvature": 8.918656349182129,
+              "aborted": false,
+              "regime_fractions": {
+                "A": 1.0,
+                "B": 0.0,
+                "C": 0.0
+              },
+              "n_eos_triggers": 0,
+              "n_ddkf_active_epochs": 0,
+              "n_epochs_run": 11,
+              "lr_change_fraction": 0.0,
+              "lr0": 1e-05,
+              "lr_final": 9.999999999999997e-06
+            }
+          ]
+        }
+      }
+    ],
+    "methods": [
+      "tune3",
+      "tune3_bestcvar",
+      "tune3_noddkf_bestcvar",
+      "tune3_placebo_bestcvar",
+      "bo_mono_cvar",
+      "random_search",
+      "asha",
+      "sam"
+    ],
+    "reference": "tune3_bestcvar"
+  }
+}

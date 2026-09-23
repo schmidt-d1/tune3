@@ -1,0 +1,152 @@
+{
+  "meta": {
+    "experiment": "validation",
+    "tag": "dionatan",
+    "timestamp": "2026-09-21T16:31:21",
+    "duration_s": 146.1,
+    "args": {
+      "csv": "data/drebin215.csv",
+      "device": "cuda",
+      "epochs": 15,
+      "n_init": 4,
+      "n_iter": 3,
+      "skip_e2e": false,
+      "tag": "dionatan"
+    },
+    "git": {
+      "commit": "fd04cc82db0d3bd53c3ec5e4e42aa87da27a8fc8",
+      "commit_short": "fd04cc8",
+      "branch": "main",
+      "dirty": false,
+      "dirty_files": []
+    },
+    "env": {
+      "python": "3.14.7",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "hostname": "DRS",
+      "user": "diona",
+      "torch": "2.14.0+cu130",
+      "cuda_available": true,
+      "gpu": "NVIDIA GeForce RTX 5070 Ti",
+      "numpy": "2.5.3",
+      "scipy": "1.18.1",
+      "botorch": "0.18.1",
+      "gpytorch": "1.15.2",
+      "statsmodels": "0.15.0",
+      "sklearn": "1.9.1"
+    },
+    "schema_version": 1
+  },
+  "payload": {
+    "report": [
+      {
+        "item": "V1 Hutchinson == Tr(H^2) exato (n=194 params)",
+        "veredito": "PROVADO",
+        "evidencia": "max|HVP - Hv|=1.2e-07; estimador(M=4000)=1.5858 vs exato=1.5872, z=-0.09",
+        "maxdiff": 1.1920928955078125e-07,
+        "est": 1.58578810505569,
+        "exact": 1.5871953964233398,
+        "z": -0.0945592994055084
+      },
+      {
+        "item": "V1b Hutchinson em model.train() (dropout=0.3) desvia do exato",
+        "veredito": "VERIFICADO(escopo: este MLP)",
+        "evidencia": "razao train/exato = 1.324 -> por isso o trial usa model.eval()",
+        "ratio": 1.323525799212279
+      },
+      {
+        "item": "V2 desvio do estimador cai ~1/sqrt(M)",
+        "veredito": "VERIFICADO(escopo: M<=16, 120 rep.)",
+        "evidencia": "sd(M=1)/sd(M=4)=2.08, sd(M=4)/sd(M=16)=1.89 (teoria: 2.00 e 2.00)",
+        "r1": 2.080116122916004,
+        "r2": 1.8929411225158084
+      },
+      {
+        "item": "V3a GSNR(codigo) == definicao Liu et al. 2020",
+        "veredito": "PROVADO",
+        "evidencia": "codigo=3.6833e+01 definicao=3.6833e+01",
+        "gsnr": 36.83286359397245
+      },
+      {
+        "item": "V3b GSNR ~ proporcional a B (dGSNR/dB = GSNR/B)",
+        "veredito": "VERIFICADO(escopo: B in {128,1024})",
+        "evidencia": "GSNR(B=1024)/GSNR(B=128) mediana=6.36; previsto=8.00 (populacao infinita) e 8.83 (correcao de populacao finita, N=9622, sem reposicao); tolerancia [3,20]",
+        "ratio": 6.358122721348771,
+        "pred_naive": 8.0,
+        "pred_fpc": 8.83368225168644,
+        "n_pop": 9622
+      },
+      {
+        "item": "V4 CVaR: quantil == Rockafellar-Uryasev; ordem media<=VaR<=CVaR; valor teorico lognormal",
+        "veredito": "PROVADO",
+        "evidencia": "max desvio quantil/RU=0.00%; ordem=True; CVaR_0.95 emp=8.359 teo=8.557 (2.3%)",
+        "worst": 3.8745564350705444e-16,
+        "emp": 8.358833013763192,
+        "theo": 8.557226866796718
+      },
+      {
+        "item": "V5 Cantelli: alarme falso <= 1-gamma sob t(3)",
+        "veredito": "VERIFICADO(escopo: t3, janela 30)",
+        "evidencia": "taxa empirica=0.0089 (cota de Cantelli: 0.05; 20000 testes)",
+        "rate": 0.00885
+      },
+      {
+        "item": "V5b Cantelli na janela REAL do trial (window=10, mediana/MAD estimados)",
+        "veredito": "VERIFICADO(escopo: t3, janela 10)",
+        "evidencia": "taxa empirica=0.0087 (cota nominal 0.05; 24000 testes). Sem garantia formal com localizacao/escala estimadas -- e' verificacao empirica.",
+        "rate": 0.008708333333333334,
+        "window": 10
+      },
+      {
+        "item": "V6a DDKF corrige na direcao certa (regulador de desvios)",
+        "veredito": "VERIFICADO(escopo: sistema linear sintetico)",
+        "evidencia": "Cov>0 & choque => u=+2.501 (reduz lr); Cov<0 & choque => u=-2.551 (aumenta lr)",
+        "u_pos": 2.5008896647055616,
+        "u_neg": -2.550753305122604
+      },
+      {
+        "item": "V6b engajamento do DDKF ao longo do tempo (pergunta do E2)",
+        "veredito": "EM ABERTO",
+        "evidencia": "R^2 medio t=21..30: 0.0118; t=70..79: 0.0008; limiar do regime B = 0.10. Com exploration_decay=0 a excitacao cessa apos o warm-up e o filtro tende ao regime A (predict-only). Isto NAO e' um bug do teste: e' o comportamento a medir no E2 (telemetria n_ddkf_active_epochs).",
+        "r2_early": 0.011806781846354319,
+        "r2_late": 0.0008050637010555452
+      },
+      {
+        "item": "V7 EoS: 0 disparos em serie estacionaria; >=1 em sharpening geometrico",
+        "veredito": "PROVADO",
+        "evidencia": "estacionaria=0, sharpening(1.2^k)=6",
+        "stat": 0,
+        "sharp": 6
+      },
+      {
+        "item": "V8 protocolo: FWER sob H0 e poder em d_z=0.8 (N=20)",
+        "veredito": "VERIFICADO(escopo: normal, 300 sim.)",
+        "evidencia": "FWER empirico=0.020 (alvo <=0.05); poder=0.92",
+        "fwer": 0.02,
+        "power": 0.9166666666666666
+      },
+      {
+        "item": "V9 ponta a ponta: 8 metodos, Pareto, telemetria",
+        "veredito": "VERIFICADO(escopo: 1 seed, orcamento minimo)",
+        "evidencia": "2.1 min; CVaR_teste={'tune3': 0.979, 'tune3_bestcvar': 0.9748, 'tune3_noddkf_bestcvar': 0.9748, 'tune3_placebo_bestcvar': 0.9512, 'bo_mono_cvar': 0.9006, 'random_search': 0.929, 'asha': 0.929, 'sam': 0.929}; Pareto=4 pts de 7 trials; DDKF ativo em 0/89 epocas (regime A medio=1.00); EoS disparos=0",
+        "minutes": 2.0636683622996013,
+        "cvar_test": {
+          "tune3": 0.979,
+          "tune3_bestcvar": 0.9748,
+          "tune3_noddkf_bestcvar": 0.9748,
+          "tune3_placebo_bestcvar": 0.9512,
+          "bo_mono_cvar": 0.9006,
+          "random_search": 0.929,
+          "asha": 0.929,
+          "sam": 0.929
+        },
+        "n_pareto": 4,
+        "ddkf_active": 0,
+        "epochs": 89,
+        "regime_A": 1.0,
+        "eos_triggers": 0
+      }
+    ],
+    "dataset": "DREBIN-215"
+  }
+}

@@ -1,0 +1,1475 @@
+{
+  "meta": {
+    "experiment": "landscape",
+    "tag": "dionatan",
+    "timestamp": "2026-09-23T12:51:45",
+    "duration_s": 14.3,
+    "args": {
+      "drebin": "data/drebin215.csv",
+      "nslkdd": "data/nsl_kdd",
+      "nsl_scaling": [
+        "standard",
+        "log_standard"
+      ],
+      "nsl_max_train": 25000,
+      "k": 30,
+      "epochs": 10,
+      "device": "cuda",
+      "seed": 0,
+      "tag": "dionatan"
+    },
+    "git": {
+      "commit": "fd04cc82db0d3bd53c3ec5e4e42aa87da27a8fc8",
+      "commit_short": "fd04cc8",
+      "branch": "main",
+      "dirty": true,
+      "dirty_files": [
+        "M .gitignore",
+        " M scripts/run_pilot.py",
+        " M scripts/validate_theory.py",
+        " M tune3/experiments/protocol.py",
+        " M tune3/integration/runner.py",
+        " M tune3/integration/trial.py",
+        " M tune3/tests/test_auditoria_2026_09.py"
+      ]
+    },
+    "env": {
+      "python": "3.14.7",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "hostname": "DRS",
+      "user": "diona",
+      "torch": "2.14.0+cu130",
+      "cuda_available": true,
+      "gpu": "NVIDIA GeForce RTX 5070 Ti",
+      "numpy": "2.5.3",
+      "scipy": "1.18.1",
+      "botorch": "0.18.1",
+      "gpytorch": "1.15.2",
+      "statsmodels": "0.15.0",
+      "sklearn": "1.9.1"
+    },
+    "schema_version": 1
+  },
+  "payload": {
+    "arms": [
+      {
+        "arm": "drebin",
+        "n_ok": 30,
+        "n_aborted": 0,
+        "log10_curv_mean": 1.3068765037739172,
+        "log10_curv_sd": 0.523854472818456,
+        "log10_curv_range": 1.8374759532284186,
+        "spearman_curv_cvar": 0.04160177975528365,
+        "cvar_mean": 0.996144144954065,
+        "rows": [
+          {
+            "cfg": 0,
+            "hparams": {
+              "learning_rate": 0.0008144886973076099,
+              "weight_decay": 1.1999049779393503e-05,
+              "dropout": 0.020486761968097345,
+              "hidden_dim": 36,
+              "n_layers": 3
+            },
+            "curvature": 3.1487544894218447,
+            "cvar": 1.027724823286367,
+            "aborted": false
+          },
+          {
+            "cfg": 1,
+            "hparams": {
+              "learning_rate": 0.005473520283788638,
+              "weight_decay": 0.0002670195766859458,
+              "dropout": 0.3647482804919992,
+              "hidden_dim": 154,
+              "n_layers": 4
+            },
+            "curvature": 4.2727875232696535,
+            "cvar": 0.9734798275734767,
+            "aborted": false
+          },
+          {
+            "cfg": 2,
+            "hparams": {
+              "learning_rate": 0.00280259706180413,
+              "weight_decay": 1.0255432976732008e-06,
+              "dropout": 0.4287021382937847,
+              "hidden_dim": 40,
+              "n_layers": 3
+            },
+            "curvature": 2.160897505283356,
+            "cvar": 1.0876472539761488,
+            "aborted": false
+          },
+          {
+            "cfg": 3,
+            "hparams": {
+              "learning_rate": 3.3648589334198054e-05,
+              "weight_decay": 0.002836061794577942,
+              "dropout": 0.27073061012454586,
+              "hidden_dim": 99,
+              "n_layers": 2
+            },
+            "curvature": 31.10040416717529,
+            "cvar": 0.944086321485721,
+            "aborted": false
+          },
+          {
+            "cfg": 4,
+            "hparams": {
+              "learning_rate": 1.2160712284471832e-05,
+              "weight_decay": 3.141471369267711e-06,
+              "dropout": 0.33531220734681516,
+              "hidden_dim": 177,
+              "n_layers": 3
+            },
+            "curvature": 11.581494998931884,
+            "cvar": 0.9297112384118325,
+            "aborted": false
+          },
+          {
+            "cfg": 5,
+            "hparams": {
+              "learning_rate": 0.00014159002641738985,
+              "weight_decay": 0.009746299280198961,
+              "dropout": 0.49041766938811504,
+              "hidden_dim": 186,
+              "n_layers": 3
+            },
+            "curvature": 18.812497329711913,
+            "cvar": 0.9432589810702109,
+            "aborted": false
+          },
+          {
+            "cfg": 6,
+            "hparams": {
+              "learning_rate": 0.0011623587566145872,
+              "weight_decay": 3.594890744699982e-05,
+              "dropout": 0.06754825251120561,
+              "hidden_dim": 194,
+              "n_layers": 3
+            },
+            "curvature": 17.88436164855957,
+            "cvar": 0.9906401185949972,
+            "aborted": false
+          },
+          {
+            "cfg": 7,
+            "hparams": {
+              "learning_rate": 8.525613229431752e-05,
+              "weight_decay": 8.776905761663257e-05,
+              "dropout": 0.4447439171745001,
+              "hidden_dim": 241,
+              "n_layers": 2
+            },
+            "curvature": 68.32144660949707,
+            "cvar": 0.9820160520455193,
+            "aborted": false
+          },
+          {
+            "cfg": 8,
+            "hparams": {
+              "learning_rate": 0.0005183098856911574,
+              "weight_decay": 1.9385524875506256e-05,
+              "dropout": 0.2971500150998484,
+              "hidden_dim": 108,
+              "n_layers": 2
+            },
+            "curvature": 28.393736362457275,
+            "cvar": 0.9258317528677381,
+            "aborted": false
+          },
+          {
+            "cfg": 9,
+            "hparams": {
+              "learning_rate": 0.004686224130787795,
+              "weight_decay": 8.102711465757493e-06,
+              "dropout": 0.3115935723430212,
+              "hidden_dim": 51,
+              "n_layers": 3
+            },
+            "curvature": 4.538429594039917,
+            "cvar": 0.8942165555524044,
+            "aborted": false
+          },
+          {
+            "cfg": 10,
+            "hparams": {
+              "learning_rate": 0.0022977084556509257,
+              "weight_decay": 9.067295552309297e-06,
+              "dropout": 0.4382421154053519,
+              "hidden_dim": 45,
+              "n_layers": 2
+            },
+            "curvature": 13.41519546508789,
+            "cvar": 1.1299748913315701,
+            "aborted": false
+          },
+          {
+            "cfg": 11,
+            "hparams": {
+              "learning_rate": 2.8238290434185012e-05,
+              "weight_decay": 6.329326021217653e-05,
+              "dropout": 0.3981621351436471,
+              "hidden_dim": 84,
+              "n_layers": 1
+            },
+            "curvature": 59.360710334777835,
+            "cvar": 1.0779137425735348,
+            "aborted": false
+          },
+          {
+            "cfg": 12,
+            "hparams": {
+              "learning_rate": 0.00016355187202997726,
+              "weight_decay": 6.223750555365426e-06,
+              "dropout": 0.04537652280956095,
+              "hidden_dim": 162,
+              "n_layers": 2
+            },
+            "curvature": 43.45238285064697,
+            "cvar": 0.9893903377627539,
+            "aborted": false
+          },
+          {
+            "cfg": 13,
+            "hparams": {
+              "learning_rate": 0.001037491706819631,
+              "weight_decay": 6.281477028287771e-06,
+              "dropout": 0.4710565552532489,
+              "hidden_dim": 114,
+              "n_layers": 1
+            },
+            "curvature": 76.26265735626221,
+            "cvar": 1.0625568017486697,
+            "aborted": false
+          },
+          {
+            "cfg": 14,
+            "hparams": {
+              "learning_rate": 0.0007714796141841603,
+              "weight_decay": 0.005112322143469579,
+              "dropout": 0.220188577357892,
+              "hidden_dim": 246,
+              "n_layers": 2
+            },
+            "curvature": 78.88204956054688,
+            "cvar": 0.9553437108616177,
+            "aborted": false
+          },
+          {
+            "cfg": 15,
+            "hparams": {
+              "learning_rate": 0.0001886626257594488,
+              "weight_decay": 0.00030258946818595135,
+              "dropout": 0.49754825261766206,
+              "hidden_dim": 245,
+              "n_layers": 2
+            },
+            "curvature": 79.74774055480957,
+            "cvar": 1.0077902349558743,
+            "aborted": false
+          },
+          {
+            "cfg": 16,
+            "hparams": {
+              "learning_rate": 0.0018758000190104763,
+              "weight_decay": 9.765416748471052e-05,
+              "dropout": 0.2646560800983852,
+              "hidden_dim": 208,
+              "n_layers": 2
+            },
+            "curvature": 58.372969436645505,
+            "cvar": 1.0153918266296387,
+            "aborted": false
+          },
+          {
+            "cfg": 17,
+            "hparams": {
+              "learning_rate": 0.0015975362270646025,
+              "weight_decay": 0.0006991518512855576,
+              "dropout": 0.4660298433066891,
+              "hidden_dim": 58,
+              "n_layers": 3
+            },
+            "curvature": 5.431996822357178,
+            "cvar": 0.9482952844012867,
+            "aborted": false
+          },
+          {
+            "cfg": 18,
+            "hparams": {
+              "learning_rate": 0.006057198217500781,
+              "weight_decay": 0.007442258653061449,
+              "dropout": 0.007353152482684644,
+              "hidden_dim": 225,
+              "n_layers": 4
+            },
+            "curvature": 6.1570528745651245,
+            "cvar": 0.9606909549925938,
+            "aborted": false
+          },
+          {
+            "cfg": 19,
+            "hparams": {
+              "learning_rate": 0.007440986880783409,
+              "weight_decay": 3.936008692949496e-06,
+              "dropout": 0.4863144069114775,
+              "hidden_dim": 231,
+              "n_layers": 3
+            },
+            "curvature": 20.689075183868407,
+            "cvar": 0.973173217075627,
+            "aborted": false
+          },
+          {
+            "cfg": 20,
+            "hparams": {
+              "learning_rate": 0.00027539989568695983,
+              "weight_decay": 8.501424035972133e-06,
+              "dropout": 0.40094028935915393,
+              "hidden_dim": 239,
+              "n_layers": 2
+            },
+            "curvature": 87.1182933807373,
+            "cvar": 0.9844178303759149,
+            "aborted": false
+          },
+          {
+            "cfg": 21,
+            "hparams": {
+              "learning_rate": 0.00041381213567394685,
+              "weight_decay": 5.902164585443198e-05,
+              "dropout": 0.4655086579905775,
+              "hidden_dim": 41,
+              "n_layers": 3
+            },
+            "curvature": 4.773011112213135,
+            "cvar": 1.030919385150196,
+            "aborted": false
+          },
+          {
+            "cfg": 22,
+            "hparams": {
+              "learning_rate": 0.0006968186099181996,
+              "weight_decay": 1.2985583238920994e-06,
+              "dropout": 0.35960988641337016,
+              "hidden_dim": 36,
+              "n_layers": 3
+            },
+            "curvature": 3.180465006828308,
+            "cvar": 1.0295567844734816,
+            "aborted": false
+          },
+          {
+            "cfg": 23,
+            "hparams": {
+              "learning_rate": 0.00034536328756814265,
+              "weight_decay": 0.005204953850233812,
+              "dropout": 0.03304124836203737,
+              "hidden_dim": 220,
+              "n_layers": 1
+            },
+            "curvature": 148.6312469482422,
+            "cvar": 1.0631238642286083,
+            "aborted": false
+          },
+          {
+            "cfg": 24,
+            "hparams": {
+              "learning_rate": 0.00010787726726300036,
+              "weight_decay": 5.2625341582970844e-05,
+              "dropout": 0.4830310403920351,
+              "hidden_dim": 158,
+              "n_layers": 2
+            },
+            "curvature": 38.2976770401001,
+            "cvar": 1.0716651178175403,
+            "aborted": false
+          },
+          {
+            "cfg": 25,
+            "hparams": {
+              "learning_rate": 5.309176241739295e-05,
+              "weight_decay": 0.0035683979617993893,
+              "dropout": 0.11293471420866219,
+              "hidden_dim": 60,
+              "n_layers": 2
+            },
+            "curvature": 14.373774433135987,
+            "cvar": 1.0736717586517335,
+            "aborted": false
+          },
+          {
+            "cfg": 26,
+            "hparams": {
+              "learning_rate": 0.0005732831728445664,
+              "weight_decay": 0.00016457429702614715,
+              "dropout": 0.40485538795638887,
+              "hidden_dim": 158,
+              "n_layers": 2
+            },
+            "curvature": 38.30285377502442,
+            "cvar": 1.0640491479780616,
+            "aborted": false
+          },
+          {
+            "cfg": 27,
+            "hparams": {
+              "learning_rate": 0.00017325629701568884,
+              "weight_decay": 0.001872767585702729,
+              "dropout": 0.31325323120987675,
+              "hidden_dim": 247,
+              "n_layers": 2
+            },
+            "curvature": 87.20668258666993,
+            "cvar": 0.9478758071079727,
+            "aborted": false
+          },
+          {
+            "cfg": 28,
+            "hparams": {
+              "learning_rate": 0.0004548147403738956,
+              "weight_decay": 0.00023751815247116215,
+              "dropout": 0.42414560413753,
+              "hidden_dim": 65,
+              "n_layers": 2
+            },
+            "curvature": 22.85909857749939,
+            "cvar": 0.8542103920101134,
+            "aborted": false
+          },
+          {
+            "cfg": 29,
+            "hparams": {
+              "learning_rate": 0.005368795786727682,
+              "weight_decay": 1.4868513594702555e-06,
+              "dropout": 0.41135314009075097,
+              "hidden_dim": 125,
+              "n_layers": 3
+            },
+            "curvature": 9.358060264587403,
+            "cvar": 0.9457003336307431,
+            "aborted": false
+          }
+        ]
+      },
+      {
+        "arm": "nslkdd/standard",
+        "n_ok": 30,
+        "n_aborted": 0,
+        "log10_curv_mean": 1.7588807576540115,
+        "log10_curv_sd": 0.5330471451875356,
+        "log10_curv_range": 1.769008401682251,
+        "spearman_curv_cvar": 0.5648498331479421,
+        "cvar_mean": 0.8037584541320799,
+        "rows": [
+          {
+            "cfg": 0,
+            "hparams": {
+              "learning_rate": 0.0008144886973076099,
+              "weight_decay": 1.1999049779393503e-05,
+              "dropout": 0.020486761968097345,
+              "hidden_dim": 36,
+              "n_layers": 3
+            },
+            "curvature": 4.981925702095031,
+            "cvar": 0.7175556282997131,
+            "aborted": false
+          },
+          {
+            "cfg": 1,
+            "hparams": {
+              "learning_rate": 0.005473520283788638,
+              "weight_decay": 0.0002670195766859458,
+              "dropout": 0.3647482804919992,
+              "hidden_dim": 154,
+              "n_layers": 4
+            },
+            "curvature": 19.83087134361267,
+            "cvar": 0.7493182187080383,
+            "aborted": false
+          },
+          {
+            "cfg": 2,
+            "hparams": {
+              "learning_rate": 0.00280259706180413,
+              "weight_decay": 1.0255432976732008e-06,
+              "dropout": 0.4287021382937847,
+              "hidden_dim": 40,
+              "n_layers": 3
+            },
+            "curvature": 10.45464231967926,
+            "cvar": 0.8035565922260285,
+            "aborted": false
+          },
+          {
+            "cfg": 3,
+            "hparams": {
+              "learning_rate": 3.3648589334198054e-05,
+              "weight_decay": 0.002836061794577942,
+              "dropout": 0.27073061012454586,
+              "hidden_dim": 99,
+              "n_layers": 2
+            },
+            "curvature": 78.43467712402344,
+            "cvar": 0.7525019841194153,
+            "aborted": false
+          },
+          {
+            "cfg": 4,
+            "hparams": {
+              "learning_rate": 1.2160712284471832e-05,
+              "weight_decay": 3.141471369267711e-06,
+              "dropout": 0.33531220734681516,
+              "hidden_dim": 177,
+              "n_layers": 3
+            },
+            "curvature": 49.551283073425296,
+            "cvar": 0.8300069894790649,
+            "aborted": false
+          },
+          {
+            "cfg": 5,
+            "hparams": {
+              "learning_rate": 0.00014159002641738985,
+              "weight_decay": 0.009746299280198961,
+              "dropout": 0.49041766938811504,
+              "hidden_dim": 186,
+              "n_layers": 3
+            },
+            "curvature": 76.46895942687988,
+            "cvar": 0.8157829003334045,
+            "aborted": false
+          },
+          {
+            "cfg": 6,
+            "hparams": {
+              "learning_rate": 0.0011623587566145872,
+              "weight_decay": 3.594890744699982e-05,
+              "dropout": 0.06754825251120561,
+              "hidden_dim": 194,
+              "n_layers": 3
+            },
+            "curvature": 62.42131175994873,
+            "cvar": 0.794700744152069,
+            "aborted": false
+          },
+          {
+            "cfg": 7,
+            "hparams": {
+              "learning_rate": 8.525613229431752e-05,
+              "weight_decay": 8.776905761663257e-05,
+              "dropout": 0.4447439171745001,
+              "hidden_dim": 241,
+              "n_layers": 2
+            },
+            "curvature": 210.80450134277345,
+            "cvar": 0.8007759096622467,
+            "aborted": false
+          },
+          {
+            "cfg": 8,
+            "hparams": {
+              "learning_rate": 0.0005183098856911574,
+              "weight_decay": 1.9385524875506256e-05,
+              "dropout": 0.2971500150998484,
+              "hidden_dim": 108,
+              "n_layers": 2
+            },
+            "curvature": 89.19209213256836,
+            "cvar": 0.7534954369068145,
+            "aborted": false
+          },
+          {
+            "cfg": 9,
+            "hparams": {
+              "learning_rate": 0.004686224130787795,
+              "weight_decay": 8.102711465757493e-06,
+              "dropout": 0.3115935723430212,
+              "hidden_dim": 51,
+              "n_layers": 3
+            },
+            "curvature": 13.704480600357055,
+            "cvar": 0.7758213181495667,
+            "aborted": false
+          },
+          {
+            "cfg": 10,
+            "hparams": {
+              "learning_rate": 0.0022977084556509257,
+              "weight_decay": 9.067295552309297e-06,
+              "dropout": 0.4382421154053519,
+              "hidden_dim": 45,
+              "n_layers": 2
+            },
+            "curvature": 25.49586181640625,
+            "cvar": 0.825028579711914,
+            "aborted": false
+          },
+          {
+            "cfg": 11,
+            "hparams": {
+              "learning_rate": 2.8238290434185012e-05,
+              "weight_decay": 6.329326021217653e-05,
+              "dropout": 0.3981621351436471,
+              "hidden_dim": 84,
+              "n_layers": 1
+            },
+            "curvature": 141.57537803649902,
+            "cvar": 0.8949041941165924,
+            "aborted": false
+          },
+          {
+            "cfg": 12,
+            "hparams": {
+              "learning_rate": 0.00016355187202997726,
+              "weight_decay": 6.223750555365426e-06,
+              "dropout": 0.04537652280956095,
+              "hidden_dim": 162,
+              "n_layers": 2
+            },
+            "curvature": 144.2029354095459,
+            "cvar": 0.7772904717922211,
+            "aborted": false
+          },
+          {
+            "cfg": 13,
+            "hparams": {
+              "learning_rate": 0.001037491706819631,
+              "weight_decay": 6.281477028287771e-06,
+              "dropout": 0.4710565552532489,
+              "hidden_dim": 114,
+              "n_layers": 1
+            },
+            "curvature": 115.04169654846191,
+            "cvar": 1.0336491093635558,
+            "aborted": false
+          },
+          {
+            "cfg": 14,
+            "hparams": {
+              "learning_rate": 0.0007714796141841603,
+              "weight_decay": 0.005112322143469579,
+              "dropout": 0.220188577357892,
+              "hidden_dim": 246,
+              "n_layers": 2
+            },
+            "curvature": 210.01287384033202,
+            "cvar": 0.8254908702373505,
+            "aborted": false
+          },
+          {
+            "cfg": 15,
+            "hparams": {
+              "learning_rate": 0.0001886626257594488,
+              "weight_decay": 0.00030258946818595135,
+              "dropout": 0.49754825261766206,
+              "hidden_dim": 245,
+              "n_layers": 2
+            },
+            "curvature": 246.41301345825195,
+            "cvar": 0.8679685125350952,
+            "aborted": false
+          },
+          {
+            "cfg": 16,
+            "hparams": {
+              "learning_rate": 0.0018758000190104763,
+              "weight_decay": 9.765416748471052e-05,
+              "dropout": 0.2646560800983852,
+              "hidden_dim": 208,
+              "n_layers": 2
+            },
+            "curvature": 141.61281661987306,
+            "cvar": 0.7949312992095947,
+            "aborted": false
+          },
+          {
+            "cfg": 17,
+            "hparams": {
+              "learning_rate": 0.0015975362270646025,
+              "weight_decay": 0.0006991518512855576,
+              "dropout": 0.4660298433066891,
+              "hidden_dim": 58,
+              "n_layers": 3
+            },
+            "curvature": 9.922770047187806,
+            "cvar": 0.8157834389209747,
+            "aborted": false
+          },
+          {
+            "cfg": 18,
+            "hparams": {
+              "learning_rate": 0.006057198217500781,
+              "weight_decay": 0.007442258653061449,
+              "dropout": 0.007353152482684644,
+              "hidden_dim": 225,
+              "n_layers": 4
+            },
+            "curvature": 24.579881477355958,
+            "cvar": 0.7462932057380677,
+            "aborted": false
+          },
+          {
+            "cfg": 19,
+            "hparams": {
+              "learning_rate": 0.007440986880783409,
+              "weight_decay": 3.936008692949496e-06,
+              "dropout": 0.4863144069114775,
+              "hidden_dim": 231,
+              "n_layers": 3
+            },
+            "curvature": 99.91135330200196,
+            "cvar": 0.7938188393115997,
+            "aborted": false
+          },
+          {
+            "cfg": 20,
+            "hparams": {
+              "learning_rate": 0.00027539989568695983,
+              "weight_decay": 8.501424035972133e-06,
+              "dropout": 0.40094028935915393,
+              "hidden_dim": 239,
+              "n_layers": 2
+            },
+            "curvature": 225.6020637512207,
+            "cvar": 0.8630119051933288,
+            "aborted": false
+          },
+          {
+            "cfg": 21,
+            "hparams": {
+              "learning_rate": 0.00041381213567394685,
+              "weight_decay": 5.902164585443198e-05,
+              "dropout": 0.4655086579905775,
+              "hidden_dim": 41,
+              "n_layers": 3
+            },
+            "curvature": 8.194735360145568,
+            "cvar": 0.7321565208435059,
+            "aborted": false
+          },
+          {
+            "cfg": 22,
+            "hparams": {
+              "learning_rate": 0.0006968186099181996,
+              "weight_decay": 1.2985583238920994e-06,
+              "dropout": 0.35960988641337016,
+              "hidden_dim": 36,
+              "n_layers": 3
+            },
+            "curvature": 4.90478378534317,
+            "cvar": 0.7202257206439971,
+            "aborted": false
+          },
+          {
+            "cfg": 23,
+            "hparams": {
+              "learning_rate": 0.00034536328756814265,
+              "weight_decay": 0.005204953850233812,
+              "dropout": 0.03304124836203737,
+              "hidden_dim": 220,
+              "n_layers": 1
+            },
+            "curvature": 288.1563995361328,
+            "cvar": 0.9176837270259857,
+            "aborted": false
+          },
+          {
+            "cfg": 24,
+            "hparams": {
+              "learning_rate": 0.00010787726726300036,
+              "weight_decay": 5.2625341582970844e-05,
+              "dropout": 0.4830310403920351,
+              "hidden_dim": 158,
+              "n_layers": 2
+            },
+            "curvature": 141.37316665649413,
+            "cvar": 0.8249295806884765,
+            "aborted": false
+          },
+          {
+            "cfg": 25,
+            "hparams": {
+              "learning_rate": 5.309176241739295e-05,
+              "weight_decay": 0.0035683979617993893,
+              "dropout": 0.11293471420866219,
+              "hidden_dim": 60,
+              "n_layers": 2
+            },
+            "curvature": 39.59384632110596,
+            "cvar": 0.7638764503002167,
+            "aborted": false
+          },
+          {
+            "cfg": 26,
+            "hparams": {
+              "learning_rate": 0.0005732831728445664,
+              "weight_decay": 0.00016457429702614715,
+              "dropout": 0.40485538795638887,
+              "hidden_dim": 158,
+              "n_layers": 2
+            },
+            "curvature": 131.0297378540039,
+            "cvar": 0.7776779365539551,
+            "aborted": false
+          },
+          {
+            "cfg": 27,
+            "hparams": {
+              "learning_rate": 0.00017325629701568884,
+              "weight_decay": 0.001872767585702729,
+              "dropout": 0.31325323120987675,
+              "hidden_dim": 247,
+              "n_layers": 2
+            },
+            "curvature": 230.14979782104493,
+            "cvar": 0.7640142116546631,
+            "aborted": false
+          },
+          {
+            "cfg": 28,
+            "hparams": {
+              "learning_rate": 0.0004548147403738956,
+              "weight_decay": 0.00023751815247116215,
+              "dropout": 0.42414560413753,
+              "hidden_dim": 65,
+              "n_layers": 2
+            },
+            "curvature": 61.906189346313475,
+            "cvar": 0.8223273153305054,
+            "aborted": false
+          },
+          {
+            "cfg": 29,
+            "hparams": {
+              "learning_rate": 0.005368795786727682,
+              "weight_decay": 1.4868513594702555e-06,
+              "dropout": 0.41135314009075097,
+              "hidden_dim": 125,
+              "n_layers": 3
+            },
+            "curvature": 40.5100492477417,
+            "cvar": 0.7581760127544404,
+            "aborted": false
+          }
+        ]
+      },
+      {
+        "arm": "nslkdd/log_standard",
+        "n_ok": 30,
+        "n_aborted": 0,
+        "log10_curv_mean": 1.8064394150984142,
+        "log10_curv_sd": 0.5391656854791577,
+        "log10_curv_range": 1.731469197588786,
+        "spearman_curv_cvar": 0.5461624026696329,
+        "cvar_mean": 0.8037523657004039,
+        "rows": [
+          {
+            "cfg": 0,
+            "hparams": {
+              "learning_rate": 0.0008144886973076099,
+              "weight_decay": 1.1999049779393503e-05,
+              "dropout": 0.020486761968097345,
+              "hidden_dim": 36,
+              "n_layers": 3
+            },
+            "curvature": 5.699613642692566,
+            "cvar": 0.7175220155715942,
+            "aborted": false
+          },
+          {
+            "cfg": 1,
+            "hparams": {
+              "learning_rate": 0.005473520283788638,
+              "weight_decay": 0.0002670195766859458,
+              "dropout": 0.3647482804919992,
+              "hidden_dim": 154,
+              "n_layers": 4
+            },
+            "curvature": 22.25566339492798,
+            "cvar": 0.7511464717388153,
+            "aborted": false
+          },
+          {
+            "cfg": 2,
+            "hparams": {
+              "learning_rate": 0.00280259706180413,
+              "weight_decay": 1.0255432976732008e-06,
+              "dropout": 0.4287021382937847,
+              "hidden_dim": 40,
+              "n_layers": 3
+            },
+            "curvature": 10.439560270309448,
+            "cvar": 0.8009676306247712,
+            "aborted": false
+          },
+          {
+            "cfg": 3,
+            "hparams": {
+              "learning_rate": 3.3648589334198054e-05,
+              "weight_decay": 0.002836061794577942,
+              "dropout": 0.27073061012454586,
+              "hidden_dim": 99,
+              "n_layers": 2
+            },
+            "curvature": 87.74834480285645,
+            "cvar": 0.7546665139198303,
+            "aborted": false
+          },
+          {
+            "cfg": 4,
+            "hparams": {
+              "learning_rate": 1.2160712284471832e-05,
+              "weight_decay": 3.141471369267711e-06,
+              "dropout": 0.33531220734681516,
+              "hidden_dim": 177,
+              "n_layers": 3
+            },
+            "curvature": 58.34293804168701,
+            "cvar": 0.8234163925647736,
+            "aborted": false
+          },
+          {
+            "cfg": 5,
+            "hparams": {
+              "learning_rate": 0.00014159002641738985,
+              "weight_decay": 0.009746299280198961,
+              "dropout": 0.49041766938811504,
+              "hidden_dim": 186,
+              "n_layers": 3
+            },
+            "curvature": 87.75245018005371,
+            "cvar": 0.8171540286540985,
+            "aborted": false
+          },
+          {
+            "cfg": 6,
+            "hparams": {
+              "learning_rate": 0.0011623587566145872,
+              "weight_decay": 3.594890744699982e-05,
+              "dropout": 0.06754825251120561,
+              "hidden_dim": 194,
+              "n_layers": 3
+            },
+            "curvature": 69.59216823577881,
+            "cvar": 0.7933563113212585,
+            "aborted": false
+          },
+          {
+            "cfg": 7,
+            "hparams": {
+              "learning_rate": 8.525613229431752e-05,
+              "weight_decay": 8.776905761663257e-05,
+              "dropout": 0.4447439171745001,
+              "hidden_dim": 241,
+              "n_layers": 2
+            },
+            "curvature": 255.86946487426758,
+            "cvar": 0.7835129563808441,
+            "aborted": false
+          },
+          {
+            "cfg": 8,
+            "hparams": {
+              "learning_rate": 0.0005183098856911574,
+              "weight_decay": 1.9385524875506256e-05,
+              "dropout": 0.2971500150998484,
+              "hidden_dim": 108,
+              "n_layers": 2
+            },
+            "curvature": 97.21592788696289,
+            "cvar": 0.7501616373062133,
+            "aborted": false
+          },
+          {
+            "cfg": 9,
+            "hparams": {
+              "learning_rate": 0.004686224130787795,
+              "weight_decay": 8.102711465757493e-06,
+              "dropout": 0.3115935723430212,
+              "hidden_dim": 51,
+              "n_layers": 3
+            },
+            "curvature": 15.64769024848938,
+            "cvar": 0.774838846206665,
+            "aborted": false
+          },
+          {
+            "cfg": 10,
+            "hparams": {
+              "learning_rate": 0.0022977084556509257,
+              "weight_decay": 9.067295552309297e-06,
+              "dropout": 0.4382421154053519,
+              "hidden_dim": 45,
+              "n_layers": 2
+            },
+            "curvature": 27.04985237121582,
+            "cvar": 0.8275586454868317,
+            "aborted": false
+          },
+          {
+            "cfg": 11,
+            "hparams": {
+              "learning_rate": 2.8238290434185012e-05,
+              "weight_decay": 6.329326021217653e-05,
+              "dropout": 0.3981621351436471,
+              "hidden_dim": 84,
+              "n_layers": 1
+            },
+            "curvature": 171.54856872558594,
+            "cvar": 0.9243554458618164,
+            "aborted": false
+          },
+          {
+            "cfg": 12,
+            "hparams": {
+              "learning_rate": 0.00016355187202997726,
+              "weight_decay": 6.223750555365426e-06,
+              "dropout": 0.04537652280956095,
+              "hidden_dim": 162,
+              "n_layers": 2
+            },
+            "curvature": 163.01268005371094,
+            "cvar": 0.7660757710933686,
+            "aborted": false
+          },
+          {
+            "cfg": 13,
+            "hparams": {
+              "learning_rate": 0.001037491706819631,
+              "weight_decay": 6.281477028287771e-06,
+              "dropout": 0.4710565552532489,
+              "hidden_dim": 114,
+              "n_layers": 1
+            },
+            "curvature": 120.95415840148925,
+            "cvar": 1.0531834855079651,
+            "aborted": false
+          },
+          {
+            "cfg": 14,
+            "hparams": {
+              "learning_rate": 0.0007714796141841603,
+              "weight_decay": 0.005112322143469579,
+              "dropout": 0.220188577357892,
+              "hidden_dim": 246,
+              "n_layers": 2
+            },
+            "curvature": 233.91973114013672,
+            "cvar": 0.8301815421581268,
+            "aborted": false
+          },
+          {
+            "cfg": 15,
+            "hparams": {
+              "learning_rate": 0.0001886626257594488,
+              "weight_decay": 0.00030258946818595135,
+              "dropout": 0.49754825261766206,
+              "hidden_dim": 245,
+              "n_layers": 2
+            },
+            "curvature": 286.8074523925781,
+            "cvar": 0.8658015050888062,
+            "aborted": false
+          },
+          {
+            "cfg": 16,
+            "hparams": {
+              "learning_rate": 0.0018758000190104763,
+              "weight_decay": 9.765416748471052e-05,
+              "dropout": 0.2646560800983852,
+              "hidden_dim": 208,
+              "n_layers": 2
+            },
+            "curvature": 163.84110336303712,
+            "cvar": 0.78537633061409,
+            "aborted": false
+          },
+          {
+            "cfg": 17,
+            "hparams": {
+              "learning_rate": 0.0015975362270646025,
+              "weight_decay": 0.0006991518512855576,
+              "dropout": 0.4660298433066891,
+              "hidden_dim": 58,
+              "n_layers": 3
+            },
+            "curvature": 10.078927683830262,
+            "cvar": 0.8122817199230195,
+            "aborted": false
+          },
+          {
+            "cfg": 18,
+            "hparams": {
+              "learning_rate": 0.006057198217500781,
+              "weight_decay": 0.007442258653061449,
+              "dropout": 0.007353152482684644,
+              "hidden_dim": 225,
+              "n_layers": 4
+            },
+            "curvature": 28.968342304229736,
+            "cvar": 0.7483414645195008,
+            "aborted": false
+          },
+          {
+            "cfg": 19,
+            "hparams": {
+              "learning_rate": 0.007440986880783409,
+              "weight_decay": 3.936008692949496e-06,
+              "dropout": 0.4863144069114775,
+              "hidden_dim": 231,
+              "n_layers": 3
+            },
+            "curvature": 117.6268367767334,
+            "cvar": 0.8108243763446807,
+            "aborted": false
+          },
+          {
+            "cfg": 20,
+            "hparams": {
+              "learning_rate": 0.00027539989568695983,
+              "weight_decay": 8.501424035972133e-06,
+              "dropout": 0.40094028935915393,
+              "hidden_dim": 239,
+              "n_layers": 2
+            },
+            "curvature": 253.49331588745116,
+            "cvar": 0.8545826957225799,
+            "aborted": false
+          },
+          {
+            "cfg": 21,
+            "hparams": {
+              "learning_rate": 0.00041381213567394685,
+              "weight_decay": 5.902164585443198e-05,
+              "dropout": 0.4655086579905775,
+              "hidden_dim": 41,
+              "n_layers": 3
+            },
+            "curvature": 8.942938566207886,
+            "cvar": 0.7280337347984314,
+            "aborted": false
+          },
+          {
+            "cfg": 22,
+            "hparams": {
+              "learning_rate": 0.0006968186099181996,
+              "weight_decay": 1.2985583238920994e-06,
+              "dropout": 0.35960988641337016,
+              "hidden_dim": 36,
+              "n_layers": 3
+            },
+            "curvature": 5.5794517993927,
+            "cvar": 0.7199382889270782,
+            "aborted": false
+          },
+          {
+            "cfg": 23,
+            "hparams": {
+              "learning_rate": 0.00034536328756814265,
+              "weight_decay": 0.005204953850233812,
+              "dropout": 0.03304124836203737,
+              "hidden_dim": 220,
+              "n_layers": 1
+            },
+            "curvature": 300.64966735839846,
+            "cvar": 0.9286968059539795,
+            "aborted": false
+          },
+          {
+            "cfg": 24,
+            "hparams": {
+              "learning_rate": 0.00010787726726300036,
+              "weight_decay": 5.2625341582970844e-05,
+              "dropout": 0.4830310403920351,
+              "hidden_dim": 158,
+              "n_layers": 2
+            },
+            "curvature": 158.31478729248047,
+            "cvar": 0.8168271832466125,
+            "aborted": false
+          },
+          {
+            "cfg": 25,
+            "hparams": {
+              "learning_rate": 5.309176241739295e-05,
+              "weight_decay": 0.0035683979617993893,
+              "dropout": 0.11293471420866219,
+              "hidden_dim": 60,
+              "n_layers": 2
+            },
+            "curvature": 41.077281665802005,
+            "cvar": 0.7548920075893402,
+            "aborted": false
+          },
+          {
+            "cfg": 26,
+            "hparams": {
+              "learning_rate": 0.0005732831728445664,
+              "weight_decay": 0.00016457429702614715,
+              "dropout": 0.40485538795638887,
+              "hidden_dim": 158,
+              "n_layers": 2
+            },
+            "curvature": 144.8310173034668,
+            "cvar": 0.7766227972507477,
+            "aborted": false
+          },
+          {
+            "cfg": 27,
+            "hparams": {
+              "learning_rate": 0.00017325629701568884,
+              "weight_decay": 0.001872767585702729,
+              "dropout": 0.31325323120987675,
+              "hidden_dim": 247,
+              "n_layers": 2
+            },
+            "curvature": 263.5390266418457,
+            "cvar": 0.7603433065414429,
+            "aborted": false
+          },
+          {
+            "cfg": 28,
+            "hparams": {
+              "learning_rate": 0.0004548147403738956,
+              "weight_decay": 0.00023751815247116215,
+              "dropout": 0.42414560413753,
+              "hidden_dim": 65,
+              "n_layers": 2
+            },
+            "curvature": 66.17448959350585,
+            "cvar": 0.819855040550232,
+            "aborted": false
+          },
+          {
+            "cfg": 29,
+            "hparams": {
+              "learning_rate": 0.005368795786727682,
+              "weight_decay": 1.4868513594702555e-06,
+              "dropout": 0.41135314009075097,
+              "hidden_dim": 125,
+              "n_layers": 3
+            },
+            "curvature": 44.876942825317386,
+            "cvar": 0.7620560195446014,
+            "aborted": false
+          }
+        ]
+      }
+    ],
+    "configs": [
+      {
+        "learning_rate": 0.0008144886973076099,
+        "weight_decay": 1.1999049779393503e-05,
+        "dropout": 0.020486761968097345,
+        "hidden_dim": 36,
+        "n_layers": 3
+      },
+      {
+        "learning_rate": 0.005473520283788638,
+        "weight_decay": 0.0002670195766859458,
+        "dropout": 0.3647482804919992,
+        "hidden_dim": 154,
+        "n_layers": 4
+      },
+      {
+        "learning_rate": 0.00280259706180413,
+        "weight_decay": 1.0255432976732008e-06,
+        "dropout": 0.4287021382937847,
+        "hidden_dim": 40,
+        "n_layers": 3
+      },
+      {
+        "learning_rate": 3.3648589334198054e-05,
+        "weight_decay": 0.002836061794577942,
+        "dropout": 0.27073061012454586,
+        "hidden_dim": 99,
+        "n_layers": 2
+      },
+      {
+        "learning_rate": 1.2160712284471832e-05,
+        "weight_decay": 3.141471369267711e-06,
+        "dropout": 0.33531220734681516,
+        "hidden_dim": 177,
+        "n_layers": 3
+      },
+      {
+        "learning_rate": 0.00014159002641738985,
+        "weight_decay": 0.009746299280198961,
+        "dropout": 0.49041766938811504,
+        "hidden_dim": 186,
+        "n_layers": 3
+      },
+      {
+        "learning_rate": 0.0011623587566145872,
+        "weight_decay": 3.594890744699982e-05,
+        "dropout": 0.06754825251120561,
+        "hidden_dim": 194,
+        "n_layers": 3
+      },
+      {
+        "learning_rate": 8.525613229431752e-05,
+        "weight_decay": 8.776905761663257e-05,
+        "dropout": 0.4447439171745001,
+        "hidden_dim": 241,
+        "n_layers": 2
+      },
+      {
+        "learning_rate": 0.0005183098856911574,
+        "weight_decay": 1.9385524875506256e-05,
+        "dropout": 0.2971500150998484,
+        "hidden_dim": 108,
+        "n_layers": 2
+      },
+      {
+        "learning_rate": 0.004686224130787795,
+        "weight_decay": 8.102711465757493e-06,
+        "dropout": 0.3115935723430212,
+        "hidden_dim": 51,
+        "n_layers": 3
+      },
+      {
+        "learning_rate": 0.0022977084556509257,
+        "weight_decay": 9.067295552309297e-06,
+        "dropout": 0.4382421154053519,
+        "hidden_dim": 45,
+        "n_layers": 2
+      },
+      {
+        "learning_rate": 2.8238290434185012e-05,
+        "weight_decay": 6.329326021217653e-05,
+        "dropout": 0.3981621351436471,
+        "hidden_dim": 84,
+        "n_layers": 1
+      },
+      {
+        "learning_rate": 0.00016355187202997726,
+        "weight_decay": 6.223750555365426e-06,
+        "dropout": 0.04537652280956095,
+        "hidden_dim": 162,
+        "n_layers": 2
+      },
+      {
+        "learning_rate": 0.001037491706819631,
+        "weight_decay": 6.281477028287771e-06,
+        "dropout": 0.4710565552532489,
+        "hidden_dim": 114,
+        "n_layers": 1
+      },
+      {
+        "learning_rate": 0.0007714796141841603,
+        "weight_decay": 0.005112322143469579,
+        "dropout": 0.220188577357892,
+        "hidden_dim": 246,
+        "n_layers": 2
+      },
+      {
+        "learning_rate": 0.0001886626257594488,
+        "weight_decay": 0.00030258946818595135,
+        "dropout": 0.49754825261766206,
+        "hidden_dim": 245,
+        "n_layers": 2
+      },
+      {
+        "learning_rate": 0.0018758000190104763,
+        "weight_decay": 9.765416748471052e-05,
+        "dropout": 0.2646560800983852,
+        "hidden_dim": 208,
+        "n_layers": 2
+      },
+      {
+        "learning_rate": 0.0015975362270646025,
+        "weight_decay": 0.0006991518512855576,
+        "dropout": 0.4660298433066891,
+        "hidden_dim": 58,
+        "n_layers": 3
+      },
+      {
+        "learning_rate": 0.006057198217500781,
+        "weight_decay": 0.007442258653061449,
+        "dropout": 0.007353152482684644,
+        "hidden_dim": 225,
+        "n_layers": 4
+      },
+      {
+        "learning_rate": 0.007440986880783409,
+        "weight_decay": 3.936008692949496e-06,
+        "dropout": 0.4863144069114775,
+        "hidden_dim": 231,
+        "n_layers": 3
+      },
+      {
+        "learning_rate": 0.00027539989568695983,
+        "weight_decay": 8.501424035972133e-06,
+        "dropout": 0.40094028935915393,
+        "hidden_dim": 239,
+        "n_layers": 2
+      },
+      {
+        "learning_rate": 0.00041381213567394685,
+        "weight_decay": 5.902164585443198e-05,
+        "dropout": 0.4655086579905775,
+        "hidden_dim": 41,
+        "n_layers": 3
+      },
+      {
+        "learning_rate": 0.0006968186099181996,
+        "weight_decay": 1.2985583238920994e-06,
+        "dropout": 0.35960988641337016,
+        "hidden_dim": 36,
+        "n_layers": 3
+      },
+      {
+        "learning_rate": 0.00034536328756814265,
+        "weight_decay": 0.005204953850233812,
+        "dropout": 0.03304124836203737,
+        "hidden_dim": 220,
+        "n_layers": 1
+      },
+      {
+        "learning_rate": 0.00010787726726300036,
+        "weight_decay": 5.2625341582970844e-05,
+        "dropout": 0.4830310403920351,
+        "hidden_dim": 158,
+        "n_layers": 2
+      },
+      {
+        "learning_rate": 5.309176241739295e-05,
+        "weight_decay": 0.0035683979617993893,
+        "dropout": 0.11293471420866219,
+        "hidden_dim": 60,
+        "n_layers": 2
+      },
+      {
+        "learning_rate": 0.0005732831728445664,
+        "weight_decay": 0.00016457429702614715,
+        "dropout": 0.40485538795638887,
+        "hidden_dim": 158,
+        "n_layers": 2
+      },
+      {
+        "learning_rate": 0.00017325629701568884,
+        "weight_decay": 0.001872767585702729,
+        "dropout": 0.31325323120987675,
+        "hidden_dim": 247,
+        "n_layers": 2
+      },
+      {
+        "learning_rate": 0.0004548147403738956,
+        "weight_decay": 0.00023751815247116215,
+        "dropout": 0.42414560413753,
+        "hidden_dim": 65,
+        "n_layers": 2
+      },
+      {
+        "learning_rate": 0.005368795786727682,
+        "weight_decay": 1.4868513594702555e-06,
+        "dropout": 0.41135314009075097,
+        "hidden_dim": 125,
+        "n_layers": 3
+      }
+    ]
+  }
+}

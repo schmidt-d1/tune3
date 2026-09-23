@@ -1,0 +1,310 @@
+{
+  "meta": {
+    "experiment": "diag_ddkf",
+    "tag": "dionatan-excitacao",
+    "timestamp": "2026-09-21T19:48:58",
+    "duration_s": 8.3,
+    "args": {
+      "csv": "data/drebin215.csv",
+      "device": "cuda",
+      "tag": "dionatan-excitacao",
+      "min_samples": [
+        20
+      ],
+      "epochs": [
+        60
+      ],
+      "seed": 0,
+      "exploration_std": [
+        0.03,
+        0.3,
+        1.0
+      ],
+      "obs_vector": [
+        "loss",
+        "curvature"
+      ]
+    },
+    "git": {
+      "commit": "fd04cc82db0d3bd53c3ec5e4e42aa87da27a8fc8",
+      "commit_short": "fd04cc8",
+      "branch": "main",
+      "dirty": true,
+      "dirty_files": [
+        "M scripts/run_pilot.py",
+        " M tune3/experiments/protocol.py",
+        " M tune3/integration/runner.py",
+        " M tune3/integration/trial.py",
+        " M tune3/tests/test_auditoria_2026_09.py"
+      ]
+    },
+    "env": {
+      "python": "3.14.7",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "hostname": "DRS",
+      "user": "diona",
+      "torch": "2.14.0+cu130",
+      "cuda_available": true,
+      "gpu": "NVIDIA GeForce RTX 5070 Ti",
+      "numpy": "2.5.3",
+      "scipy": "1.18.1",
+      "botorch": "0.18.1",
+      "gpytorch": "1.15.2",
+      "statsmodels": "0.15.0",
+      "sklearn": "1.9.1"
+    },
+    "schema_version": 1
+  },
+  "payload": {
+    "rows": [
+      {
+        "obs_vector": "loss",
+        "curvature_every": 5,
+        "min_samples": 20,
+        "epochs": 60,
+        "exploration_std": 0.03,
+        "exploration_decay": 0.0,
+        "n_ddkf_observations": 60,
+        "r2_max": 0.012286363091724954,
+        "r2_mean": 0.0013258386205035116,
+        "regime_fractions": {
+          "A": 1.0,
+          "B": 0.0,
+          "C": 0.0
+        },
+        "n_ddkf_active_epochs": 0,
+        "lr_change_fraction": 0.0,
+        "n_epochs_run": 60,
+        "cvar": 1.0311007938109154
+      },
+      {
+        "obs_vector": "loss",
+        "curvature_every": 5,
+        "min_samples": 20,
+        "epochs": 60,
+        "exploration_std": 0.03,
+        "exploration_decay": 0.02,
+        "n_ddkf_observations": 60,
+        "r2_max": 0.007853101302698952,
+        "r2_mean": 0.0016937293937133962,
+        "regime_fractions": {
+          "A": 1.0,
+          "B": 0.0,
+          "C": 0.0
+        },
+        "n_ddkf_active_epochs": 0,
+        "lr_change_fraction": 0.0,
+        "n_epochs_run": 60,
+        "cvar": 1.0311007938109154
+      },
+      {
+        "obs_vector": "loss",
+        "curvature_every": 5,
+        "min_samples": 20,
+        "epochs": 60,
+        "exploration_std": 0.3,
+        "exploration_decay": 0.0,
+        "n_ddkf_observations": 60,
+        "r2_max": 1.2286363091724992,
+        "r2_mean": 0.13378767241205738,
+        "regime_fractions": {
+          "A": 0.65,
+          "B": 0.31666666666666665,
+          "C": 0.03333333333333333
+        },
+        "n_ddkf_active_epochs": 21,
+        "lr_change_fraction": 0.3559322033898305,
+        "n_epochs_run": 60,
+        "cvar": 1.0116332045271377
+      },
+      {
+        "obs_vector": "loss",
+        "curvature_every": 5,
+        "min_samples": 20,
+        "epochs": 60,
+        "exploration_std": 0.3,
+        "exploration_decay": 0.02,
+        "n_ddkf_observations": 60,
+        "r2_max": 0.7853101302699136,
+        "r2_mean": 0.15247916371711842,
+        "regime_fractions": {
+          "A": 0.5166666666666667,
+          "B": 0.4666666666666667,
+          "C": 0.016666666666666666
+        },
+        "n_ddkf_active_epochs": 29,
+        "lr_change_fraction": 0.4915254237288136,
+        "n_epochs_run": 60,
+        "cvar": 1.0227905152257808
+      },
+      {
+        "obs_vector": "loss",
+        "curvature_every": 5,
+        "min_samples": 20,
+        "epochs": 60,
+        "exploration_std": 1.0,
+        "exploration_decay": 0.0,
+        "n_ddkf_observations": 60,
+        "r2_max": 13.651514546361074,
+        "r2_mean": 1.5585607346382233,
+        "regime_fractions": {
+          "A": 0.3333333333333333,
+          "B": 0.016666666666666666,
+          "C": 0.65
+        },
+        "n_ddkf_active_epochs": 40,
+        "lr_change_fraction": 0.6779661016949152,
+        "n_epochs_run": 60,
+        "cvar": 0.9995605871697103
+      },
+      {
+        "obs_vector": "loss",
+        "curvature_every": 5,
+        "min_samples": 20,
+        "epochs": 60,
+        "exploration_std": 1.0,
+        "exploration_decay": 0.02,
+        "n_ddkf_observations": 60,
+        "r2_max": 8.725668114110178,
+        "r2_mean": 1.8074071687846738,
+        "regime_fractions": {
+          "A": 0.3333333333333333,
+          "B": 0.016666666666666666,
+          "C": 0.65
+        },
+        "n_ddkf_active_epochs": 40,
+        "lr_change_fraction": 0.6779661016949152,
+        "n_epochs_run": 60,
+        "cvar": 1.0388138284367963
+      },
+      {
+        "obs_vector": "curvature",
+        "curvature_every": 1,
+        "min_samples": 20,
+        "epochs": 60,
+        "exploration_std": 0.03,
+        "exploration_decay": 0.0,
+        "n_ddkf_observations": 60,
+        "r2_max": 0.014646474999190027,
+        "r2_mean": 0.002640565893817913,
+        "regime_fractions": {
+          "A": 1.0,
+          "B": 0.0,
+          "C": 0.0
+        },
+        "n_ddkf_active_epochs": 0,
+        "lr_change_fraction": 0.0,
+        "n_epochs_run": 60,
+        "cvar": 1.0307822744708417
+      },
+      {
+        "obs_vector": "curvature",
+        "curvature_every": 1,
+        "min_samples": 20,
+        "epochs": 60,
+        "exploration_std": 0.03,
+        "exploration_decay": 0.02,
+        "n_ddkf_observations": 60,
+        "r2_max": 0.009916074280332867,
+        "r2_mean": 0.0019463363181619528,
+        "regime_fractions": {
+          "A": 1.0,
+          "B": 0.0,
+          "C": 0.0
+        },
+        "n_ddkf_active_epochs": 0,
+        "lr_change_fraction": 0.0,
+        "n_epochs_run": 60,
+        "cvar": 1.0307822744708417
+      },
+      {
+        "obs_vector": "curvature",
+        "curvature_every": 1,
+        "min_samples": 20,
+        "epochs": 60,
+        "exploration_std": 0.3,
+        "exploration_decay": 0.0,
+        "n_ddkf_observations": 60,
+        "r2_max": 1.4646474999189947,
+        "r2_mean": 0.2719188824269424,
+        "regime_fractions": {
+          "A": 0.4666666666666667,
+          "B": 0.31666666666666665,
+          "C": 0.21666666666666667
+        },
+        "n_ddkf_active_epochs": 32,
+        "lr_change_fraction": 0.5423728813559322,
+        "n_epochs_run": 60,
+        "cvar": 1.0180207747073213
+      },
+      {
+        "obs_vector": "curvature",
+        "curvature_every": 1,
+        "min_samples": 20,
+        "epochs": 60,
+        "exploration_std": 0.3,
+        "exploration_decay": 0.02,
+        "n_ddkf_observations": 60,
+        "r2_max": 0.9916074280332897,
+        "r2_mean": 0.2041103794660753,
+        "regime_fractions": {
+          "A": 0.36666666666666664,
+          "B": 0.5,
+          "C": 0.13333333333333333
+        },
+        "n_ddkf_active_epochs": 38,
+        "lr_change_fraction": 0.6101694915254238,
+        "n_epochs_run": 60,
+        "cvar": 1.0268039792037207
+      },
+      {
+        "obs_vector": "curvature",
+        "curvature_every": 1,
+        "min_samples": 20,
+        "epochs": 60,
+        "exploration_std": 1.0,
+        "exploration_decay": 0.0,
+        "n_ddkf_observations": 60,
+        "r2_max": 16.273861110211083,
+        "r2_mean": 3.334874053685657,
+        "regime_fractions": {
+          "A": 0.3333333333333333,
+          "B": 0.0,
+          "C": 0.6666666666666666
+        },
+        "n_ddkf_active_epochs": 40,
+        "lr_change_fraction": 0.6779661016949152,
+        "n_epochs_run": 60,
+        "cvar": 1.0038270567144667
+      },
+      {
+        "obs_vector": "curvature",
+        "curvature_every": 1,
+        "min_samples": 20,
+        "epochs": 60,
+        "exploration_std": 1.0,
+        "exploration_decay": 0.02,
+        "n_ddkf_observations": 60,
+        "r2_max": 11.017860311481014,
+        "r2_mean": 2.5640635708770065,
+        "regime_fractions": {
+          "A": 0.3333333333333333,
+          "B": 0.0,
+          "C": 0.6666666666666666
+        },
+        "n_ddkf_active_epochs": 40,
+        "lr_change_fraction": 0.6779661016949152,
+        "n_epochs_run": 60,
+        "cvar": 1.0390537543730303
+      }
+    ],
+    "verdict": "O DDKF ATUA com z='loss', min_samples=20 e 60 epocas: 40 epocas ativas, R2max=13.652. Este e' o braco a pre-registrar no E2.",
+    "hparams": {
+      "learning_rate": 0.001,
+      "weight_decay": 0.0001,
+      "dropout": 0.1,
+      "hidden_dim": 128,
+      "n_layers": 2
+    }
+  }
+}
