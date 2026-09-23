@@ -62,7 +62,14 @@ def run_tune3(data, config=None, wandb_run=None):
                           "n_ddkf_active_epochs": res.get("n_ddkf_active_epochs"),
                           "n_epochs_run": res.get("n_epochs_run"),
                           "lr_change_fraction": res.get("lr_change_fraction"),
-                          "lr0": res.get("lr0"), "lr_final": res.get("lr_final")})
+                          "lr0": res.get("lr0"), "lr_final": res.get("lr_final"),
+                          # E2: por que o DDKF (nao) atua. n_ddkf_active_epochs sozinho nao
+                          # distingue "buffer curto" de "gate fechado"; r2_max e
+                          # n_ddkf_observations distinguem.
+                          "r2_max": res.get("r2_max"), "r2_mean": res.get("r2_mean"),
+                          "n_ddkf_observations": res.get("n_ddkf_observations"),
+                          "n_curvature_estimates": res.get("n_curvature_estimates"),
+                          "obs_vector": res.get("obs_vector")})
         if cfg.objective2 == "random":
             second = float(placebo_rng.normal())      # placebo: ruido no lugar da curvatura
         else:

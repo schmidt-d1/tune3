@@ -25,6 +25,7 @@ import structlog
 
 from tune3.integration.runner import run_tune3, Tune3RunConfig
 from tune3.integration.trial import TrialConfig, run_trial
+from tune3.micro import DDKFConfig
 from tune3.macro.bo_loop import MacroConfig
 from tune3.baselines.plain_trial import plain_trial, PlainTrialConfig
 from tune3.baselines.hpo import RandomSearchHPO, ASHA
@@ -50,6 +51,12 @@ class ProtocolConfig:
     # Cadencia de re-estimativa da curvatura dentro do trial (5 = padrao; 1 = a cada
     # epoca, mais caro). Exposto para medir o custo dos dois regimes (decisao D-C).
     curvature_every: int = 5
+    # Braco de ablacao do vetor de observacao do DDKF: "loss" | "curvature" (D1).
+    obs_vector: str = "loss"
+    # Amplitude da excitacao do log-lr na identificacao. O padrao do projeto (0.03) deixa
+    # o sistema NAO identificavel (R^2 ~ 0.005 << r2_low=0.10) e o DDKF nunca atua; com
+    # 0.30 o gate abre. E' o parametro que torna o E2 uma pergunta e nao uma tautologia.
+    ddkf_exploration_std: float = 0.03
     methods: List[str] = field(default_factory=lambda: list(ALL_METHODS))
     search_space: Dict[str, Tuple[float, float]] = field(default_factory=lambda: {
         "log_lr": (-5.0, -2.0), "log_wd": (-6.0, -2.0),
@@ -72,12 +79,17 @@ def _eval_on_test(hparams, data_full, seed, cfg, optimizer="sgd"):
             "test_loss": r["test_loss"], "best_epoch": r["best_epoch"], "hparams": hparams}
 
 
+def _ddkf_cfg(cfg):
+    return DDKFConfig(rho=0.95, sigma_eta=0.05, exploration_std=cfg.ddkf_exploration_std)
+
+
 def _tune3_variant(train_val, cfg, seed, objective2="curvature", ddkf_enabled=True):
     run_cfg = Tune3RunConfig(
         macro=MacroConfig(n_init=cfg.n_init, n_iter=cfg.n_iter, device="cpu", seed=seed),
         trial=TrialConfig(max_epochs=cfg.epochs, patience=cfg.patience, optimizer="sgd",
                           device=cfg.device, gamma=cfg.gamma, seed=seed, ddkf_enabled=ddkf_enabled,
-                          curvature_every=cfg.curvature_every),
+                          curvature_every=cfg.curvature_every, obs_vector=cfg.obs_vector,
+                          ddkf=_ddkf_cfg(cfg)),
         search_space=dict(cfg.search_space), objective2=objective2)
     return run_tune3(train_val, run_cfg)
 
@@ -110,7 +122,8 @@ def run_seed(seed, loader_fn, cfg):
     if "bo_mono_cvar" in M:                                # E1 (B4)
         trial_cfg = TrialConfig(max_epochs=cfg.epochs, patience=cfg.patience, optimizer="sgd",
                                 device=cfg.device, gamma=cfg.gamma, seed=seed,
-                                curvature_every=cfg.curvature_every)
+                                curvature_every=cfg.curvature_every, obs_vector=cfg.obs_vector,
+                                ddkf=_ddkf_cfg(cfg))
         b4 = MonoObjectiveBO(cfg.search_space,
                              evaluate_fn=lambda hp: run_trial(hp, train_val, trial_cfg),
                              n_init=cfg.n_init, n_iter=cfg.n_iter, seed=seed).run()

@@ -19,7 +19,8 @@ def test_cohens_dz_zero_quando_sem_variacao_ou_media_nula():
 
 
 def test_bootstrap_ci_exclui_zero_com_efeito_claro():
-    lo, hi = bootstrap_ci([0.10, 0.12, 0.08, 0.11, 0.09], n_boot=3000, seed=0)
+    # rev. 4 (23/09/2026): 6 pares (antes 5) -- bootstrap_ci passou a devolver NaN para n < 6
+    lo, hi = bootstrap_ci([0.10, 0.12, 0.08, 0.11, 0.09, 0.105], n_boot=3000, seed=0)
     assert lo > 0  # efeito real => IC não contém 0
 
 

@@ -71,7 +71,8 @@ def _eval_split(model, crit, crit_ps, X, y, want_scores: bool):
 
 def plain_trial(hparams, data, config=None, max_epochs_override=None,
                 report_intermediate=False, return_scores=False,
-                test_data: Optional[Tuple[np.ndarray, np.ndarray]] = None) -> Dict:
+                test_data: Optional[Tuple[np.ndarray, np.ndarray]] = None,
+                return_test_losses: bool = False) -> Dict:
     cfg = config or PlainTrialConfig()
     torch.manual_seed(cfg.seed); np.random.seed(cfg.seed)
     device = torch.device(cfg.device)
@@ -158,6 +159,8 @@ def plain_trial(hparams, data, config=None, max_epochs_override=None,
         tl, tps, tscores = _eval_split(model, crit, crit_ps, Xte, yte, return_scores)
         out["test_loss"] = float(tl)
         out["cvar_test"] = float(cvar(tps, cfg.gamma)) if np.isfinite(tl) else 1e3
+        if return_test_losses:                 # CVaR por subconjunto (ex.: so' ataques novos)
+            out["test_losses"] = np.asarray(tps, dtype=float)
         if return_scores:
             out["scores_test"] = tscores
     return out

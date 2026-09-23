@@ -52,7 +52,11 @@ def _synthetic(n, seed=0, d=215):
     return X, (s > np.quantile(s, 0.63)).astype(int)
 
 
-def load_data(csv, seed=0):
+def load_data(csv, seed=0, dataset=None, data_path=None):
+    if dataset == "nslkdd":
+        from tune3.data.registry import load_dataset
+        Xtr, Xv, Xte, ytr, yv, yte = load_dataset("nslkdd", data_path, seed)
+        return (Xtr, ytr, Xv, yv, Xte, yte), "NSL-KDD (split oficial, z-score)"
     if csv:
         from tune3.data.drebin import DrebinLoader, DrebinConfig
         Xtr, Xv, Xte, ytr, yv, yte = DrebinLoader(DrebinConfig(csv_path=csv, random_state=seed)).load_splits()
@@ -320,6 +324,9 @@ def v9_end_to_end(data, device, epochs, n_init, n_iter):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--csv", default=None)
+    ap.add_argument("--dataset", default=None, choices=["drebin", "nslkdd"],
+                    help="nslkdd usa data/nsl_kdd (ou --data-path); sem isso, --csv => DREBIN")
+    ap.add_argument("--data-path", default=None)
     ap.add_argument("--device", default="cpu", choices=["cpu", "cuda"])
     ap.add_argument("--epochs", type=int, default=15)
     ap.add_argument("--n-init", type=int, default=4)
@@ -328,7 +335,7 @@ def main():
     ap.add_argument("--tag", default=None)
     args = ap.parse_args()
     t0 = time.time()
-    data, dname = load_data(args.csv)
+    data, dname = load_data(args.csv, dataset=args.dataset, data_path=args.data_path)
     print(f"\n=== VALIDACAO TEORIA x IMPLEMENTACAO -- dados: {dname} -- device: {args.device}\n")
     v1_v2_hutchinson(); v3_gsnr(data); v4_cvar(); v5_cantelli(); v6_ddkf(); v7_eos(); v8_stats()
     if not args.skip_e2e:

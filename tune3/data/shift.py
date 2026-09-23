@@ -18,7 +18,9 @@ from typing import Optional, Tuple
 
 import numpy as np
 import structlog
-from sklearn.cluster import KMeans
+# `sklearn.cluster` e' importado SO' dentro de cluster_malware(): importar o pacote carrega
+# sklearn.neighbors._kd_tree (extensao compilada), que o Controle Inteligente de Aplicativos do
+# Windows passou a bloquear em 23/09/2026. Assim so' o S2 depende dela.
 
 logger = structlog.get_logger()
 
@@ -29,6 +31,7 @@ def cluster_malware(X: np.ndarray, y: np.ndarray, n_clusters: int,
     y = np.asarray(y).astype(int)
     labels = np.full(len(y), -1, dtype=int)
     pos_idx = np.where(y == positive_label)[0]
+    from sklearn.cluster import KMeans
     km = KMeans(n_clusters=n_clusters, random_state=seed, n_init=10)
     labels[pos_idx] = km.fit_predict(X[pos_idx])
     return labels

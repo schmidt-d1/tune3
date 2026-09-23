@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import argparse, time
 
-from tune3.data.drebin import DrebinLoader, DrebinConfig
+from tune3.data.registry import load_dataset
 from tune3.experiments.protocol import run_protocol, ProtocolConfig, ALL_METHODS
 from tune3.experiments.stats import compare_paired, summarize
 from tune3.experiments.results_io import save_result
@@ -25,6 +25,14 @@ from tune3.experiments.results_io import save_result
 def main():
     ap = argparse.ArgumentParser(description="Piloto estatistico do Tune3.")
     ap.add_argument("--csv", default="data/drebin215.csv")
+    ap.add_argument("--dataset", default="drebin", choices=["drebin", "nslkdd"],
+                    help="nslkdd: trilha de validade externa (data/nsl_kdd; ver tune3/data/nslkdd.py)")
+    ap.add_argument("--data-path", default=None, help="caminho do dataset (padrao depende de --dataset)")
+    ap.add_argument("--nsl-split", default="official", choices=["official", "random"],
+                    help="official = teste KDDTest+ com ataques nunca vistos (zero-day); random = in-distribution")
+    ap.add_argument("--nsl-scaling", default="standard", choices=["standard", "log_standard", "none"])
+    ap.add_argument("--nsl-max-train", type=int, default=None,
+                    help="subamostra estratificada do treino NSL-KDD (ex.: 25000 para pilotos)")
     ap.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2])
     ap.add_argument("--epochs", type=int, default=20)
     ap.add_argument("--n-init", type=int, default=5)
@@ -33,6 +41,12 @@ def main():
     ap.add_argument("--curvature-every", type=int, default=5,
                     help="cadencia (em epocas) da re-estimativa de Tr(H^2) dentro do trial; "
                          "5 = padrao, 1 = a cada epoca (mais caro). Use para medir o custo dos dois.")
+    ap.add_argument("--obs-vector", default="loss", choices=["loss", "curvature"],
+                    help="vetor de observacao do DDKF: loss (padrao) ou curvature (braco D1; "
+                         "use junto com --curvature-every 1)")
+    ap.add_argument("--ddkf-exploration-std", type=float, default=0.03,
+                    help="amplitude da excitacao do log-lr (padrao 0.03 deixa o DDKF inerte; "
+                         "0.30 abre o gate). Braco E2.")
     ap.add_argument("--methods", nargs="+", default=list(ALL_METHODS), choices=ALL_METHODS)
     ap.add_argument("--reference", default="tune3_bestcvar")
     ap.add_argument("--tag", default=None, help="identificador de quem roda (ex.: aluno-joao)")
@@ -41,16 +55,26 @@ def main():
     t0 = time.time()
 
     def loader_fn(seed: int):
-        loader = DrebinLoader(DrebinConfig(csv_path=args.csv, random_state=seed))
-        Xtr, Xv, Xte, ytr, yv, yte = loader.load_splits()
+        if args.dataset == "nslkdd":
+            Xtr, Xv, Xte, ytr, yv, yte = load_dataset(
+                "nslkdd", args.data_path, seed, split=args.nsl_split,
+                scaling=args.nsl_scaling, max_train=args.nsl_max_train)
+        else:
+            Xtr, Xv, Xte, ytr, yv, yte = load_dataset("drebin", args.data_path or args.csv, seed)
         return (Xtr, ytr, Xv, yv, Xte, yte)
 
     cfg = ProtocolConfig(seeds=args.seeds, epochs=args.epochs, n_init=args.n_init,
                          n_iter=args.n_iter, device=args.device, methods=list(args.methods),
-                         curvature_every=args.curvature_every)
+                         curvature_every=args.curvature_every,
+                         obs_vector=args.obs_vector,
+                         ddkf_exploration_std=args.ddkf_exploration_std)
 
+    print(f"[piloto] dataset={args.dataset}"
+          + (f" (split={args.nsl_split}, scaling={args.nsl_scaling}, max_train={args.nsl_max_train})"
+             if args.dataset == "nslkdd" else ""))
     print(f"[piloto] {len(args.seeds)} seeds, {args.epochs} epocas, device={args.device}, "
-          f"curvature_every={args.curvature_every}")
+          f"curvature_every={args.curvature_every}, obs_vector={args.obs_vector}, "
+          f"exploration_std={args.ddkf_exploration_std}")
     print(f"[piloto] metodos: {', '.join(cfg.methods)}\n")
 
     results = run_protocol(loader_fn, cfg)
@@ -79,7 +103,7 @@ def main():
 
     save_result({"scores": scores, "stats": stats, "per_seed": results["per_seed"],
                  "methods": results["methods"], "reference": ref},
-                experiment="pilot_h1", tag=args.tag, args=vars(args), started_at=t0,
+                experiment="pilot_h1" if args.dataset == "drebin" else "pilot_nslkdd", tag=args.tag, args=vars(args), started_at=t0,
                 extra_path=args.out)
 
 

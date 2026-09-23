@@ -57,6 +57,9 @@ def _stat_dz(x, axis=-1):
     return out
 
 
+MIN_N_BOOTSTRAP = 6   # abaixo disso o bootstrap nao e' inferencia (ver bootstrap_ci)
+
+
 def bootstrap_ci(diffs, n_boot: int = 10000, alpha: float = 0.05, seed: int = 0,
                  statistic: str = "mean", ci_method: str = "bca") -> Tuple[float, float]:
     """
@@ -72,7 +75,14 @@ def bootstrap_ci(diffs, n_boot: int = 10000, alpha: float = 0.05, seed: int = 0,
     stat = _stat_mean if statistic == "mean" else _stat_dz
     if statistic not in ("mean", "dz"):
         raise ValueError("statistic deve ser 'mean' ou 'dz'")
-    if d.size < 2 or np.allclose(d, d[0]):
+    if d.size < MIN_N_BOOTSTRAP:
+        # Com n=3 existem so' 10 reamostras distintas: o "IC" bate na fronteira e parece
+        # informativo sem ser (visto nos pilotos de 23/09/2026: limite inferior 0.0000 em
+        # todas as comparacoes). Mesmo limiar em que o Wilcoxon passa a poder dar p<0.05.
+        warnings.warn(f"bootstrap com n={d.size} < {MIN_N_BOOTSTRAP}: IC nao reportado (NaN).",
+                      RuntimeWarning)
+        return float("nan"), float("nan")
+    if np.allclose(d, d[0]):
         v = float(stat(d)) if d.size else 0.0
         return v, v
     method = {"bca": "BCa", "percentile": "percentile"}[ci_method]
@@ -197,3 +207,24 @@ def aggregate_per_seed(results_by_fold: Dict[str, Dict], method: str,
     for i in range(n_seeds):
         out.append(float(np.mean([f["by_metric"][method][metric][i] for f in folds])))
     return out
+
+
+def partial_spearman(y, x, controls) -> float:
+    """Correlacao PARCIAL em postos entre y e x, controlando pelas colunas de `controls`.
+
+    Residuos de OLS dos postos de y e de x sobre os postos dos controles; devolve a correlacao
+    de Pearson dos residuos. Robusta a cauda pesada (so' usa ordem). E' a estatistica do E0:
+    rho(log Tr(H^2), CVaR_teste | CVaR_validacao) mede se a curvatura carrega informacao sobre
+    o teste que a validacao NAO carrega. A correlacao bruta nao serve para isso: se a curvatura
+    so' afeta o teste ATRAVES da validacao, a bruta e' positiva e a parcial e' ~0 (redundancia);
+    se ha' um efeito direto de sinal oposto, a bruta pode ser ~0 e a parcial nao (supressao).
+    """
+    from scipy.stats import rankdata, pearsonr
+    y = np.asarray(y, float); x = np.asarray(x, float)
+    ry, rx = rankdata(y), rankdata(x)
+    A = np.column_stack([np.ones(len(y))] + [rankdata(np.asarray(c, float)) for c in controls])
+    ey = ry - A @ np.linalg.lstsq(A, ry, rcond=None)[0]
+    ex = rx - A @ np.linalg.lstsq(A, rx, rcond=None)[0]
+    if ey.std() == 0 or ex.std() == 0:
+        return float("nan")
+    return float(pearsonr(ey, ex)[0])

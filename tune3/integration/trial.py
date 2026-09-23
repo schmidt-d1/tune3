@@ -22,9 +22,20 @@ Dado hiperparametros (do MACRO/BO), treina o modelo com:
   - EARLY STOPPING (paciencia): para se val_loss nao melhora.
 Retorna (CVaR_gamma da MELHOR epoca de validacao, Tr(H^2)) + telemetria.
 
-OBSERVACAO DO DDKF (decisao de projeto, documentada): z_t = (train_loss,
-val_loss, log GSNR). A curvatura Tr(H^2) NAO entra no vetor de observacao do
-filtro; ela atua (i) como objetivo do nivel MACRO e (ii) via EoSDetector.
+OBSERVACAO DO DDKF (agora um BRACO DE ABLACAO, `TrialConfig.obs_vector`):
+  "loss"      (padrao)  z_t = (train_loss, val_loss, log GSNR)
+  "curvature" (D1)      z_t = (train_loss, log(1+Tr(H^2)), log GSNR)
+Ate' set/2026 so' existia a primeira, e o manuscrito descrevia a segunda -- a
+divergencia estava catalogada como D1. O diagnostico de 21/09/2026
+(`scripts/diag_ddkf.py`) mostrou que com "loss" o sistema e' NAO IDENTIFICAVEL a
+partir da trajetoria do trial: R^2 <= 0.012 no DREBIN contra r2_low=0.10, em
+min_samples de 10 a 30, 30 a 60 epocas, com e sem excitacao persistente. O
+RegimeGate entao mantem o controlador inerte (n_ddkf_active_epochs == 0 em todos
+os trials de todos os pilotos). D1 deixou de ser divergencia de documentacao e
+virou alternativa de projeto a ser testada: a curvatura tem acoplamento direto
+com o lr no limite de estabilidade (lambda_max ~ 2/eta), logo pode ser observavel
+onde a perda nao e'. Com "curvature", use curvature_every=1 (senao a observacao
+repete entre reestimativas e a covariancia zera).
 """
 from __future__ import annotations
 
@@ -74,6 +85,24 @@ class TrialConfig:
     curvature_every: int = 5
     # Ablacao E2: False => lr fixo em lr0 (Cantelli/EoS continuam ativos).
     ddkf_enabled: bool = True
+    # VETOR DE OBSERVACAO DO DDKF (braco de ablacao; ver docs/AUDITORIA_2026_09.md, D1).
+    #   "loss"      -> z = [train_loss, val_loss, log GSNR]        (implementado desde sempre)
+    #   "curvature" -> z = [train_loss, log(1+Tr(H^2)), log GSNR]  (o que o manuscrito descrevia)
+    # Motivo do braco: com "loss" o sistema e' NAO IDENTIFICAVEL a partir da trajetoria do
+    # trial (R^2 <= 0.012 medido no DREBIN, contra r2_low=0.10), entao o RegimeGate mantem o
+    # controlador inerte. A curvatura tem acoplamento direto com o lr no limite de
+    # estabilidade (lambda_max ~ 2/eta), logo pode ser observavel onde a perda nao e'.
+    obs_vector: str = "loss"
+
+    def __post_init__(self):
+        if self.obs_vector not in ("loss", "curvature"):
+            raise ValueError(f"obs_vector deve ser 'loss' ou 'curvature'; veio {self.obs_vector!r}")
+        if self.obs_vector == "curvature" and self.curvature_every > 1:
+            logger.warning(
+                "obs_vector='curvature' com curvature_every>1: o DDKF recebera' o MESMO valor "
+                "de curvatura entre reestimativas, o que zera a covariancia (mesmo padrao do "
+                "bug B2 do EoS). Use curvature_every=1 para que a observacao seja nova a cada "
+                "epoca.", curvature_every=self.curvature_every)
 
 
 def _class_weights(y, k, device):
@@ -137,7 +166,7 @@ def run_trial(hparams, data, config=None, wandb_run=None) -> Dict:
     aborted = False
     # telemetria de engajamento (E2): o controlador realmente mexeu no lr?
     lr_traj = []; n_ddkf_active = 0; n_curv_estimates = 0
-    curv_traj = []
+    curv_traj = []; r2_traj = []
 
     for epoch in range(cfg.max_epochs):
         model.train()
@@ -176,8 +205,11 @@ def run_trial(hparams, data, config=None, wandb_run=None) -> Dict:
 
         # --- controle MICRO do lr ---
         log_gsnr = gsnr_est.log_gsnr(grads_for_gsnr) if len(grads_for_gsnr) >= 2 else 0.0
-        ddkf.update(np.array([train_loss, val_loss, log_gsnr]))
+        # 2a componente: val_loss (padrao) ou log(1+Tr(H^2)) (braco de ablacao, ver TrialConfig)
+        obs2 = val_loss if cfg.obs_vector == "loss" else float(np.log1p(max(last_curv, 0.0)))
+        ddkf.update(np.array([train_loss, obs2, log_gsnr]))
         r2 = ddkf.information_ratio(); factor = gate.gating_factor(r2); gate.observe(r2)
+        r2_traj.append(float(r2))          # diagnostico: por que o DDKF (nao) atua
         cur_lr = max(_current_lr(opt), 1e-12)
         if cfg.ddkf_enabled:
             new_log_lr = ddkf.x_hat if factor > 0 else np.log(lr0)
@@ -215,6 +247,11 @@ def run_trial(hparams, data, config=None, wandb_run=None) -> Dict:
         "n_epochs_run": len(lr_traj),
         "n_ddkf_active_epochs": n_ddkf_active,
         "n_curvature_estimates": n_curv_estimates,
+        "obs_vector": cfg.obs_vector,          # qual braco de ablacao gerou este trial
+        "r2_max": float(max(r2_traj)) if r2_traj else 0.0,
+        "r2_mean": float(sum(r2_traj) / len(r2_traj)) if r2_traj else 0.0,
+        "n_ddkf_observations": len(r2_traj),   # compare com DDKFConfig.min_samples
+
         "lr0": lr0,
         "lr_final": float(lr_arr[-1]) if lr_arr.size else lr0,
         "lr_min": float(lr_arr.min()) if lr_arr.size else lr0,

@@ -7,6 +7,9 @@ venv/
 *.egg-info/
 *.log
 data/*.csv
+# datasets em subpastas (ex.: data/nsl_kdd/*.txt) -- cada maquina baixa o seu
+data/**/*.txt
+data/**/*.arff
 outputs/
 wandb/
 _tmp_worker_*.json
