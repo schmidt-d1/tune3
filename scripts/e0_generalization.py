@@ -22,9 +22,27 @@ curvatura (Hutchinson, M=20, eval) nesse modelo, e UMA avaliacao no teste. Nada 
 entra em escolha nenhuma. Correlacoes em POSTOS (Spearman), robustas a cauda pesada; IC por
 bootstrap percentilico pareado sobre as configuracoes.
 
+Criterios de qualidade da amostra (acrescentados em 23/09/2026, ANTES da rodada k=400, apos a
+rodada k=40 com --epochs 30 mostrar 38/40 configuracoes do NSL-KDD com a melhor epoca = ultima):
+  - ESTAGNADA: melhor epoca < --min-best-epoch (padrao 2). Com lr ~1e-5 e batch 4096 a melhora
+    por epoca fica abaixo de min_delta=1e-4, a paciencia esgota e o "melhor modelo" e' o da
+    epoca 0 -- praticamente a inicializacao. Essas configuracoes sao EXCLUIDAS da analise.
+  - TRUNCADA: melhor epoca = ultima epoca permitida (o early stopping nao disparou). Com SGD,
+    batch 4096 e lr ate' 1e-5, isso e' a REGRA, nao a excecao: num teste com 200 epocas, 11 de 12
+    configuracoes ainda melhoravam na epoca 199. Por isso o orcamento padrao aqui e' o MESMO do
+    protocolo (ProtocolConfig: 100 epocas, paciencia 10) -- a pergunta pre-registrada e' se H_G
+    vale no orcamento em que o Tune3 de fato opera. Quando mais da metade da amostra e' truncada,
+    o veredito diz isso explicitamente: vale para ESTE orcamento, nao para minimos convergidos.
+    A correlacao curvatura x CVaR de validacao DEPENDE do orcamento (NSL-KDD: +0,56 com 10
+    epocas, -0,03 com 30, -0,77 com 200 num teste de 12 configuracoes), porque o posto do CVaR
+    entre configuracoes muda com o treino (rho = +0,39 entre 10 e 30 epocas) e o da curvatura
+    quase nao muda (rho = +0,87). Rode tambem --epochs 30 e 200 como analise de sensibilidade.
+
 Uso:
     python scripts/e0_generalization.py --device cuda --tag dionatan                 # NSL-KDD + DREBIN
-    python scripts/e0_generalization.py --k 60 --epochs 30 --datasets nslkdd --device cuda
+    python scripts/e0_generalization.py --k 400 --device cuda --tag dionatan-k400          # primario
+    python scripts/e0_generalization.py --k 400 --epochs 30 --device cuda --tag dionatan-k400-e30
+    python scripts/e0_generalization.py --k 400 --epochs 200 --patience 15 --device cuda --tag dionatan-k400-e200
 """
 from __future__ import annotations
 
@@ -89,9 +107,12 @@ def run_dataset(name, configs, args):
             row["cvar_test_novel"] = float(cvar(tl[novel], 0.95))
             row["cvar_test_known"] = float(cvar(tl[~novel], 0.95))
         rows.append(row)
+    stalled = [r for r in rows if r["best_epoch"] < args.min_best_epoch]
     ok = [r for r in rows if np.isfinite(r["curvature"]) and 0 < r["curvature"] < 1e3
-          and r["cvar_test"] < 1e3]
+          and r["cvar_test"] < 1e3 and r["best_epoch"] >= args.min_best_epoch]
     n = len(ok)
+    n_trunc = sum(r["best_epoch"] >= args.epochs - 1 for r in ok)
+    frac_trunc = n_trunc / n if n else float("nan")
     lc = np.log10([r["curvature"] for r in ok]); cv = np.array([r["cvar_val"] for r in ok])
     lr = np.log10([r["hparams"]["learning_rate"] for r in ok])
     lwd = np.log10([r["hparams"]["weight_decay"] for r in ok])
@@ -100,8 +121,14 @@ def run_dataset(name, configs, args):
     if ok and "cvar_test_novel" in ok[0]:
         targets += [("cvar_test_novel", "teste: ataques NOVOS"), ("cvar_test_known", "teste: ataques conhecidos")]
 
-    out = {"dataset": name, "n_ok": n, "n_total": len(rows), "rows": rows, "results": {}}
-    print(f"\n[{name}] {n}/{len(rows)} configuracoes validas")
+    out = {"dataset": name, "epochs": args.epochs, "n_ok": n, "n_total": len(rows), "n_stalled": len(stalled),
+           "n_truncated": n_trunc, "frac_truncated": frac_trunc, "rows": rows, "results": {}}
+    print(f"\n[{name}] {n}/{len(rows)} configuracoes validas "
+          f"({len(stalled)} estagnadas excluidas; {n_trunc} truncadas = {frac_trunc:.0%} das validas)")
+    if n and frac_trunc > 0.5:
+        print(f"  NOTA: em {frac_trunc:.0%} das configuracoes a melhor epoca foi a ULTIMA (early stopping "
+              f"nao disparou). O resultado vale para o orcamento de {args.epochs} epocas, nao para "
+              f"minimos convergidos.")
     print(f"  {'alvo':28s} {'rho(curv,alvo)':>15} {'parcial|val':>12} {'IC95':>18} {'parcial|val,lr,wd':>18}")
     for key, label in targets:
         y = np.array([r[key] for r in ok])
@@ -124,6 +151,13 @@ def verdict(res):
     alvo = "ataques novos" if key == "cvar_test_novel" else "teste"
     if res["n_ok"] < 10 or not np.isfinite(lo):
         return f"EM ABERTO: so' {res['n_ok']} configuracoes validas (use --k >= 30)"
+    pre = f"[orcamento {res.get('epochs', '?')} epocas"
+    if res.get("frac_truncated", 0) > 0.5:
+        pre += f"; {res['frac_truncated']:.0%} truncadas: nao vale para minimos convergidos"
+    return pre + "] " + _verdict_core(r, lo, hi, alvo)
+
+
+def _verdict_core(r, lo, hi, alvo):
     if lo > 0:
         return (f"SUSTENTA H_G: com a validacao fixada, mais curvatura -> pior CVaR em {alvo} "
                 f"(parcial {r['partial_given_val']:+.2f}, IC [{lo:+.2f},{hi:+.2f}]). A curvatura carrega "
@@ -143,8 +177,11 @@ def main():
     ap.add_argument("--nslkdd", default="data/nsl_kdd")
     ap.add_argument("--nsl-max-train", type=int, default=25000)
     ap.add_argument("--k", type=int, default=40, help="configuracoes sorteadas (as MESMAS em todos os datasets)")
-    ap.add_argument("--epochs", type=int, default=30)
-    ap.add_argument("--patience", type=int, default=10)
+    ap.add_argument("--epochs", type=int, default=100,
+                    help="teto de epocas (padrao = ProtocolConfig.epochs: o orcamento do Tune3)")
+    ap.add_argument("--patience", type=int, default=10, help="padrao = ProtocolConfig.patience")
+    ap.add_argument("--min-best-epoch", type=int, default=2,
+                    help="configuracoes com melhor epoca abaixo disto sao ESTAGNADAS e excluidas")
     ap.add_argument("--device", default="cpu", choices=["cpu", "cuda"])
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--tag", default=None)
