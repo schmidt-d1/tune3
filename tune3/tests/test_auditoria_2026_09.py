@@ -457,3 +457,60 @@ def test_A14b_plain_trial_devolve_perdas_de_teste_coerentes():
                     test_data=(Xte, yte), return_test_losses=True)
     assert r["test_losses"].shape == (120,)
     assert abs(cvar(r["test_losses"], 0.95) - r["cvar_test"]) < 1e-9
+
+
+# ---------------------------------------------------------------------------
+# A15/A16 (24/09/2026): holdout de validacao e parada por perda de treino
+# ---------------------------------------------------------------------------
+def test_A15_holdout_nao_escolhe_nada_e_reproduz_cvar():
+    """O holdout e' so' medido: trocar o holdout nao muda a epoca escolhida nem o CVaR de
+    validacao/teste, e com holdout = validacao o cvar_holdout coincide com o cvar."""
+    from tune3.baselines.plain_trial import plain_trial, PlainTrialConfig
+    Xtr, ytr = _synthetic(300, 0); Xv, yv = _synthetic(150, 1); Xh, yh = _synthetic(150, 3)
+    cfg = PlainTrialConfig(max_epochs=6, device="cpu", batch_size=64)
+    a = plain_trial(HP, (Xtr, ytr, Xv, yv), cfg, holdout_data=(Xh, yh))
+    b = plain_trial(HP, (Xtr, ytr, Xv, yv), cfg, holdout_data=(Xh[::-1].copy(), 1 - yh[::-1]))
+    c = plain_trial(HP, (Xtr, ytr, Xv, yv), cfg)
+    assert a["best_epoch"] == b["best_epoch"] == c["best_epoch"]
+    assert a["cvar"] == b["cvar"] == c["cvar"] and a["curvature"] == c["curvature"]
+    assert "cvar_holdout" not in c and a["cvar_holdout"] != b["cvar_holdout"]
+    d = plain_trial(HP, (Xtr, ytr, Xv, yv), cfg, holdout_data=(Xv, yv))
+    assert abs(d["cvar_holdout"] - d["cvar"]) < 1e-9
+    assert c["stop_mode"] == "val_early_stopping" and "reached_train_loss" not in c
+
+
+def test_A16_parada_por_perda_de_treino():
+    """Com stop_train_loss: para na 1a epoca com perda de treino <= T, o modelo final e' o dessa
+    epoca (a validacao nao escolhe), e um T inatingivel roda ate' o teto com reached=False."""
+    from tune3.baselines.plain_trial import plain_trial, PlainTrialConfig
+    Xtr, ytr = _synthetic(400, 0); Xv, yv = _synthetic(150, 1)
+    hp = {"learning_rate": 0.05, "weight_decay": 0.0, "dropout": 0.0, "hidden_dim": 32, "n_layers": 2}
+    base = PlainTrialConfig(max_epochs=4, device="cpu", batch_size=64)
+    r0 = plain_trial(hp, (Xtr, ytr, Xv, yv), base)
+    T = r0["train_loss_final"] * 1.05          # atingivel em poucas epocas
+    r = plain_trial(hp, (Xtr, ytr, Xv, yv),
+                    PlainTrialConfig(max_epochs=200, device="cpu", batch_size=64, stop_train_loss=T))
+    assert r["stop_mode"] == "train_loss" and r["reached_train_loss"]
+    assert r["train_loss_final"] <= T + 1e-12
+    assert r["best_epoch"] == r["epochs_run"] - 1          # modelo final = epoca de parada
+    # a validacao nao escolhe: trocar a validacao nao muda epoca de parada nem curvatura
+    r2 = plain_trial(hp, (Xtr, ytr, Xv[::-1].copy(), 1 - yv[::-1]),
+                     PlainTrialConfig(max_epochs=200, device="cpu", batch_size=64, stop_train_loss=T))
+    assert r2["epochs_run"] == r["epochs_run"] and r2["curvature"] == r["curvature"]
+    ru = plain_trial(hp, (Xtr, ytr, Xv, yv),
+                     PlainTrialConfig(max_epochs=5, device="cpu", batch_size=64, stop_train_loss=1e-12))
+    assert not ru["reached_train_loss"] and ru["epochs_run"] == 5
+
+
+def test_A16b_split_half_estratificado_e_disjunto():
+    """split_half do E0: metades disjuntas, cobrem tudo, proporcao de classes preservada."""
+    import importlib.util, pathlib
+    p = pathlib.Path(__file__).resolve().parents[2] / "scripts" / "e0_generalization.py"
+    spec = importlib.util.spec_from_file_location("e0g", p); m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    rng = np.random.default_rng(0); X = rng.normal(size=(1001, 3)); y = (rng.random(1001) < 0.3).astype(int)
+    Xa, ya, Xb, yb = m.split_half(X, y, 7)
+    assert len(ya) + len(yb) == 1001
+    sa = {tuple(r) for r in Xa}; sb = {tuple(r) for r in Xb}
+    assert not (sa & sb)
+    assert abs(ya.mean() - yb.mean()) < 0.01

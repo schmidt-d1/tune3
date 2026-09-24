@@ -16,6 +16,10 @@ CORRECAO (set/2026, auditoria): separacao estrita validacao x teste.
 Antes desta correcao, protocol.py/security_protocol.py passavam o TESTE no lugar
 da validacao, de modo que a melhor epoca era escolhida olhando o teste
 (vazamento). Os numeros produzidos por aquela versao nao devem ser reportados.
+
+ACRESCIMO (24/09/2026): `PlainTrialConfig.stop_train_loss` (parada por perda de treino, sem
+selecao na validacao) e `holdout_data` (segunda validacao para medir vies de selecao). Com os
+padroes (None), o comportamento e' bit a bit o anterior.
 """
 from __future__ import annotations
 
@@ -50,12 +54,30 @@ class PlainTrialConfig:
     enable_tf32: bool = True
     use_class_weight: bool = True
     curvature_probes: int = 5
+    # Parada por PERDA DE TREINO (Jiang et al., ICLR 2020): se definido, o trial para na
+    # primeira epoca em que a perda de treino (mesma funcao do treino, model.eval(), treino
+    # inteiro) fica <= este valor, e o modelo FINAL e' o dessa epoca -- a validacao nao
+    # escolhe nada (nem early stopping, nem melhor epoca). Assim todas as configuracoes sao
+    # comparadas no mesmo ponto de ajuste, e o CVaR de validacao fica livre de vies de selecao.
+    # None (padrao) = comportamento original: early stopping e melhor epoca na validacao.
+    stop_train_loss: Optional[float] = None
 
 
 def _class_weights(y, k, device):
     c = np.bincount(np.asarray(y).astype(int), minlength=k).astype(float)
     c = np.clip(c, 1.0, None)
     return torch.tensor(c.sum() / (k * c), dtype=torch.float32, device=device)
+
+
+@torch.no_grad()
+def _train_loss(model, crit, X, y, bs):
+    """Perda de treino media (ponderada como no treino) em model.eval(), em blocos de `bs`."""
+    model.eval()
+    tot, cnt = 0.0, 0
+    for s in range(0, X.shape[0], bs):
+        xb, yb = X[s:s + bs], y[s:s + bs]
+        tot += float(crit(model(xb), yb)) * xb.shape[0]; cnt += xb.shape[0]
+    return tot / max(cnt, 1)
 
 
 @torch.no_grad()
@@ -72,7 +94,11 @@ def _eval_split(model, crit, crit_ps, X, y, want_scores: bool):
 def plain_trial(hparams, data, config=None, max_epochs_override=None,
                 report_intermediate=False, return_scores=False,
                 test_data: Optional[Tuple[np.ndarray, np.ndarray]] = None,
-                return_test_losses: bool = False) -> Dict:
+                return_test_losses: bool = False,
+                holdout_data: Optional[Tuple[np.ndarray, np.ndarray]] = None) -> Dict:
+    """`holdout_data` = (X, y) OPCIONAL: segunda validacao, que NAO participa de nenhuma escolha;
+    o modelo final e' avaliado nela uma vez ("cvar_holdout"). Serve para medir o vies de selecao
+    do CVaR de validacao (a melhor epoca e' escolhida na mesma validacao em que ele e' medido)."""
     cfg = config or PlainTrialConfig()
     torch.manual_seed(cfg.seed); np.random.seed(cfg.seed)
     device = torch.device(cfg.device)
@@ -110,6 +136,8 @@ def plain_trial(hparams, data, config=None, max_epochs_override=None,
     inter: List[float] = []
     best_val = np.inf; best_val_ps = None; best_scores = None; best_state = None
     best_epoch = -1; wait = 0
+    stop_mode = cfg.stop_train_loss is not None
+    reached = False; trl = float("nan")
     for ep in range(n_epochs):
         model.train()
         perm = torch.randperm(n, device=device)
@@ -123,6 +151,14 @@ def plain_trial(hparams, data, config=None, max_epochs_override=None,
         vl, vps, vprobs = _eval_split(model, crit, crit_ps, Xv, yv, return_scores)
         if report_intermediate:
             inter.append(vl)
+        if stop_mode:                    # a validacao so' e' registrada, nunca escolhe
+            trl = _train_loss(model, crit, Xtr_t, ytr_t, bs)
+            if not np.isfinite(trl):
+                break
+            if trl <= cfg.stop_train_loss:
+                reached = True
+                break
+            continue
         if vl < best_val - cfg.min_delta:
             best_val = vl; best_val_ps = vps; best_scores = vprobs; best_epoch = ep; wait = 0
             best_state = copy.deepcopy(model.state_dict())
@@ -131,7 +167,10 @@ def plain_trial(hparams, data, config=None, max_epochs_override=None,
             if wait >= cfg.patience:
                 break
 
-    if best_state is None:           # nenhuma epoca melhorou (ex.: NaN desde o inicio)
+    if stop_mode:                    # modelo final = o da epoca de parada (ou da ultima)
+        best_val_ps = vps; best_val = vl; best_scores = vprobs; best_epoch = ep
+        best_state = copy.deepcopy(model.state_dict())
+    elif best_state is None:         # nenhuma epoca melhorou (ex.: NaN desde o inicio)
         best_val_ps = vps; best_val = vl; best_scores = vprobs; best_epoch = ep
         best_state = copy.deepcopy(model.state_dict())
 
@@ -147,9 +186,22 @@ def plain_trial(hparams, data, config=None, max_epochs_override=None,
     cv = float(cvar(best_val_ps, cfg.gamma)) if np.isfinite(best_val) else 1e3
     out = {"cvar": cv, "curvature": float(curv) if np.isfinite(curv) else 1e3,
            "final_val_loss": float(best_val), "best_epoch": int(best_epoch),
-           "intermediate_val_losses": inter}
+           "intermediate_val_losses": inter,
+           "stop_mode": "train_loss" if stop_mode else "val_early_stopping",
+           "epochs_run": int(ep + 1)}
+    out["train_loss_final"] = float(_train_loss(model, crit, Xtr_t, ytr_t, bs))
+    if stop_mode:
+        out["reached_train_loss"] = bool(reached)
     if return_scores:
         out["scores"] = best_scores
+
+    # --- segunda validacao (holdout): nao escolheu nada, avaliada uma vez ---
+    if holdout_data is not None:
+        Xh = torch.as_tensor(holdout_data[0], dtype=torch.float32, device=device)
+        yh = torch.as_tensor(holdout_data[1], dtype=torch.long, device=device)
+        hl, hps, _ = _eval_split(model, crit, crit_ps, Xh, yh, False)
+        out["holdout_loss"] = float(hl)
+        out["cvar_holdout"] = float(cvar(hps, cfg.gamma)) if np.isfinite(hl) else 1e3
 
     # --- avaliacao UNICA no teste, so' se pedida, com o modelo ja escolhido ---
     if test_data is not None:
