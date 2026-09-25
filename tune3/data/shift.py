@@ -18,9 +18,12 @@ from typing import Optional, Tuple
 
 import numpy as np
 import structlog
-# `sklearn.cluster` e' importado SO' dentro de cluster_malware(): importar o pacote carrega
+# k-means proprio (numpy), sem sklearn.cluster (25/09/2026): importar sklearn.cluster carrega
 # sklearn.neighbors._kd_tree (extensao compilada), que o Controle Inteligente de Aplicativos do
-# Windows passou a bloquear em 23/09/2026. Assim so' o S2 depende dela.
+# Windows bloqueia desde 23/09/2026. Com a implementacao propria o S2 e o E0 por cluster rodam em
+# qualquer maquina, e a atribuicao de clusters e' IDENTICA entre maquinas (so' numpy + semente).
+# Nao reproduz bit a bit o KMeans do sklearn -- nenhum resultado S2 anterior e' reportavel de
+# qualquer forma (vazamento de teste, auditoria de set/2026).
 
 logger = structlog.get_logger()
 
@@ -31,10 +34,47 @@ def cluster_malware(X: np.ndarray, y: np.ndarray, n_clusters: int,
     y = np.asarray(y).astype(int)
     labels = np.full(len(y), -1, dtype=int)
     pos_idx = np.where(y == positive_label)[0]
-    from sklearn.cluster import KMeans
-    km = KMeans(n_clusters=n_clusters, random_state=seed, n_init=10)
-    labels[pos_idx] = km.fit_predict(X[pos_idx])
+    labels[pos_idx] = kmeans(X[pos_idx], n_clusters, seed=seed, n_init=10)
     return labels
+
+
+def kmeans(X: np.ndarray, k: int, seed: int = 0, n_init: int = 10, max_iter: int = 300,
+           tol: float = 1e-6) -> np.ndarray:
+    """k-means (Lloyd) com inicializacao k-means++; devolve o rotulo de cada linha.
+    Roda `n_init` vezes e fica com a de menor inercia. Deterministico dada a semente.
+    Rotulos reordenados por tamanho decrescente de cluster (0 = maior), para que o
+    numero do fold nao dependa de detalhes da inicializacao."""
+    X = np.asarray(X, dtype=np.float64); n = len(X)
+    if not 1 <= k <= n:
+        raise ValueError(f"k={k} invalido para {n} pontos")
+    rng = np.random.default_rng(seed)
+    sq = (X * X).sum(1)
+
+    def d2(C):                                    # distancias quadradas ponto x centro
+        return np.maximum(sq[:, None] - 2 * X @ C.T + (C * C).sum(1)[None, :], 0.0)
+
+    best_lab, best_in = None, np.inf
+    for _ in range(n_init):
+        C = X[[rng.integers(n)]]                  # k-means++
+        for _j in range(1, k):
+            dmin = d2(C).min(1)
+            p = dmin / dmin.sum() if dmin.sum() > 0 else np.full(n, 1.0 / n)
+            C = np.vstack([C, X[rng.choice(n, p=p)]])
+        prev = np.inf
+        for _it in range(max_iter):
+            D = d2(C); lab = D.argmin(1); inertia = float(D[np.arange(n), lab].sum())
+            for j in range(k):
+                m = lab == j
+                C[j] = X[m].mean(0) if m.any() else X[rng.integers(n)]   # cluster vazio: reinicia
+            if prev - inertia <= tol * max(prev, 1.0):
+                break
+            prev = inertia
+        D = d2(C); lab = D.argmin(1); inertia = float(D[np.arange(n), lab].sum())
+        if inertia < best_in:
+            best_in, best_lab = inertia, lab
+    order = np.argsort(-np.bincount(best_lab, minlength=k), kind="stable")
+    remap = np.empty(k, dtype=int); remap[order] = np.arange(k)
+    return remap[best_lab]
 
 
 def cluster_holdout_split(

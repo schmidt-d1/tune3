@@ -119,6 +119,17 @@ def split_half(X, y, seed):
 
 
 def load(name, args, seed):
+    if name == "drebin_cluster":
+        # DREBIN com deslocamento: o malware de TESTE vem inteiro de um cluster (k-means) que nao
+        # aparece no treino nem na validacao; benignos divididos nas mesmas proporcoes. E' o analogo
+        # dos "ataques novos" do NSL-KDD dentro do dominio malware Android.
+        from tune3.data.registry import load_dataset
+        from tune3.data.shift import cluster_holdout_split
+        Xa, Xb, Xc, ya, yb, yc = load_dataset("drebin", args.drebin, 0)
+        X = np.concatenate([Xa, Xb, Xc]); y = np.concatenate([ya, yb, yc])
+        Xtr, ytr, Xv, yv, Xte, yte = cluster_holdout_split(X, y, args.n_clusters, args.cluster_fold,
+                                                           seed=seed)
+        return Xtr, ytr, Xv, yv, Xte, yte, (yte == 1)
     if name == "nslkdd":
         from tune3.data.nslkdd import NSLKDDLoader, NSLKDDConfig
         m = NSLKDDLoader(NSLKDDConfig(data_dir=args.nslkdd, random_state=seed, split="official",
@@ -156,7 +167,7 @@ def run_dataset(name, configs, args):
         halves[key] = (perm[:h], perm[h:2 * h])
     tc = PlainTrialConfig(max_epochs=args.epochs, patience=args.patience, device=args.device,
                           gamma=0.95, seed=args.seed, stop_train_loss=stop)
-    rows = []
+    rows = []; losses_val, losses_test = [], []
     for i, hp in enumerate(configs):
         r = plain_trial(hp, (Xtr, ytr, Xv, yv), tc, test_data=(Xte, yte),
                         return_test_losses=True, holdout_data=hold, return_val_losses=True)
@@ -177,6 +188,8 @@ def run_dataset(name, configs, args):
             row["cvar_test_novel"] = float(cvar(tl[novel], 0.95))
             row["cvar_test_known"] = float(cvar(tl[~novel], 0.95))
         vl_ = r.get("val_losses")
+        if args.save_losses and tl is not None and vl_ is not None:
+            losses_val.append(np.asarray(vl_, np.float16)); losses_test.append(np.asarray(tl, np.float16))
         if tl is not None and vl_ is not None and np.all(np.isfinite(tl)) and np.all(np.isfinite(vl_)):
             for key in subsets:
                 m_, iv, it = match[key]
@@ -217,7 +230,10 @@ def run_dataset(name, configs, args):
 
     targets = [("cvar_test", "teste (todo)")]
     if ok and "cvar_test_novel" in ok[0]:
-        targets += [("cvar_test_novel", "teste: ataques NOVOS"), ("cvar_test_known", "teste: ataques conhecidos")]
+        if name == "drebin_cluster":
+            targets += [("cvar_test_novel", "teste: malware do cluster NOVO"), ("cvar_test_known", "teste: benignos")]
+        else:
+            targets += [("cvar_test_novel", "teste: ataques NOVOS"), ("cvar_test_known", "teste: ataques conhecidos")]
 
     out = {"dataset": name, "epochs": args.epochs, "mode": "train_loss" if stop is not None else "val_early_stopping",
            "stop_train_loss": stop, "val_split": bool(hold is not None), "control": ctrl_name,
@@ -227,6 +243,10 @@ def run_dataset(name, configs, args):
            "log10_lr_range_all": [float(lr_all.min()), float(lr_all.max())],
            "log10_lr_range_ok": [float(lr.min()), float(lr.max())] if n else None,
            "rows": rows, "results": {}}
+    if args.save_losses and losses_val:
+        out["_losses"] = {"val": np.stack(losses_val), "test": np.stack(losses_test),
+                          "y_val": np.asarray(yv), "y_test": np.asarray(yte),
+                          "test_novel_mask": (np.asarray(novel) if novel is not None else np.zeros(len(yte), bool))}
     extra = (f"{n_trunc} truncadas = {frac_trunc:.0%} das validas" if stop is None else
              f"log10 lr retido em [{lr.min():.2f}, {lr.max():.2f}] de [{lr_all.min():.2f}, {lr_all.max():.2f}]" if n else "")
     print(f"\n[{name}] {n}/{len(rows)} configuracoes validas ({len(excluded)} {excl_label} excluidas; {extra})")
@@ -327,7 +347,8 @@ def verdict(res):
         return f"EM ABERTO: so' {res['n_ok']} configuracoes validas"
     key = "cvar_test_novel" if "cvar_test_novel" in res["results"] else "cvar_test"
     r = res["results"][key]; lo, hi = r["partial_ci95"]
-    alvo = "ataques novos" if key == "cvar_test_novel" else "teste"
+    alvo = ("malware do cluster novo" if res["dataset"] == "drebin_cluster" else "ataques novos") \
+        if key == "cvar_test_novel" else "teste"
     if res["n_ok"] < 10 or not np.isfinite(lo):
         return f"EM ABERTO: so' {res['n_ok']} configuracoes validas (use --k >= 30)"
     if res.get("mode") == "train_loss":
@@ -356,7 +377,14 @@ def _verdict_core(r, lo, hi, alvo):
 
 def main():
     ap = argparse.ArgumentParser(description="E0: a curvatura preve generalizacao alem da validacao?")
-    ap.add_argument("--datasets", nargs="+", default=["nslkdd", "drebin"], choices=["nslkdd", "drebin"])
+    ap.add_argument("--datasets", nargs="+", default=["nslkdd", "drebin"],
+                    choices=["nslkdd", "drebin", "drebin_cluster"])
+    ap.add_argument("--n-clusters", type=int, default=5, help="drebin_cluster: clusters de malware (k-means)")
+    ap.add_argument("--cluster-fold", type=int, default=0,
+                    help="drebin_cluster: cluster retido como malware NOVO (0 = o maior)")
+    ap.add_argument("--save-losses", action="store_true",
+                    help="grava as perdas por amostra (val e teste) de cada configuracao em results/raw/*.npz "
+                         "(fora do git) -- permite reanalisar sem treinar de novo")
     ap.add_argument("--drebin", default="data/drebin215.csv")
     ap.add_argument("--nslkdd", default="data/nsl_kdd")
     ap.add_argument("--nsl-max-train", type=int, default=25000)
@@ -393,8 +421,19 @@ def main():
     for res in results:
         res["verdict"] = verdict(res)
         print(f"  [{res['dataset']}] {res['verdict']}")
-    save_result({"datasets": results, "configs": configs}, experiment="e0_generalization",
-                tag=args.tag, args=vars(args), started_at=t0)
+    losses = {res["dataset"]: res.pop("_losses", None) for res in results}   # fora do JSON
+    path = save_result({"datasets": results, "configs": configs}, experiment="e0_generalization",
+                       tag=args.tag, args=vars(args), started_at=t0)
+    if args.save_losses:
+        import os
+        os.makedirs("results/raw", exist_ok=True)
+        stem = os.path.splitext(os.path.basename(str(path)))[0] if path else f"e0_{int(t0)}"
+        for res in results:
+            L = losses.get(res["dataset"])
+            if L:
+                f = f"results/raw/{stem}_{res['dataset']}.npz"
+                np.savez_compressed(f, **L)
+                print(f"[perdas por amostra] {f}")
 
 
 if __name__ == "__main__":

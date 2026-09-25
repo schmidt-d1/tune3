@@ -28,3 +28,5 @@ _tmp_worker_*.json
 !results/**/*.json
 # pasta onde o app do Claude salva os arquivos enviados no chat (fica dentro do repo)
 Claude outputs/
+# perdas por amostra do E0 (--save-losses): grandes, regeneraveis, fora do git
+results/raw/

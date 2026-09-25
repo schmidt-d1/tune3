@@ -527,3 +527,26 @@ def test_A17_val_losses_reproduzem_cvar_de_validacao():
         r = plain_trial(HP, (Xtr, ytr, Xv, yv), cfg, return_val_losses=True)
         assert r["val_losses"].shape == (150,)
         assert abs(cvar(r["val_losses"], 0.95) - r["cvar"]) < 1e-9
+
+
+def test_A18_kmeans_proprio_sem_sklearn_deterministico():
+    """k-means numpy do S2/E0-cluster: recupera blocos bem separados, e' deterministico dada a
+    semente, rotula por tamanho decrescente e NAO importa sklearn.cluster (bloqueado pelo
+    Controle Inteligente de Aplicativos do Windows)."""
+    import subprocess, sys
+    from tune3.data.shift import kmeans
+    rng = np.random.default_rng(0)
+    centros = np.array([[0, 0], [10, 0], [0, 10]], float); tam = [300, 200, 100]
+    X = np.vstack([c + rng.normal(scale=0.5, size=(t, 2)) for c, t in zip(centros, tam)])
+    verdade = np.repeat([0, 1, 2], tam)
+    lab = kmeans(X, 3, seed=1)
+    assert np.array_equal(lab, kmeans(X, 3, seed=1))
+    assert np.array_equal(lab, verdade)                 # rotulos ordenados por tamanho
+    code = ("import sys; import numpy as np; from tune3.data.shift import cluster_malware; "
+            "X=np.random.default_rng(0).random((200,5)); y=(X[:,0]>.5).astype(int); "
+            "cluster_malware(X,y,3); print('sklearn.cluster' in sys.modules)")
+    import pathlib
+    raiz = pathlib.Path(__file__).resolve().parents[2]
+    out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=True,
+                         cwd=str(raiz))
+    assert out.stdout.strip() == "False"
