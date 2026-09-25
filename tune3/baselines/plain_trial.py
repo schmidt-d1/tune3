@@ -95,7 +95,8 @@ def plain_trial(hparams, data, config=None, max_epochs_override=None,
                 report_intermediate=False, return_scores=False,
                 test_data: Optional[Tuple[np.ndarray, np.ndarray]] = None,
                 return_test_losses: bool = False,
-                holdout_data: Optional[Tuple[np.ndarray, np.ndarray]] = None) -> Dict:
+                holdout_data: Optional[Tuple[np.ndarray, np.ndarray]] = None,
+                return_val_losses: bool = False) -> Dict:
     """`holdout_data` = (X, y) OPCIONAL: segunda validacao, que NAO participa de nenhuma escolha;
     o modelo final e' avaliado nela uma vez ("cvar_holdout"). Serve para medir o vies de selecao
     do CVaR de validacao (a melhor epoca e' escolhida na mesma validacao em que ele e' medido)."""
@@ -194,6 +195,8 @@ def plain_trial(hparams, data, config=None, max_epochs_override=None,
         out["reached_train_loss"] = bool(reached)
     if return_scores:
         out["scores"] = best_scores
+    if return_val_losses:                # perdas por amostra da validacao no modelo final
+        out["val_losses"] = np.asarray(best_val_ps, dtype=float)
 
     # --- segunda validacao (holdout): nao escolheu nada, avaliada uma vez ---
     if holdout_data is not None:

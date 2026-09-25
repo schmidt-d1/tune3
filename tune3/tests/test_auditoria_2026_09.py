@@ -514,3 +514,16 @@ def test_A16b_split_half_estratificado_e_disjunto():
     sa = {tuple(r) for r in Xa}; sb = {tuple(r) for r in Xb}
     assert not (sa & sb)
     assert abs(ya.mean() - yb.mean()) < 0.01
+
+
+def test_A17_val_losses_reproduzem_cvar_de_validacao():
+    """return_val_losses: as perdas por amostra da validacao reproduzem o 'cvar' devolvido (base
+    da checagem de artefato com n pareado do E0), nos dois modos de parada."""
+    from tune3.baselines.plain_trial import plain_trial, PlainTrialConfig
+    from tune3.core.objectives import cvar
+    Xtr, ytr = _synthetic(300, 0); Xv, yv = _synthetic(150, 1)
+    for cfg in (PlainTrialConfig(max_epochs=4, device="cpu", batch_size=64),
+                PlainTrialConfig(max_epochs=6, device="cpu", batch_size=64, stop_train_loss=0.5)):
+        r = plain_trial(HP, (Xtr, ytr, Xv, yv), cfg, return_val_losses=True)
+        assert r["val_losses"].shape == (150,)
+        assert abs(cvar(r["val_losses"], 0.95) - r["cvar"]) < 1e-9

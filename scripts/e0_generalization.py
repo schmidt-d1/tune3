@@ -45,15 +45,27 @@ Dois modos acrescentados em 24/09/2026 (fase exploratoria, apos o E0 k=400):
                 otimismo do CVaR medido na mesma validacao que escolheu a epoca, o lr tambem deve
                 prever HOLD alem de SEL -- e SEL e HOLD sao i.i.d., entao isso so' pode ser selecao.
                 O controle das parciais passa a ser o CVaR de HOLD.
+  --crossfit    (24/09) --val-split com os papeis trocados numa segunda passada. Motivo: no NSL-KDD a
+                HOLD saiu 0,13 MELHOR que a SEL em media -- sinal que selecao nao produz; e' diferenca de
+                composicao entre as metades (validacao de 5 000 -> cauda de 125 amostras por metade).
+                Media dos dois gaps = otimismo por selecao; metade da diferenca = composicao.
   --stop-train-loss T
                 parada por perda de treino (Jiang et al., ICLR 2020): cada configuracao treina ate'
                 a perda de treino <= T (teto --epochs); a validacao nao escolhe nada. Remove o
                 confundimento de orcamento. Configuracoes que nao atingem T sao EXCLUIDAS e a faixa
                 de lr retida e' reportada (as de lr baixo tendem a nao atingir).
 
+CHECAGEM DE ARTEFATO (25/09/2026), impressa sempre. Motivo: na rodada com parada por perda de treino
+(k=600) a parcial saiu NEGATIVA nos dois datasets -- inclusive no DREBIN, onde validacao e teste sao
+i.i.d. e, portanto, nao ha' "generalizacao alem da validacao" a medir, so' ruido e vies de estimacao.
+Um valor sistematico ali aponta para artefato do estimador. Duas checagens: (i) CVaR com n pareado
+(validacao e alvo em subamostras do mesmo tamanho) e (ii) parcial entre duas metades i.i.d. do
+proprio alvo, cujo valor esperado e' zero.
+
 Uso:
     python scripts/e0_generalization.py --device cuda --tag dionatan                 # NSL-KDD + DREBIN
     python scripts/e0_generalization.py --k 400 --val-split --device cuda --tag dionatan-k400-split
+    python scripts/e0_generalization.py --k 400 --crossfit --device cuda --tag dionatan-k400-crossfit
     python scripts/e0_generalization.py --k 400 --stop-train-loss 0.05 --epochs 1000 --device cuda --tag dionatan-k400-stop
     python scripts/e0_generalization.py --k 400 --device cuda --tag dionatan-k400          # primario
     python scripts/e0_generalization.py --k 400 --epochs 30 --device cuda --tag dionatan-k400-e30
@@ -120,16 +132,34 @@ def load(name, args, seed):
 def run_dataset(name, configs, args):
     Xtr, ytr, Xv, yv, Xte, yte, novel = load(name, args, args.seed)
     hold = None
+    if args.crossfit:
+        args.val_split = True
     if args.val_split:
         Xv, yv, Xh, yh = split_half(Xv, yv, args.seed + 1000)
         hold = (Xh, yh)
     stop = args.stop_train_loss
+    # --- checagens de artefato (25/09): indices sorteados UMA vez por dataset (numeros aleatorios
+    # comuns entre configuracoes), para CVaR com n pareado e para metades i.i.d. do teste ---
+    arng = np.random.default_rng(args.seed + 2000)
+    subsets = {"cvar_test": np.arange(len(yte))}
+    if novel is not None and novel.any():
+        subsets["cvar_test_novel"] = np.flatnonzero(novel); subsets["cvar_test_known"] = np.flatnonzero(~novel)
+    nv = len(yv) // 2 if args.val_split else len(yv)
+    match = {}
+    for key, idx in subsets.items():          # m = min(n_val, n_alvo); R subamostras de tamanho m
+        m_ = min(nv, len(idx))
+        match[key] = (m_, [arng.choice(nv, m_, replace=False) for _ in range(args.match_reps)],
+                      [arng.choice(idx, m_, replace=False) for _ in range(args.match_reps)])
+    halves = {}
+    for key, idx in subsets.items():          # metades i.i.d. de mesmo tamanho do alvo
+        perm = arng.permutation(idx); h = len(perm) // 2
+        halves[key] = (perm[:h], perm[h:2 * h])
     tc = PlainTrialConfig(max_epochs=args.epochs, patience=args.patience, device=args.device,
                           gamma=0.95, seed=args.seed, stop_train_loss=stop)
     rows = []
     for i, hp in enumerate(configs):
         r = plain_trial(hp, (Xtr, ytr, Xv, yv), tc, test_data=(Xte, yte),
-                        return_test_losses=True, holdout_data=hold)
+                        return_test_losses=True, holdout_data=hold, return_val_losses=True)
         tl = r.get("test_losses")
         row = {"cfg": i, "hparams": hp, "curvature": float(r["curvature"]),
                "cvar_val": float(r["cvar"]), "cvar_test": float(r["cvar_test"]),
@@ -137,11 +167,23 @@ def run_dataset(name, configs, args):
                "train_loss_final": float(r.get("train_loss_final", float("nan")))}
         if hold is not None:
             row["cvar_val_hold"] = float(r["cvar_holdout"])
+        if args.crossfit:                      # papeis trocados: HOLD escolhe a epoca, SEL so' e' medida
+            rb = plain_trial(hp, (Xtr, ytr, hold[0], hold[1]), tc, holdout_data=(Xv, yv))
+            row["cvar_sel_B"] = float(rb["cvar"]); row["cvar_hold_B"] = float(rb["cvar_holdout"])
+            row["best_epoch_B"] = int(rb.get("best_epoch", -1))
         if stop is not None:
             row["reached"] = bool(r["reached_train_loss"])
         if novel is not None and tl is not None and novel.any():
             row["cvar_test_novel"] = float(cvar(tl[novel], 0.95))
             row["cvar_test_known"] = float(cvar(tl[~novel], 0.95))
+        vl_ = r.get("val_losses")
+        if tl is not None and vl_ is not None and np.all(np.isfinite(tl)) and np.all(np.isfinite(vl_)):
+            for key in subsets:
+                m_, iv, it = match[key]
+                row[key + "_m"] = float(np.mean([cvar(tl[j], 0.95) for j in it]))
+                row["cvar_val_m_" + key] = float(np.mean([cvar(vl_[j], 0.95) for j in iv]))
+                a_, b_ = halves[key]
+                row[key + "_h1"] = float(cvar(tl[a_], 0.95)); row[key + "_h2"] = float(cvar(tl[b_], 0.95))
         rows.append(row)
 
     base_ok = lambda r: (np.isfinite(r["curvature"]) and 0 < r["curvature"] < 1e3 and r["cvar_test"] < 1e3
@@ -225,6 +267,58 @@ def run_dataset(name, configs, args):
               f"gap medio HOLD-SEL = {gap.mean():+.4f}; rho(lr, gap) = {rg:+.2f}")
         print(f"                   parcial(alvo, lr | SEL) = {plr_sel:+.3f}  vs  parcial(alvo, lr | HOLD) = "
               f"{out['results'][k0]['partial_lr_given_val']:+.3f}")
+
+    # --- CHECAGEM DE ARTEFATO -------------------------------------------------------------------
+    # (i) n pareado: CVaR de validacao e do alvo recalculados em subamostras do MESMO tamanho m,
+    #     mediadas; remove o vies de amostra finita do CVaR empirico, que depende de n e do formato
+    #     da cauda (e este depende dos hiperparametros).
+    # (ii) metades i.i.d.: parcial(CVaR_H2, curv | CVaR_H1) com H1, H2 metades do proprio alvo.
+    #     H1 e H2 sao trocaveis e de mesmo tamanho: o valor esperado e' ZERO se nao houver
+    #     artefato de estimacao. O que a curvatura "preve" aqui e' ruido/vies, nao generalizacao.
+    okm = [r for r in ok if all((k + "_m") in r for k in subsets)]
+    if len(okm) >= 10:
+        out["artifact_checks"] = {}
+        lcm = np.log10([r["curvature"] for r in okm]); nm = len(okm)
+        print(f"  CHECAGEM DE ARTEFATO (n={nm}; n pareado com {args.match_reps} subamostras):")
+        for key, label in targets:
+            y_m = np.array([r[key + "_m"] for r in okm]); v_m = np.array([r["cvar_val_m_" + key] for r in okm])
+            h1 = np.array([r[key + "_h1"] for r in okm]); h2 = np.array([r[key + "_h2"] for r in okm])
+            pm = partial_spearman(y_m, lcm, [v_m])
+            pm_ci = boot_ci(lambda i: partial_spearman(y_m[i], lcm[i], [v_m[i]]), nm)
+            ph = partial_spearman(h2, lcm, [h1])
+            ph_ci = boot_ci(lambda i: partial_spearman(h2[i], lcm[i], [h1[i]]), nm)
+            out["artifact_checks"][key] = {"m": match[key][0], "partial_matched_n": pm, "ci95_matched_n": pm_ci,
+                                           "partial_iid_halves": ph, "ci95_iid_halves": ph_ci}
+            print(f"    {label:28s} n pareado (m={match[key][0]}): parcial {pm:+.3f} [{pm_ci[0]:+.2f}, {pm_ci[1]:+.2f}]"
+                  f"   |  metades i.i.d.: parcial(H2, curv | H1) {ph:+.3f} [{ph_ci[0]:+.2f}, {ph_ci[1]:+.2f}]")
+
+    if args.crossfit and n >= 10:              # composicao das metades se cancela na media dos dois papeis
+        okb = [r for r in ok if r.get("cvar_hold_B", 1e3) < 1e3 and r.get("cvar_sel_B", 1e3) < 1e3]
+        m = np.array([r in okb for r in ok])
+        optA = ctrl - cv_sel                   # HOLD - SEL com a metade A escolhendo
+        optB = np.array([r["cvar_hold_B"] - r["cvar_sel_B"] if r in okb else np.nan for r in ok])
+        opt = ((optA + optB) / 2)[m]; lrm, lcm = lr[m], lc[m]; nm = int(m.sum())
+        rng = np.random.default_rng(0)
+        bm = [opt[rng.integers(0, nm, nm)].mean() for _ in range(4000)]
+        rl = float(pearsonr(rankdata(lrm), rankdata(opt))[0])
+        rl_ci = boot_ci(lambda i: float(pearsonr(rankdata(lrm[i]), rankdata(opt[i]))[0]), nm)
+        rc = float(pearsonr(rankdata(lcm), rankdata(opt))[0])
+        out["crossfit"] = {"n": nm, "optimism_mean": float(opt.mean()),
+                           "optimism_ci95": [float(np.percentile(bm, 2.5)), float(np.percentile(bm, 97.5))],
+                           "composition_A_minus_B": float(np.nanmean((optA - optB) / 2)),
+                           "rho_lr_optimism": rl, "rho_lr_optimism_ci95": rl_ci, "rho_curv_optimism": rc}
+        # mesma semente => mesma trajetoria; o otimismo so' existe quando os dois papeis escolhem
+        # epocas diferentes (com a melhor epoca = ultima nos dois, os modelos sao identicos e ele e' 0)
+        dif = np.array([r["best_epoch"] != r.get("best_epoch_B", r["best_epoch"]) for r in ok])[m]
+        out["crossfit"]["frac_epoch_differs"] = float(dif.mean())
+        cf = out["crossfit"]
+        print(f"  CROSS-FIT (n={nm}): otimismo medio do CVaR de validacao = {cf['optimism_mean']:+.4f} "
+              f"[{cf['optimism_ci95'][0]:+.4f}, {cf['optimism_ci95'][1]:+.4f}]; efeito de composicao A-B = "
+              f"{cf['composition_A_minus_B']:+.4f}")
+        print(f"                     epoca escolhida difere entre os papeis em {dif.mean():.0%} das configuracoes"
+              f"{' (sem variacao: correlacoes indefinidas)' if np.ptp(opt) == 0 else ''}")
+        print(f"                     rho(lr, otimismo) = {rl:+.3f} [{rl_ci[0]:+.2f}, {rl_ci[1]:+.2f}];  "
+              f"rho(curvatura, otimismo) = {rc:+.3f}")
     return out
 
 
@@ -274,8 +368,14 @@ def main():
                     help="configuracoes com melhor epoca abaixo disto sao ESTAGNADAS e excluidas")
     ap.add_argument("--val-split", action="store_true",
                     help="metade da validacao escolhe a epoca (SEL), a outra so' e' medida (HOLD)")
+    ap.add_argument("--crossfit", action="store_true",
+                    help="implica --val-split e treina cada configuracao 2x com os papeis SEL/HOLD trocados: "
+                         "a media dos dois gaps cancela a diferenca de composicao entre as metades e isola o "
+                         "vies de selecao (dobra o custo)")
     ap.add_argument("--stop-train-loss", type=float, default=None,
                     help="parada por perda de treino <= T (Jiang et al. 2020); a validacao nao escolhe nada")
+    ap.add_argument("--match-reps", type=int, default=30,
+                    help="subamostras para o CVaR com n pareado (checagem de artefato)")
     ap.add_argument("--device", default="cpu", choices=["cpu", "cuda"])
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--tag", default=None)
