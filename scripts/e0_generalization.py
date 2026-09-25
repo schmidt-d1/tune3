@@ -199,8 +199,12 @@ def run_dataset(name, configs, args):
                 row[key + "_h1"] = float(cvar(tl[a_], 0.95)); row[key + "_h2"] = float(cvar(tl[b_], 0.95))
         rows.append(row)
 
-    base_ok = lambda r: (np.isfinite(r["curvature"]) and 0 < r["curvature"] < 1e3 and r["cvar_test"] < 1e3
-                         and (r.get("cvar_val_hold", 0.0) < 1e3))
+    # 1e3 e' o SENTINELA de falha do plain_trial (valor nao finito); uma curvatura real acima de
+    # 1000 e' valida (25/09: no fold 1 do DREBIN por cluster uma configuracao com Tr(H^2) = 1115 era
+    # descartada pelo filtro antigo "< 1e3").
+    base_ok = lambda r: (np.isfinite(r["curvature"]) and r["curvature"] > 0 and r["curvature"] != 1e3
+                         and r["cvar_test"] != 1e3 and r.get("cvar_val_hold", 0.0) != 1e3
+                         and np.isfinite(r["cvar_test"]))
     if stop is not None:                       # parada por perda de treino: exclui quem nao atingiu
         excluded = [r for r in rows if not r["reached"]]
         ok = [r for r in rows if r["reached"] and base_ok(r)]
@@ -249,7 +253,10 @@ def run_dataset(name, configs, args):
                           "test_novel_mask": (np.asarray(novel) if novel is not None else np.zeros(len(yte), bool))}
     extra = (f"{n_trunc} truncadas = {frac_trunc:.0%} das validas" if stop is None else
              f"log10 lr retido em [{lr.min():.2f}, {lr.max():.2f}] de [{lr_all.min():.2f}, {lr_all.max():.2f}]" if n else "")
-    print(f"\n[{name}] {n}/{len(rows)} configuracoes validas ({len(excluded)} {excl_label} excluidas; {extra})")
+    n_invalid = len(rows) - len(excluded) - n
+    inv = f"; {n_invalid} com valor invalido (falha numerica)" if n_invalid else ""
+    out["n_invalid"] = n_invalid
+    print(f"\n[{name}] {n}/{len(rows)} configuracoes validas ({len(excluded)} {excl_label} excluidas{inv}; {extra})")
     if n and frac_trunc > 0.5:
         print(f"  NOTA: em {frac_trunc:.0%} das configuracoes a melhor epoca foi a ULTIMA (early stopping "
               f"nao disparou). O resultado vale para o orcamento de {args.epochs} epocas, nao para "
