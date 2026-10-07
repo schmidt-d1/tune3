@@ -61,6 +61,11 @@ class PlainTrialConfig:
     # comparadas no mesmo ponto de ajuste, e o CVaR de validacao fica livre de vies de selecao.
     # None (padrao) = comportamento original: early stopping e melhor epoca na validacao.
     stop_train_loss: Optional[float] = None
+    # D2 (out/2026, imagens): lote da curvatura (None = batch_size, o comportamento anterior) e
+    # avaliacao em blocos quando a entrada e' imagem (X.ndim > 2), para nao estourar a memoria.
+    # Para entradas tabulares (2D) a avaliacao continua num passe so' -- resultados identicos.
+    curvature_batch: Optional[int] = None
+    eval_chunk: int = 1024
 
 
 def _class_weights(y, k, device):
@@ -80,11 +85,26 @@ def _train_loss(model, crit, X, y, bs):
     return tot / max(cnt, 1)
 
 
+def _logits(model, X, chunk):
+    """Logits em model.eval(); em blocos so' para imagens (X.ndim > 2)."""
+    if X.dim() > 2 and X.shape[0] > chunk:
+        return torch.cat([model(X[i:i + chunk]) for i in range(0, X.shape[0], chunk)])
+    return model(X)
+
+
 @torch.no_grad()
-def _eval_split(model, crit, crit_ps, X, y, want_scores: bool):
+def _error(model, X, y, chunk):
+    """Erro de classificacao (fracao) e vetor de acertos, em model.eval()."""
+    model.eval()
+    ok = (_logits(model, X, chunk).argmax(1) == y)
+    return float(1.0 - ok.double().mean()), ok.cpu().numpy()
+
+
+@torch.no_grad()
+def _eval_split(model, crit, crit_ps, X, y, want_scores: bool, chunk: int = 1024):
     """Avalia um split em model.eval(): (loss media, perdas por amostra, prob. classe 1)."""
     model.eval()
-    out = model(X)
+    out = _logits(model, X, chunk)
     loss = float(crit(out, y))
     ps = crit_ps(out, y).cpu().numpy()
     scores = F.softmax(out, dim=1)[:, 1].cpu().numpy() if want_scores else None
@@ -96,10 +116,16 @@ def plain_trial(hparams, data, config=None, max_epochs_override=None,
                 test_data: Optional[Tuple[np.ndarray, np.ndarray]] = None,
                 return_test_losses: bool = False,
                 holdout_data: Optional[Tuple[np.ndarray, np.ndarray]] = None,
-                return_val_losses: bool = False) -> Dict:
+                return_val_losses: bool = False,
+                return_errors: bool = False,
+                extra_measures=None) -> Dict:
     """`holdout_data` = (X, y) OPCIONAL: segunda validacao, que NAO participa de nenhuma escolha;
     o modelo final e' avaliado nela uma vez ("cvar_holdout"). Serve para medir o vies de selecao
-    do CVaR de validacao (a melhor epoca e' escolhida na mesma validacao em que ele e' medido)."""
+    do CVaR de validacao (a melhor epoca e' escolhida na mesma validacao em que ele e' medido).
+    `return_errors`: erro de classificacao no treino, na validacao e no teste ("test_correct" por
+    amostra), no modelo final -- o gap de generalizacao da replicacao de Jiang et al. (D2).
+    `extra_measures(model, xb, yb, crit) -> dict`: medidas adicionais no modelo final, no MESMO
+    lote de treino da curvatura (ex.: sharpness adaptativa); chamada so' se fornecida."""
     cfg = config or PlainTrialConfig()
     torch.manual_seed(cfg.seed); np.random.seed(cfg.seed)
     device = torch.device(cfg.device)
@@ -149,7 +175,7 @@ def plain_trial(hparams, data, config=None, max_epochs_override=None,
                 crit(model(xb), yb).backward(); opt.second_step(zero_grad=True)
             else:
                 opt.zero_grad(); crit(model(xb), yb).backward(); opt.step()
-        vl, vps, vprobs = _eval_split(model, crit, crit_ps, Xv, yv, return_scores)
+        vl, vps, vprobs = _eval_split(model, crit, crit_ps, Xv, yv, return_scores, cfg.eval_chunk)
         if report_intermediate:
             inter.append(vl)
         if stop_mode:                    # a validacao so' e' registrada, nunca escolhe
@@ -179,10 +205,12 @@ def plain_trial(hparams, data, config=None, max_epochs_override=None,
     model.load_state_dict(best_state)
 
     # curvatura no modelo da melhor epoca, em eval() (sem dropout), batch de TREINO
-    perm = torch.randperm(n, device=device)[:bs]
+    cb = min(cfg.curvature_batch, n) if cfg.curvature_batch else bs
+    perm = torch.randperm(n, device=device)[:cb]
     model.eval()
     curv = HutchinsonEstimator(HutchinsonConfig(num_probes=cfg.curvature_probes)).estimate(
         model, crit(model(Xtr_t[perm]), ytr_t[perm]))
+    extra = extra_measures(model, Xtr_t[perm], ytr_t[perm], crit) if extra_measures else {}
 
     cv = float(cvar(best_val_ps, cfg.gamma)) if np.isfinite(best_val) else 1e3
     out = {"cvar": cv, "curvature": float(curv) if np.isfinite(curv) else 1e3,
@@ -191,6 +219,10 @@ def plain_trial(hparams, data, config=None, max_epochs_override=None,
            "stop_mode": "train_loss" if stop_mode else "val_early_stopping",
            "epochs_run": int(ep + 1)}
     out["train_loss_final"] = float(_train_loss(model, crit, Xtr_t, ytr_t, bs))
+    out.update(extra)
+    if return_errors:
+        out["train_error"] = _error(model, Xtr_t, ytr_t, cfg.eval_chunk)[0]
+        out["val_error"] = _error(model, Xv, yv, cfg.eval_chunk)[0]
     if stop_mode:
         out["reached_train_loss"] = bool(reached)
     if return_scores:
@@ -202,7 +234,7 @@ def plain_trial(hparams, data, config=None, max_epochs_override=None,
     if holdout_data is not None:
         Xh = torch.as_tensor(holdout_data[0], dtype=torch.float32, device=device)
         yh = torch.as_tensor(holdout_data[1], dtype=torch.long, device=device)
-        hl, hps, _ = _eval_split(model, crit, crit_ps, Xh, yh, False)
+        hl, hps, _ = _eval_split(model, crit, crit_ps, Xh, yh, False, cfg.eval_chunk)
         out["holdout_loss"] = float(hl)
         out["cvar_holdout"] = float(cvar(hps, cfg.gamma)) if np.isfinite(hl) else 1e3
 
@@ -211,11 +243,13 @@ def plain_trial(hparams, data, config=None, max_epochs_override=None,
         X_te, y_te = test_data
         Xte = torch.as_tensor(X_te, dtype=torch.float32, device=device)
         yte = torch.as_tensor(y_te, dtype=torch.long, device=device)
-        tl, tps, tscores = _eval_split(model, crit, crit_ps, Xte, yte, return_scores)
+        tl, tps, tscores = _eval_split(model, crit, crit_ps, Xte, yte, return_scores, cfg.eval_chunk)
         out["test_loss"] = float(tl)
         out["cvar_test"] = float(cvar(tps, cfg.gamma)) if np.isfinite(tl) else 1e3
         if return_test_losses:                 # CVaR por subconjunto (ex.: so' ataques novos)
             out["test_losses"] = np.asarray(tps, dtype=float)
+        if return_errors:
+            out["test_error"], out["test_correct"] = _error(model, Xte, yte, cfg.eval_chunk)
         if return_scores:
             out["scores_test"] = tscores
     return out

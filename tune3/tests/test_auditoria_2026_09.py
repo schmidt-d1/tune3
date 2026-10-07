@@ -550,3 +550,127 @@ def test_A18_kmeans_proprio_sem_sklearn_deterministico():
     out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=True,
                          cwd=str(raiz))
     assert out.stdout.strip() == "False"
+
+
+# ---------------------------------------------------------------------------
+# A19-A23 (out/2026): etapa D2 -- CNN, sharpness adaptativa, CIFAR, Kendall granulado
+# ---------------------------------------------------------------------------
+def _fake_cifar(root, n_per_batch=200, n101=100, seed=0):
+    """Arquivos no formato oficial (pickle do CIFAR-10, .npy do CIFAR-10.1), com dados falsos."""
+    import os, pickle
+    rng = np.random.default_rng(seed)
+    base = os.path.join(root, "cifar10", "cifar-10-batches-py"); os.makedirs(base)
+    for name in [f"data_batch_{i}" for i in range(1, 6)] + ["test_batch"]:
+        y = np.arange(n_per_batch) % 10
+        X = rng.integers(0, 256, size=(n_per_batch, 3072), dtype=np.uint8)
+        with open(os.path.join(base, name), "wb") as f:
+            pickle.dump({b"data": X, b"labels": list(map(int, y))}, f)
+    d1 = os.path.join(root, "cifar10_1"); os.makedirs(d1)
+    np.save(os.path.join(d1, "cifar10.1_v6_data.npy"), rng.integers(0, 256, size=(n101, 32, 32, 3), dtype=np.uint8))
+    np.save(os.path.join(d1, "cifar10.1_v6_labels.npy"), (np.arange(n101) % 10).astype(np.int64))
+    return os.path.join(root, "cifar10"), d1
+
+
+def test_A19_small_cnn_formas_e_fabrica():
+    from tune3.models import build_model, SmallCNN
+    x = torch.randn(4, 3, 32, 32)
+    for depth in (2, 3, 4):
+        m = build_model(3, 10, arch="cnn", hparams={"hidden_dim": 8, "n_layers": depth, "dropout": 0.25})
+        assert isinstance(m, SmallCNN) and m(x).shape == (4, 10)
+    n = lambda d, w: sum(p.numel() for p in SmallCNN(10, width=w, depth=d).parameters())
+    assert n(2, 8) < n(3, 8) and n(3, 8) < n(3, 16)
+
+
+def test_A20_sharpness_adaptativa_invariante_a_reescala_e_tr_h2_nao():
+    """Rede ReLU: multiplicar a 1a camada por a e dividir a 2a por a da' a MESMA funcao. A sharpness
+    adaptativa nao muda; a Tr(H^2) muda (Dinh et al., 2017). E os pesos voltam ao original."""
+    from tune3.curvature import adaptive_sharpness, HutchinsonEstimator, HutchinsonConfig
+    torch.manual_seed(0)
+    X = torch.randn(256, 6); y = (X[:, 0] > 0).long()
+    net = nn.Sequential(nn.Linear(6, 16), nn.ReLU(), nn.Linear(16, 2))
+    opt = torch.optim.SGD(net.parameters(), lr=0.1)
+    for _ in range(200):
+        opt.zero_grad(); nn.functional.cross_entropy(net(X), y).backward(); opt.step()
+    import copy
+    net2 = copy.deepcopy(net); a = 4.0
+    with torch.no_grad():
+        net2[0].weight.mul_(a); net2[0].bias.mul_(a); net2[2].weight.div_(a)
+    assert torch.allclose(net(X), net2(X), atol=1e-5)
+    lf = lambda m: nn.functional.cross_entropy(m(X), y)
+    w_before = [p.detach().clone() for p in net.parameters()]
+    s1 = adaptive_sharpness(net, lf, rho=0.1, steps=10); s2 = adaptive_sharpness(net2, lf, rho=0.1, steps=10)
+    assert all(torch.equal(p, w) for p, w in zip(net.parameters(), w_before))
+    assert s1 > 0 and abs(s1 - s2) / s1 < 1e-3
+    tr = lambda m: HutchinsonEstimator(HutchinsonConfig(num_probes=50)).estimate(m, lf(m))
+    torch.manual_seed(1); t1 = tr(net); torch.manual_seed(1); t2 = tr(net2)
+    assert abs(t1 - t2) / t1 > 0.5
+
+
+def test_A21_cifar_loader_formato_divisao_e_normalizacao(tmp_path):
+    from tune3.data.cifar import CIFARLoader, CIFARConfig, load_cifar101_raw
+    d10, d101 = _fake_cifar(str(tmp_path))
+    m = CIFARLoader(CIFARConfig(data_dir=d10, cifar101_dir=d101, n_train=300, n_val=200)).load_splits_with_meta()
+    assert m["X_train"].shape == (300, 3, 32, 32) and m["X_train"].dtype == np.float32
+    assert m["X_val"].shape == (200, 3, 32, 32)
+    assert len(np.intersect1d(m["train_idx"], m["val_idx"])) == 0          # validacao disjunta do treino
+    assert np.bincount(m["y_train"]).tolist() == [30] * 10                   # estratificado
+    assert abs(float(m["X_train"].mean(axis=(0, 2, 3)).max())) < 1e-4       # normalizado pelo treino
+    assert m["X_test"].shape[0] == 200 + 100 and m["test_novel_mask"].sum() == 100
+    assert not m["test_novel_mask"][:200].any() and m["test_novel_mask"][200:].all()
+    raw = np.load(f"{d101}/cifar10.1_v6_data.npy"); X1, _ = load_cifar101_raw(d101)
+    assert X1[5, 2, 7, 9] == raw[5, 7, 9, 2]                                 # NHWC -> NCHW correto
+
+
+def test_A22_kendall_granulado():
+    from tune3.experiments.generalization_measures import granulated_kendall, kendall_tau
+    import itertools
+    rng = np.random.default_rng(0)
+    rows = []
+    for a, b, c in itertools.product([1, 2, 3], [1, 2, 3], [1, 2, 3]):
+        g = 2.0 * a - 1.0 * b + 0.0 * c + rng.normal(scale=0.01)
+        rows.append({"hparams": {"a": a, "b": b, "c": c}, "m_bom": g, "m_a": float(a), "g": g})
+    gk = granulated_kendall(rows, "m_bom", "g", ["a", "b", "c"])
+    assert gk["per_factor"]["a"]["psi"] == 1.0 and gk["per_factor"]["b"]["psi"] == 1.0
+    # uma medida que so' acompanha o fator a acerta psi_a, mas nao ganha nada em b (nao varia la')
+    gka = granulated_kendall(rows, "m_a", "g", ["a", "b", "c"])
+    assert gka["per_factor"]["a"]["psi"] == 1.0 and np.isnan(gka["per_factor"]["b"]["psi"])
+    assert kendall_tau([1, 2, 3, 4], [1, 2, 3, 4]) == 1.0
+
+
+def test_A23_plain_trial_com_imagens_erros_e_medidas_extras():
+    from tune3.baselines.plain_trial import plain_trial, PlainTrialConfig
+    rng = np.random.default_rng(0)
+    X = rng.normal(size=(240, 3, 32, 32)).astype(np.float32); y = (np.arange(240) % 3).astype(np.int64)
+    X[y == 1, 0] += 1.0; X[y == 2, 1] += 1.0
+    seen = {}
+
+    def extra(model, xb, yb, crit):
+        seen["n"] = xb.shape[0]; return {"medida_x": 1.5}
+    r = plain_trial({"learning_rate": 0.01, "weight_decay": 0.0, "dropout": 0.0, "hidden_dim": 4, "n_layers": 2},
+                    (X[:160], y[:160], X[160:200], y[160:200]),
+                    PlainTrialConfig(max_epochs=3, batch_size=32, arch="cnn", device="cpu", curvature_batch=64,
+                                     eval_chunk=16, use_class_weight=False),
+                    test_data=(X[200:], y[200:]), return_errors=True, extra_measures=extra)
+    assert seen["n"] == 64 and r["medida_x"] == 1.5
+    assert 0.0 <= r["train_error"] <= 1.0 and 0.0 <= r["val_error"] <= 1.0
+    assert r["test_correct"].shape == (40,) and abs(r["test_error"] - (1 - r["test_correct"].mean())) < 1e-12
+
+
+def test_A24_regra_A_nao_aceita_medida_que_so_acompanha_a_profundidade():
+    """Uma medida que so' acompanha a profundidade (que por sua vez move o gap) tem tau alto e
+    Psi > 0, mas NAO passa na regra (A) da D2: so' 1 dos 5 fatores com psi > 0. Uma medida que
+    acompanha o gap em todos os fatores passa."""
+    from tune3.experiments.generalization_measures import granulated_kendall, kendall_tau, replication_positive
+    import itertools
+    rng = np.random.default_rng(0); F = ["d", "w", "lr", "wd", "do"]; rows = []
+    for v in itertools.product(*[[1, 2, 3]] * 5):
+        hp = dict(zip(F, v))
+        gap = 0.5 * hp["d"] + 0.2 * hp["w"] - 0.3 * hp["lr"] + 0.1 * hp["wd"] + 0.15 * hp["do"]
+        rows.append({"hparams": hp, "gap": gap, "prof": hp["d"] + rng.normal(scale=0.05),
+                     "boa": gap + rng.normal(scale=0.02)})
+    g = np.array([r["gap"] for r in rows])
+    for m, esperado in (("prof", False), ("boa", True)):
+        x = np.array([r[m] for r in rows]); tau = kendall_tau(x, g)
+        gk = granulated_kendall(rows, m, "gap", F)
+        assert tau > 0.3 and gk["Psi"] > 0
+        assert replication_positive([tau - 0.05, tau + 0.05], gk) is esperado
