@@ -674,3 +674,51 @@ def test_A24_regra_A_nao_aceita_medida_que_so_acompanha_a_profundidade():
         gk = granulated_kendall(rows, m, "gap", F)
         assert tau > 0.3 and gk["Psi"] > 0
         assert replication_positive([tau - 0.05, tau + 0.05], gk) is esperado
+
+
+# ---------------------------------------------------------------------------
+# A25-A27 (out/2026): fase F -- fisher_combine em stats, cluster_seed, escassez de validacao
+# ---------------------------------------------------------------------------
+def test_A25_fisher_combine_valores_conhecidos():
+    from tune3.experiments.stats import fisher_combine
+    c = fisher_combine([0.3, 0.3, 0.3], [100, 100, 100], 1)
+    assert abs(c["r"] - 0.3) < 1e-9 and c["I2"] == 0.0 and abs(c["r_re"] - 0.3) < 1e-9
+    assert c["ci95"][0] < 0.3 < c["ci95"][1]
+    h = fisher_combine([0.6, -0.4, 0.5, -0.3], [200, 200, 200, 200], 1)
+    assert h["I2"] > 0.5 and (h["ci95_re"][1] - h["ci95_re"][0]) > (h["ci95"][1] - h["ci95"][0])
+    assert fisher_combine([float("nan")], [50], 1)["k"] == 0
+
+
+def test_A26_cluster_seed_fixa_os_clusters_e_muda_so_a_divisao():
+    """F2: com cluster_seed fixo, o malware de teste do fold e' o MESMO conjunto para qualquer seed de
+    divisao; so' treino/validacao (e os benignos do teste) mudam. Sem cluster_seed, seed muda tudo."""
+    from tune3.data.shift import cluster_holdout_split
+    X, y = _synthetic(2000, 0)
+    def mal_test(seed, cs):
+        _, _, _, _, Xte, yte = cluster_holdout_split(X, y, 4, 1, seed=seed, cluster_seed=cs)
+        return {tuple(r) for r in Xte[yte == 1]}
+    def train_set(seed, cs):
+        Xtr, *_ = cluster_holdout_split(X, y, 4, 1, seed=seed, cluster_seed=cs)
+        return {tuple(r) for r in Xtr}
+    assert mal_test(1, 0) == mal_test(2, 0) == mal_test(0, 0)
+    assert train_set(1, 0) != train_set(2, 0)
+    a, b = cluster_holdout_split(X, y, 4, 1, seed=0), cluster_holdout_split(X, y, 4, 1, seed=0, cluster_seed=0)
+    assert all(np.array_equal(u, v) for u, v in zip(a, b))        # padrao None == seed: D1 reproduzivel
+
+
+def test_A27_escassez_de_validacao_recupera_estrutura_conhecida():
+    """scan(): num cenario em que a medida acompanha a QUALIDADE do modelo (redundante com a validacao
+    completa), a parcial dada a validacao escassa e' positiva e cai com n_val -> veredito SUSTENTA.
+    Com medida independente de tudo -> NAO SUSTENTA. Valida a logica antes dos dados reais."""
+    from tune3.experiments.val_scarcity import scan
+    rng = np.random.default_rng(0); M, N = 150, 2000
+    q = rng.normal(size=M)                                    # qualidade latente do modelo
+    V = np.exp(0.4 * q[:, None] + rng.normal(scale=0.9, size=(M, N)))   # perdas por amostra (cauda pesada)
+    target = q + 0.3 * rng.normal(size=M)                      # alvo: qualidade + ruido
+    x_bom = q + 0.5 * rng.normal(size=M)                       # "curvatura" que acompanha a qualidade
+    x_nulo = rng.normal(size=M)
+    r = scan(V, target, x_bom, sizes=(50, 100, 200, 500), stat="cvar", R=30, B=150, seed=0)
+    P = [row["P"] for row in r["per_size"]]
+    assert P[0] > P[-1] + 0.2 and r["verdict"].startswith("ESCASSEZ SUSTENTA")
+    r0 = scan(V, target, x_nulo, sizes=(50, 100, 200, 500), stat="cvar", R=30, B=150, seed=0)
+    assert r0["verdict"].startswith("NAO SUSTENTA")

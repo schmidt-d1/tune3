@@ -85,9 +85,15 @@ def cluster_holdout_split(
     val_frac: float = 0.2,
     seed: int = 0,
     positive_label: int = 1,
+    cluster_seed: Optional[int] = None,
 ) -> Tuple[np.ndarray, ...]:
     """
     Leave-one-cluster-out. Retorna (X_tr, y_tr, X_val, y_val, X_te, y_te).
+
+    `seed` governa a divisao treino/validacao (e os benignos do teste); `cluster_seed` governa o
+    k-means que define os clusters. Padrao None = o mesmo `seed` (comportamento anterior). Numa
+    REPLICACAO (fase F2, out/2026) os clusters devem ficar fixos (cluster_seed=0) enquanto a semente
+    de divisao e de treino muda: replica-se o experimento, nao a definicao das familias.
 
     - Malware do cluster `fold` -> TESTE (variante nao vista).
     - Malware dos demais clusters -> treino/val.
@@ -96,7 +102,8 @@ def cluster_holdout_split(
     """
     rng = np.random.default_rng(seed)
     y = np.asarray(y).astype(int)
-    clabels = cluster_malware(X, y, n_clusters, seed=seed, positive_label=positive_label)
+    cs = seed if cluster_seed is None else cluster_seed
+    clabels = cluster_malware(X, y, n_clusters, seed=cs, positive_label=positive_label)
 
     mal_test_idx = np.where(clabels == fold)[0]
     mal_trainval_idx = np.where((clabels != fold) & (clabels >= 0))[0]
@@ -124,7 +131,7 @@ def cluster_holdout_split(
     val = np.concatenate([mal_val, neg_val]); rng.shuffle(val)
     te = np.concatenate([mal_test_idx, neg_test]); rng.shuffle(te)
 
-    logger.info("cluster_holdout_split", fold=fold, n_clusters=n_clusters,
+    logger.info("cluster_holdout_split", fold=fold, n_clusters=n_clusters, cluster_seed=cs, split_seed=seed,
                 treino=len(tr), val=len(val), teste=len(te),
                 malware_teste=len(mal_test_idx),
                 frac_mal_treino=round(float((y[tr] == positive_label).mean()), 3))

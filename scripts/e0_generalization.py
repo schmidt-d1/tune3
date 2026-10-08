@@ -128,7 +128,7 @@ def load(name, args, seed):
         Xa, Xb, Xc, ya, yb, yc = load_dataset("drebin", args.drebin, 0)
         X = np.concatenate([Xa, Xb, Xc]); y = np.concatenate([ya, yb, yc])
         Xtr, ytr, Xv, yv, Xte, yte = cluster_holdout_split(X, y, args.n_clusters, args.cluster_fold,
-                                                           seed=seed)
+                                                           seed=seed, cluster_seed=args.cluster_seed)
         return Xtr, ytr, Xv, yv, Xte, yte, (yte == 1)
     if name == "nslkdd":
         from tune3.data.nslkdd import NSLKDDLoader, NSLKDDConfig
@@ -389,6 +389,9 @@ def main():
     ap.add_argument("--n-clusters", type=int, default=5, help="drebin_cluster: clusters de malware (k-means)")
     ap.add_argument("--cluster-fold", type=int, default=0,
                     help="drebin_cluster: cluster retido como malware NOVO (0 = o maior)")
+    ap.add_argument("--cluster-seed", type=int, default=0,
+                    help="drebin_cluster: semente do k-means que define os clusters (fixa em 0 nas replicacoes; "
+                         "--seed muda so' a divisao treino/validacao e o treino)")
     ap.add_argument("--save-losses", action="store_true",
                     help="grava as perdas por amostra (val e teste) de cada configuracao em results/raw/*.npz "
                          "(fora do git) -- permite reanalisar sem treinar de novo")

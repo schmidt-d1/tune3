@@ -33,3 +33,5 @@ results/raw/
 # CIFAR-10 / CIFAR-10.1 (scripts/download_cifar.py): cada maquina baixa os seus
 data/cifar10/
 data/cifar10_1/
+# KronoDroid (F3): cada maquina baixa o seu
+data/kronodroid/

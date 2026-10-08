@@ -25,32 +25,7 @@ from __future__ import annotations
 
 import argparse, glob, json
 import numpy as np
-from scipy.stats import norm
-
-
-def fisher_combine(rs, ns, n_controls=1):
-    rs = np.asarray(rs, float); ns = np.asarray(ns, float)
-    ok = np.isfinite(rs) & (ns - 3 - n_controls > 0)
-    rs, ns = rs[ok], ns[ok]
-    if len(rs) == 0:
-        return {"k": 0}
-    z = np.arctanh(np.clip(rs, -0.999999, 0.999999)); w = ns - 3 - n_controls
-    zbar = float((w * z).sum() / w.sum()); se = float(1.0 / np.sqrt(w.sum()))
-    Q = float((w * (z - zbar) ** 2).sum()); df = len(rs) - 1
-    I2 = float(max(0.0, (Q - df) / Q)) if (df > 0 and Q > 0) else 0.0
-    p = float(2 * (1 - norm.cdf(abs(zbar / se))))
-    # efeitos aleatorios (DerSimonian-Laird): cada fold e' um cenario de deslocamento diferente;
-    # para generalizar a uma familia NOVA de malware, a variancia entre folds entra no IC.
-    # Acrescentado em 25/09/2026 DEPOIS de ver os 5 folds (I2 = 92 %): o pre-registro fixou efeito
-    # fixo; os dois sao reportados e a divergencia entre eles e' declarada.
-    c = w.sum() - (w ** 2).sum() / w.sum()
-    tau2 = max(0.0, (Q - df) / c) if c > 0 else 0.0
-    wr = 1.0 / (1.0 / w + tau2); zr = float((wr * z).sum() / wr.sum()); ser = float(1.0 / np.sqrt(wr.sum()))
-    return {"k": int(len(rs)), "r": float(np.tanh(zbar)),
-            "ci95": [float(np.tanh(zbar - 1.96 * se)), float(np.tanh(zbar + 1.96 * se))],
-            "p": p, "Q": Q, "I2": I2, "tau2": float(tau2),
-            "r_re": float(np.tanh(zr)), "ci95_re": [float(np.tanh(zr - 1.96 * ser)), float(np.tanh(zr + 1.96 * ser))],
-            "p_re": float(2 * (1 - norm.cdf(abs(zr / ser))))}
+from tune3.experiments.stats import fisher_combine
 
 
 def main():
