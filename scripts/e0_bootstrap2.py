@@ -68,7 +68,10 @@ def main():
             H = [np.log10(h("learning_rate")), np.log10(h("weight_decay")), h("dropout"), h("hidden_dim"), h("n_layers")]
             lc = np.log10([r["curvature"] for r in ok]); TT = T[:, mask]
             y0, v0 = cvar_rows(TT), cvar_rows(V)
-            runs.append({"name": f"{d['dataset']} fold {J['meta']['args'].get('cluster_fold')}", "n": len(ok),
+            a_ = J["meta"]["args"]
+            name = (f"{d['dataset']} fold {a_.get('cluster_fold')}" if d["dataset"] == "drebin_cluster"
+                    else f"{d['dataset']} semente {a_.get('seed')}")
+            runs.append({"name": name, "n": len(ok),
                          "V": V, "T": TT, "lc": lc, "H": H,
                          "p": partial_spearman(y0, lc, [v0]), "p5": partial_spearman(y0, lc, [v0] + H)})
     if not runs:

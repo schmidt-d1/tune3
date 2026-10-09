@@ -73,19 +73,21 @@ def run_e0(paths, args):
             V = Z["val"][idx].astype(np.float64); T = Z["test"][idx].astype(np.float64); nov = Z["test_novel_mask"]
             y = cvar_rows(T[:, nov]) if nov.any() else cvar_rows(T)
             hp, arch = hp_arrays(rows)
-            by_ds.setdefault(d["dataset"], []).append({"fold": a.get("cluster_fold"), "src": stem, "n": len(rows), "V": V, "y": y,
-                                                       "x": np.log10([r["curvature"] for r in rows]), "hp": hp, "arch": arch})
+            by_ds.setdefault(d["dataset"], []).append({"fold": a.get("cluster_fold"), "seed": a.get("seed"), "src": stem, "n": len(rows),
+                                                       "V": V, "y": y, "x": np.log10([r["curvature"] for r in rows]), "hp": hp, "arch": arch})
     out = {}
     for ds, runs in by_ds.items():
         print(f"\n== E0 / {ds}: {len(runs)} rodada(s), alvo = CVaR nos {'ataques/malware NOVOS'} ==")
         out[ds] = {"runs": [], "combined": {}}
+        unit = "folds" if runs[0]["fold"] is not None else "sementes"     # DREBIN por cluster: folds; NSL-KDD: sementes
         for stat in args.stats:
             per = []
             for R_ in runs:
                 res = scan(R_["V"], R_["y"], R_["x"], arch=R_["arch"], hparams=R_["hp"], sizes=args.sizes, stat=stat,
                            R=args.R, B=args.B, seed=args.seed)
-                per.append(res); out[ds]["runs"].append({"fold": R_["fold"], "src": R_["src"], "stat": stat, "scan": res})
-                print(format_scan(res, f"{ds} fold {R_['fold']} | {stat} | log Tr(H2)"))
+                per.append(res); out[ds]["runs"].append({"fold": R_["fold"], "seed": R_["seed"], "src": R_["src"], "stat": stat, "scan": res})
+                lab = f"fold {R_['fold']}" if R_["fold"] is not None else f"semente {R_['seed']}"
+                print(format_scan(res, f"{ds} {lab} | {stat} | log Tr(H2)"))
             if len(per) > 1:                      # combinacao por tamanho (efeitos aleatorios), como na D1
                 comb = {"stat": stat, "n_models": sum(R_["n"] for R_ in runs), "n_val": per[0]["n_val"], "R": args.R, "B": args.B,
                         "sizes": per[0]["sizes"], "per_size": []}
@@ -101,7 +103,7 @@ def run_e0(paths, args):
                         row["P_arch"] = fa["r_re"]; row["P_arch_ci95"] = fa["ci95_re"]
                     comb["per_size"].append(row)
                 comb["verdict"] = scan_verdict(comb); out[ds]["combined"][stat] = comb
-                print(format_scan(comb, f"{ds} COMBINADO (efeitos aleatorios, {len(per)} folds) | {stat} | log Tr(H2)"))
+                print(format_scan(comb, f"{ds} COMBINADO (efeitos aleatorios, {len(per)} {unit}) | {stat} | log Tr(H2)"))
                 print("     I2 por tamanho: " + "  ".join(f"{r['n_val']}:{r['I2']:.0%}" for r in comb["per_size"]))
     return out
 
