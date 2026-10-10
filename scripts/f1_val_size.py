@@ -79,14 +79,15 @@ def run_e0(paths, args):
     for ds, runs in by_ds.items():
         print(f"\n== E0 / {ds}: {len(runs)} rodada(s), alvo = CVaR nos {'ataques/malware NOVOS'} ==")
         out[ds] = {"runs": [], "combined": {}}
-        unit = "folds" if runs[0]["fold"] is not None else "sementes"     # DREBIN por cluster: folds; NSL-KDD: sementes
+        by_fold = ds == "drebin_cluster"                                   # DREBIN por cluster: folds; NSL-KDD: sementes
+        unit = "folds" if by_fold else "sementes"
         for stat in args.stats:
             per = []
             for R_ in runs:
                 res = scan(R_["V"], R_["y"], R_["x"], arch=R_["arch"], hparams=R_["hp"], sizes=args.sizes, stat=stat,
                            R=args.R, B=args.B, seed=args.seed)
                 per.append(res); out[ds]["runs"].append({"fold": R_["fold"], "seed": R_["seed"], "src": R_["src"], "stat": stat, "scan": res})
-                lab = f"fold {R_['fold']}" if R_["fold"] is not None else f"semente {R_['seed']}"
+                lab = f"fold {R_['fold']}" if by_fold else f"semente {R_['seed']}"
                 print(format_scan(res, f"{ds} {lab} | {stat} | log Tr(H2)"))
             if len(per) > 1:                      # combinacao por tamanho (efeitos aleatorios), como na D1
                 comb = {"stat": stat, "n_models": sum(R_["n"] for R_ in runs), "n_val": per[0]["n_val"], "R": args.R, "B": args.B,
