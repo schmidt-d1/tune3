@@ -118,6 +118,9 @@ def split_half(X, y, seed):
     return X[a], y[a], X[b], y[b]
 
 
+_DATA_META = {}      # metadados do carregamento (ex.: contagens da divisao temporal do KronoDroid), vao para o JSON
+
+
 def load(name, args, seed):
     if name == "drebin_cluster":
         # DREBIN com deslocamento: o malware de TESTE vem inteiro de um cluster (k-means) que nao
@@ -130,6 +133,17 @@ def load(name, args, seed):
         Xtr, ytr, Xv, yv, Xte, yte = cluster_holdout_split(X, y, args.n_clusters, args.cluster_fold,
                                                            seed=seed, cluster_seed=args.cluster_seed)
         return Xtr, ytr, Xv, yv, Xte, yte, (yte == 1)
+    if name == "kronodroid":
+        # KronoDroid (real device) com DIVISAO TEMPORAL (F3): treino/validacao no periodo <= corte, teste
+        # depois do corte; a mascara 'novel' marca o futuro DISTANTE (ano >= far). Regra fixada no
+        # pre-registro (claude/TUNE3_PREREGISTRO_FASE_DIRECAO.md, "F3 -- regra fixada").
+        from tune3.data.kronodroid import KronoDroidLoader, KronoDroidConfig
+        m = KronoDroidLoader(KronoDroidConfig(data_dir=args.kronodroid, cut_year=args.krono_cut, far_year=args.krono_far,
+                                              max_train=args.krono_max_train, n_val=args.krono_n_val,
+                                              match_ratio=not args.krono_natural_ratio,
+                                              random_state=seed)).load_splits_with_meta()
+        _DATA_META["kronodroid"] = m["meta"]
+        return m["X_train"], m["y_train"], m["X_val"], m["y_val"], m["X_test"], m["y_test"], m["test_novel_mask"]
     if name == "nslkdd":
         from tune3.data.nslkdd import NSLKDDLoader, NSLKDDConfig
         m = NSLKDDLoader(NSLKDDConfig(data_dir=args.nslkdd, random_state=seed, split="official",
@@ -236,10 +250,14 @@ def run_dataset(name, configs, args):
     if ok and "cvar_test_novel" in ok[0]:
         if name == "drebin_cluster":
             targets += [("cvar_test_novel", "teste: malware do cluster NOVO"), ("cvar_test_known", "teste: benignos")]
+        elif name == "kronodroid":
+            targets += [("cvar_test_novel", f"teste: futuro DISTANTE (>= {args.krono_far})"),
+                        ("cvar_test_known", f"teste: futuro proximo ({args.krono_cut + 1}-{args.krono_far - 1})")]
         else:
             targets += [("cvar_test_novel", "teste: ataques NOVOS"), ("cvar_test_known", "teste: ataques conhecidos")]
 
     out = {"dataset": name, "epochs": args.epochs, "mode": "train_loss" if stop is not None else "val_early_stopping",
+           "data_meta": _DATA_META.get(name),
            "stop_train_loss": stop, "val_split": bool(hold is not None), "control": ctrl_name,
            "n_ok": n, "n_total": len(rows), "n_excluded": len(excluded), "excluded_reason": excl_label,
            "n_stalled": len(excluded) if stop is None else None,
@@ -352,10 +370,13 @@ def run_dataset(name, configs, args):
 def verdict(res):
     if not res["results"]:
         return f"EM ABERTO: so' {res['n_ok']} configuracoes validas"
-    key = "cvar_test_novel" if "cvar_test_novel" in res["results"] else "cvar_test"
+    if res["dataset"] == "kronodroid":          # F3: alvo primario = todo o teste futuro (apos o corte)
+        key = "cvar_test"
+    else:
+        key = "cvar_test_novel" if "cvar_test_novel" in res["results"] else "cvar_test"
     r = res["results"][key]; lo, hi = r["partial_ci95"]
     alvo = ("malware do cluster novo" if res["dataset"] == "drebin_cluster" else "ataques novos") \
-        if key == "cvar_test_novel" else "teste"
+        if key == "cvar_test_novel" else ("teste FUTURO (apos o corte)" if res["dataset"] == "kronodroid" else "teste")
     if res["n_ok"] < 10 or not np.isfinite(lo):
         return f"EM ABERTO: so' {res['n_ok']} configuracoes validas (use --k >= 30)"
     if res.get("mode") == "train_loss":
@@ -385,7 +406,14 @@ def _verdict_core(r, lo, hi, alvo):
 def main():
     ap = argparse.ArgumentParser(description="E0: a curvatura preve generalizacao alem da validacao?")
     ap.add_argument("--datasets", nargs="+", default=["nslkdd", "drebin"],
-                    choices=["nslkdd", "drebin", "drebin_cluster"])
+                    choices=["nslkdd", "drebin", "drebin_cluster", "kronodroid"])
+    ap.add_argument("--kronodroid", default="data/kronodroid/real_device", help="pasta com real_malware_v1.zip e real_legitimate_v1.zip")
+    ap.add_argument("--krono-cut", type=int, default=2014, help="kronodroid: treino/validacao ate' este ano (inclusive); teste depois")
+    ap.add_argument("--krono-far", type=int, default=2018, help="kronodroid: teste 'distante' = ano >= este (mascara novel)")
+    ap.add_argument("--krono-max-train", type=int, default=25000)
+    ap.add_argument("--krono-n-val", type=int, default=5000)
+    ap.add_argument("--krono-natural-ratio", action="store_true",
+                    help="kronodroid: NAO casar a fracao de malware do teste com a do treino (exploratorio)")
     ap.add_argument("--n-clusters", type=int, default=5, help="drebin_cluster: clusters de malware (k-means)")
     ap.add_argument("--cluster-fold", type=int, default=0,
                     help="drebin_cluster: cluster retido como malware NOVO (0 = o maior)")

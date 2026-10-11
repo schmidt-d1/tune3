@@ -722,3 +722,113 @@ def test_A27_escassez_de_validacao_recupera_estrutura_conhecida():
     assert P[0] > P[-1] + 0.2 and r["verdict"].startswith("ESCASSEZ SUSTENTA")
     r0 = scan(V, target, x_nulo, sizes=(50, 100, 200, 500), stat="cvar", R=30, B=150, seed=0)
     assert r0["verdict"].startswith("NAO SUSTENTA")
+
+
+# ---------------------------------------------------------------- F3 (out/2026): KronoDroid temporal
+def _krono_fake(dir_, seed=0, leak_col=False):
+    """Dois ZIPs com a ESTRUTURA do KronoDroid real (separadores nr_syscalls / nr_permissions, metadados no
+    fim, datas M/D/AAAA), em escala pequena. Permissoes P_A..P_D; 'P_RARE' com suporte < 50; 'P_FUTURE'
+    so' aparece depois do corte; chamada 'sys_rare' com 3 linhas nao-nulas; 'sys_const' constante."""
+    import zipfile, pandas as pd
+    rng = np.random.default_rng(seed); rows = []
+    for lab, n in ((1, 900), (0, 700)):
+        for i in range(n):
+            year = int(rng.choice([2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020],
+                                  p=[.14, .14, .12, .1, .1, .08, .08, .08, .06, .05, .05]))
+            rows.append({"Package": f"pkg{lab}{i}", "Malware": lab,
+                         "read": int(rng.poisson(50 + 40 * lab)), "write": int(rng.poisson(20)),
+                         "sys_rare": int(i < 3 and lab == 1), "sys_const": 0, "ptrace": int(rng.poisson(0.02)) * (1 + 500 * (year > 2014)),
+                         "nr_syscalls": int(rng.poisson(90)),
+                         "P_A": int(rng.random() < 0.3 + 0.4 * lab), "P_B": int(rng.random() < 0.5), "P_C": int(rng.random() < 0.2),
+                         "P_RARE": int(i < 10), "P_FUTURE": int(year > 2014 and rng.random() < 0.5), "P_D": int(rng.random() < 0.1),
+                         "nr_permissions": 3, "normal": 2, "dangerous": 1, "signature": 0, "custom_yes": 0, "nr_custom": 0, "total_perm": 3,
+                         "sha256": f"{seed:02d}{lab}{i:06d}", "CFileSize": int(rng.integers(10**4, 10**7)), "UFileSize": int(rng.integers(10**4, 10**7)),
+                         "EarliestModDate": f"1/1/{year}", "HighestModDate": f"{int(rng.integers(1, 13))}/{int(rng.integers(1, 28))}/{year}",
+                         "FilesInsideAPK": 10, "TimesSubmitted": 3, "NrContactedIps": 0, "Activities": 2.0, "NrIntServices": 0.0,
+                         "NrIntServicesActions": 0.0, "NrIntActivities": 1.0, "NrIntActivitiesActions": 1.0, "NrIntReceivers": 0.0,
+                         "NrIntReceiversActions": 0.0, "TotalIntentFilters": 1.0, "NrServices": 0.0, "Scanners": 60,
+                         "Detection_Ratio": 0.5 * lab, "MalFamily": "Fam" if lab else float("nan")})
+    df = pd.DataFrame(rows)
+    df.loc[0, "HighestModDate"] = "1/1/1980"                     # placeholder: deve ser descartado
+    for lab, name in ((1, "real_malware_v1"), (0, "real_legitimate_v1")):
+        part = df[df["Malware"] == lab]
+        if leak_col and lab == 0:
+            part = part.assign(ONLY_BENIGN=1)
+        with zipfile.ZipFile(dir_ / f"{name}.zip", "w") as z:
+            z.writestr(f"{name}.csv", part.to_csv(index=False))
+    return df
+
+
+def test_A28_kronodroid_divisao_temporal_sem_vazamento(tmp_path):
+    """F3: (i) treino/validacao so' ate' o corte, teste so' depois; mascara 'novel' = futuro distante;
+    (ii) fracao de malware do teste casada com a do periodo de treino, no proximo e no distante;
+    (iii) identificadores, datas e metadados do VirusTotal NAO viram atributo; permissoes ficam 0/1;
+    (iv) colunas constantes ou com suporte < min_support descartadas (inclui permissao que so' existe
+    no futuro); z-score ajustado no treino e limitado a +-clip_z; (v) data-placeholder descartada;
+    (vi) deterministico; proporcao natural mantem todas as linhas do futuro."""
+    from tune3.data.kronodroid import KronoDroidLoader, KronoDroidConfig, EXCLUDE
+    _krono_fake(tmp_path)
+    cfg = KronoDroidConfig(data_dir=str(tmp_path), cut_year=2014, far_year=2018, max_train=600, n_val=200,
+                           min_support=50, clip_z=10.0, random_state=0)
+    m = KronoDroidLoader(cfg).load_splits_with_meta(); meta = m["meta"]; names = m["feature_names"]
+    assert meta["n_rows_bad_year"] == 1 and meta["n_train"] == 600 and meta["n_val"] == 200
+    yr = m["test_year"]; assert yr.min() == 2015 and list(m["test_novel_mask"]) == list(yr >= 2018)
+    p = meta["p_mal_train_period"]
+    assert abs(meta["frac_mal_test_near"] - p) < 0.02 and abs(meta["frac_mal_test_far"] - p) < 0.02
+    assert abs(m["y_train"].mean() - p) < 0.02 and abs(m["y_val"].mean() - p) < 0.02
+    assert not (set(names) & set(EXCLUDE)) and "ONLY_BENIGN" not in names
+    for c in ("sys_const", "sys_rare", "P_RARE", "P_FUTURE"):
+        assert c in meta["dropped_constant"] and c not in names
+    assert "read" in names and "P_A" in names and "CFileSize" in names
+    perm = [i for i, n in enumerate(names) if n in ("P_A", "P_B", "P_C", "P_D")]
+    assert set(np.unique(m["X_train"][:, perm])) <= {0.0, 1.0} and set(np.unique(m["X_test"][:, perm])) <= {0.0, 1.0}
+    j = names.index("read")
+    assert abs(m["X_train"][:, j].mean()) < 1e-4 and abs(m["X_train"][:, j].std() - 1) < 1e-3
+    assert np.abs(m["X_test"]).max() <= 10.0 + 1e-6 and not np.isnan(m["X_test"]).any()
+    m2 = KronoDroidLoader(cfg).load_splits_with_meta()
+    assert np.array_equal(m["X_test"], m2["X_test"]) and np.array_equal(m["X_train"], m2["X_train"])
+    nat = KronoDroidLoader(KronoDroidConfig(data_dir=str(tmp_path), max_train=600, n_val=200, match_ratio=False,
+                                            min_support=50)).load_splits_with_meta()
+    assert nat["meta"]["n_test"] > meta["n_test"] and nat["meta"]["n_test"] == int((_years_after(tmp_path) > 2014).sum())
+
+
+def _years_after(dir_):
+    """Anos validos (apos descarte do placeholder) dos dois ZIPs, para conferir a proporcao natural."""
+    import zipfile, io, pandas as pd
+    ys = []
+    for name in ("real_malware_v1", "real_legitimate_v1"):
+        with zipfile.ZipFile(dir_ / f"{name}.zip") as z, z.open(f"{name}.csv") as f:
+            d = pd.read_csv(io.BytesIO(f.read()))
+        y = pd.to_datetime(d["HighestModDate"], format="%m/%d/%Y", errors="coerce").dt.year
+        ys.append(y[y.between(2008, 2020)].values)
+    return np.concatenate(ys)
+
+
+def test_A29_kronodroid_coluna_so_de_um_lado_e_vazamento_e_cai(tmp_path):
+    """Uma coluna presente so' no arquivo de benignos (ou so' no de malware) identificaria o rotulo:
+    o loader usa a INTERSECAO das colunas e registra a descartada."""
+    from tune3.data.kronodroid import KronoDroidLoader, KronoDroidConfig
+    _krono_fake(tmp_path, leak_col=True)
+    m = KronoDroidLoader(KronoDroidConfig(data_dir=str(tmp_path), max_train=600, n_val=200)).load_splits_with_meta()
+    assert m["meta"]["dropped_columns"] == ["ONLY_BENIGN"] and "ONLY_BENIGN" not in m["feature_names"]
+
+
+def test_A30_e0_carrega_kronodroid_e_rotula_alvos(tmp_path):
+    """O E0 aceita --datasets kronodroid, devolve a 7-tupla coerente (mascara = futuro distante) e o
+    veredito do kronodroid usa o teste INTEIRO como alvo primario."""
+    import importlib.util, pathlib, argparse
+    p = pathlib.Path(__file__).resolve().parents[2] / "scripts" / "e0_generalization.py"
+    spec = importlib.util.spec_from_file_location("e0g", p); e0 = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(e0)
+    _krono_fake(tmp_path)
+    args = argparse.Namespace(kronodroid=str(tmp_path), krono_cut=2014, krono_far=2018, krono_max_train=600,
+                              krono_n_val=200, krono_natural_ratio=False)
+    Xtr, ytr, Xv, yv, Xte, yte, novel = e0.load("kronodroid", args, 0)
+    assert Xtr.shape[0] == len(ytr) == 600 and Xv.shape[0] == 200 and Xte.shape[0] == len(yte) == len(novel)
+    assert Xtr.shape[1] == Xv.shape[1] == Xte.shape[1] and 0 < novel.sum() < len(novel)
+    assert e0._DATA_META["kronodroid"]["cut_year"] == 2014
+    res = {"dataset": "kronodroid", "n_ok": 50, "n_total": 60, "mode": "train_loss", "stop_train_loss": 0.1, "control": "val",
+           "results": {"cvar_test": {"partial_given_val": 0.3, "partial_ci95": [0.1, 0.5]},
+                       "cvar_test_novel": {"partial_given_val": -0.3, "partial_ci95": [-0.5, -0.1]}}}
+    v = e0.verdict(res)
+    assert "SUSTENTA H_G" in v and "FUTURO" in v and "CONTRADIZ" not in v       # usou cvar_test, nao o 'novel'
