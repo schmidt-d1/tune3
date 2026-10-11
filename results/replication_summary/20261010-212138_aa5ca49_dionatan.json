@@ -1,0 +1,252 @@
+{
+  "meta": {
+    "experiment": "replication_summary",
+    "tag": "dionatan",
+    "timestamp": "2026-10-10T21:21:38",
+    "duration_s": 3.0,
+    "args": {
+      "nsl": [
+        "results/e0_generalization/*k600-stop-s0.json",
+        "results/e0_generalization/*k600-stop-s1.json",
+        "results/e0_generalization/*k600-stop-s2.json"
+      ],
+      "drebin_cluster": [
+        "results/e0_generalization/*dionatan-drebin-cluster-f*.json",
+        "results/e0_generalization/*drebin-cluster-s1-f*.json",
+        "results/e0_generalization/*drebin-cluster-s2-f*.json"
+      ],
+      "cifar": [
+        "results/d2_cifar/*dionatan-grid.json",
+        "results/d2_cifar/*grid-s1.json",
+        "results/d2_cifar/*grid-s2.json"
+      ],
+      "tag": "dionatan"
+    },
+    "git": {
+      "commit": "aa5ca4942e7936e0089b4017bd03cadda5fad503",
+      "commit_short": "aa5ca49",
+      "branch": "main",
+      "dirty": false,
+      "dirty_files": []
+    },
+    "env": {
+      "python": "3.14.7",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "hostname": "DRS",
+      "user": "diona",
+      "torch": "2.14.0+cu130",
+      "cuda_available": true,
+      "gpu": "NVIDIA GeForce RTX 5070 Ti",
+      "numpy": "2.5.3",
+      "scipy": "1.18.1",
+      "botorch": "0.18.1",
+      "gpytorch": "1.15.2",
+      "statsmodels": "0.15.0",
+      "sklearn": "1.9.1"
+    },
+    "schema_version": 1
+  },
+  "payload": {
+    "nsl": [
+      {
+        "src": "20261008-163706_03e25ff_dionatan-k600-stop-s0.json",
+        "seed": 0,
+        "git": "03e25ff",
+        "n": 303,
+        "partial_val": -0.4306605911379583,
+        "ci_val": [
+          -0.5373917117491689,
+          -0.3203224775238398
+        ],
+        "partial_5hp": 0.0779465337126658,
+        "ci_5hp": [
+          -0.06137834850918783,
+          0.19945052629885948
+        ],
+        "replica": true
+      },
+      {
+        "src": "20261008-171346_03e25ff_dionatan-k600-stop-s1.json",
+        "seed": 1,
+        "git": "03e25ff",
+        "n": 266,
+        "partial_val": -0.285460308164762,
+        "ci_val": [
+          -0.38255880802145525,
+          -0.17920155205842106
+        ],
+        "partial_5hp": 0.06330307145927465,
+        "ci_5hp": [
+          -0.05953328112796491,
+          0.19242543155913772
+        ],
+        "replica": true
+      },
+      {
+        "src": "20261008-174650_03e25ff_dionatan-k600-stop-s2.json",
+        "seed": 2,
+        "git": "03e25ff",
+        "n": 288,
+        "partial_val": -0.5361664523660357,
+        "ci_val": [
+          -0.6156410589889405,
+          -0.44431073193871135
+        ],
+        "partial_5hp": 0.014540193679849593,
+        "ci_5hp": [
+          -0.09398519042663686,
+          0.134463845702646
+        ],
+        "replica": true
+      }
+    ],
+    "drebin_cluster": [
+      {
+        "glob": "results/e0_generalization/*dionatan-drebin-cluster-f*.json",
+        "n_folds": 5,
+        "seed": [
+          0
+        ],
+        "git": [
+          "908c435"
+        ],
+        "per_fold": [
+          0.4685685795872593,
+          0.10198895507309903,
+          -0.10120444478072917,
+          0.1525965486830739,
+          -4.1728981632430605e-05
+        ],
+        "re": 0.1321678485872896,
+        "ci_re": [
+          -0.0719037149319582,
+          0.3256184968368676
+        ],
+        "I2": 0.9156190183061889,
+        "re_5hp": 0.03068597163795375,
+        "ci_re_5hp": [
+          -0.02952514568636559,
+          0.09067520342332236
+        ],
+        "replica": true
+      },
+      {
+        "glob": "results/e0_generalization/*drebin-cluster-s1-f*.json",
+        "n_folds": 5,
+        "seed": [
+          1
+        ],
+        "git": [
+          "3c01d30"
+        ],
+        "per_fold": [
+          0.5507485086034629,
+          0.1665335728826021,
+          -0.009552694452016602,
+          0.4030415265725689,
+          -0.045595214770165635
+        ],
+        "re": 0.2282659472193193,
+        "ci_re": [
+          -0.02089492190814113,
+          0.45073047989085446
+        ],
+        "I2": 0.9391028221153788,
+        "re_5hp": 0.09214354380563136,
+        "ci_re_5hp": [
+          -0.02908652436533733,
+          0.2107021955102454
+        ],
+        "replica": true
+      },
+      {
+        "glob": "results/e0_generalization/*drebin-cluster-s2-f*.json",
+        "n_folds": 5,
+        "seed": [
+          2
+        ],
+        "git": [
+          "d53f976"
+        ],
+        "per_fold": [
+          0.5280321630067506,
+          0.015209641857617447,
+          -0.19912596552516448,
+          0.1287333830341504,
+          0.03562171432527562
+        ],
+        "re": 0.11283971526551466,
+        "ci_re": [
+          -0.14319488274133516,
+          0.3547179186999178
+        ],
+        "I2": 0.9481171934083267,
+        "re_5hp": 0.025431858938659947,
+        "ci_re_5hp": [
+          -0.04692833699405968,
+          0.09752653805467343
+        ],
+        "replica": true
+      }
+    ],
+    "cifar": [
+      {
+        "src": "20261007-211209_995071b_dionatan-grid.json",
+        "seed": 0,
+        "git": "995071b",
+        "n": 225,
+        "tau_gap": 0.4598408472654107,
+        "tau_ci": [
+          0.3839473673938052,
+          0.5302553644202085
+        ],
+        "Psi": 0.3065149596383795,
+        "A_positive": true,
+        "partial_B": -0.0730601576779936,
+        "ci_B": [
+          -0.19180406261916821,
+          0.06509519610964365
+        ],
+        "replica": true
+      },
+      {
+        "src": "20261010-152547_0a7a9bd_dionatan-grid-s1.json",
+        "seed": 1,
+        "git": "0a7a9bd",
+        "n": 225,
+        "tau_gap": 0.48427237257032146,
+        "tau_ci": [
+          0.41560552902112136,
+          0.5460493363949784
+        ],
+        "Psi": 0.30130083148742126,
+        "A_positive": true,
+        "partial_B": -0.07970575403692293,
+        "ci_B": [
+          -0.20439278176817416,
+          0.048599063171302415
+        ],
+        "replica": true
+      },
+      {
+        "src": "20261010-192354_4225b1b_dionatan-grid-s2.json",
+        "seed": 2,
+        "git": "4225b1b",
+        "n": 224,
+        "tau_gap": 0.5440564201091301,
+        "tau_ci": [
+          0.4842834544522606,
+          0.5994364461484354
+        ],
+        "Psi": 0.38383483460030365,
+        "A_positive": true,
+        "partial_B": -0.2842511293297225,
+        "ci_B": [
+          -0.39377086712726306,
+          -0.1455162843649134
+        ],
+        "replica": false
+      }
+    ]
+  }
+}
