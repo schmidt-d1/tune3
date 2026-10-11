@@ -1,0 +1,263 @@
+{
+  "meta": {
+    "experiment": "inspect",
+    "tag": "kronodroid-real",
+    "timestamp": "2026-10-10T21:23:33",
+    "duration_s": 1.8,
+    "args": {
+      "path": "data/kronodroid/real_device",
+      "tag": "kronodroid-real",
+      "max_rows": null,
+      "max_cols": 40,
+      "label_hint": null,
+      "label_col": null,
+      "time_hint": null
+    },
+    "git": {
+      "commit": "4774ebc220709b996bfeb53b1730a89bd1e15439",
+      "commit_short": "4774ebc",
+      "branch": "main",
+      "dirty": false,
+      "dirty_files": []
+    },
+    "env": {
+      "python": "3.14.7",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "hostname": "DRS",
+      "user": "diona",
+      "torch": "2.14.0+cu130",
+      "cuda_available": true,
+      "gpu": "NVIDIA GeForce RTX 5070 Ti",
+      "numpy": "2.5.3",
+      "scipy": "1.18.1",
+      "botorch": "0.18.1",
+      "gpytorch": "1.15.2",
+      "statsmodels": "0.15.0",
+      "sklearn": "1.9.1"
+    },
+    "schema_version": 1
+  },
+  "payload": {
+    "path": "data/kronodroid/real_device",
+    "files": [
+      {
+        "file": "real_legitimate_v1.zip::real_legitimate_v1.csv",
+        "shape": [
+          36755,
+          484
+        ],
+        "n_columns": 484,
+        "first_columns": [
+          "Package",
+          "Malware",
+          "execve",
+          "getuid32",
+          "getgid32",
+          "geteuid32",
+          "getegid32",
+          "getresuid32",
+          "getresgid32",
+          "readahead",
+          "getgroups32",
+          "getpgid",
+          "getppid",
+          "getsid",
+          "setsid",
+          "setgid32",
+          "setuid32",
+          "setreuid32",
+          "setresuid32",
+          "setresgid32",
+          "brk",
+          "kill",
+          "tgkill",
+          "ptrace",
+          "getrusage",
+          "getpriority",
+          "setpriority",
+          "ugetrlimit",
+          "setrlimit",
+          "prlimit64",
+          "setgroups32",
+          "setpgid",
+          "setregid32",
+          "chroot",
+          "prctl",
+          "capget",
+          "capset",
+          "sigaltstack",
+          "acct",
+          "read"
+        ],
+        "dtypes": {
+          "str": 5,
+          "int64": 469,
+          "float64": 10
+        },
+        "missing_frac_max": 0.9194939464018501,
+        "label_candidates": {
+          "Malware": {
+            "0": 36755
+          },
+          "BIND_CHOOSER_TARGET_SERVICE": {
+            "0": 36621,
+            "1": 134
+          },
+          "MalFamily": {
+            "nan": 33796,
+            "Boogr": 522,
+            "FakeInst": 394,
+            "Agent": 295,
+            "FakeToken": 240,
+            "SMSSend": 177,
+            "LeadBolt": 137,
+            "Waps/Simhosy": 113,
+            "Fujacks": 110,
+            "Youmi": 109,
+            "MTK": 107,
+            "DroidKungFu": 94
+          }
+        },
+        "time_candidates": {},
+        "feature_groups_by_prefix": {
+          "sys": 70,
+          "bind": 31,
+          "read": 14,
+          "set": 12,
+          "write": 11,
+          "sched": 10,
+          "access": 9,
+          "rt": 7,
+          "request": 6,
+          "clock": 5,
+          "timer": 5,
+          "change": 5,
+          "epoll": 4,
+          "broadcast": 4,
+          "get": 4,
+          "receive": 4,
+          "use": 4,
+          "mount": 3,
+          "timerfd": 3,
+          "delete": 3,
+          "inotify": 3,
+          "nr": 3,
+          "bluetooth": 3,
+          "call": 3,
+          "install": 3
+        },
+        "numeric_columns": 479,
+        "binary_columns": 161
+      },
+      {
+        "file": "real_malware_v1.zip::real_malware_v1.csv",
+        "shape": [
+          41382,
+          484
+        ],
+        "n_columns": 484,
+        "first_columns": [
+          "Package",
+          "Malware",
+          "execve",
+          "getuid32",
+          "getgid32",
+          "geteuid32",
+          "getegid32",
+          "getresuid32",
+          "getresgid32",
+          "readahead",
+          "getgroups32",
+          "getpgid",
+          "getppid",
+          "getsid",
+          "setsid",
+          "setgid32",
+          "setuid32",
+          "setreuid32",
+          "setresuid32",
+          "setresgid32",
+          "brk",
+          "kill",
+          "tgkill",
+          "ptrace",
+          "getrusage",
+          "getpriority",
+          "setpriority",
+          "ugetrlimit",
+          "setrlimit",
+          "prlimit64",
+          "setgroups32",
+          "setpgid",
+          "setregid32",
+          "chroot",
+          "prctl",
+          "capget",
+          "capset",
+          "sigaltstack",
+          "acct",
+          "read"
+        ],
+        "dtypes": {
+          "str": 5,
+          "int64": 469,
+          "float64": 10
+        },
+        "missing_frac_max": 0.008892755304238558,
+        "label_candidates": {
+          "Malware": {
+            "1": 41382
+          },
+          "BIND_CHOOSER_TARGET_SERVICE": {
+            "0": 41381,
+            "1": 1
+          },
+          "MalFamily": {
+            "Airpush/StopSMS": 7775,
+            "SMSreg": 5019,
+            "Malap": 4055,
+            "Boxer": 3597,
+            "Agent": 2934,
+            "FakeInst": 2384,
+            "Locker/SLocker Ransomware": 1846,
+            "BankBot": 1297,
+            "Dowgin": 1145,
+            "FakeApp": 994,
+            "DroidKungFu": 990,
+            "Kuguo": 843
+          }
+        },
+        "time_candidates": {},
+        "feature_groups_by_prefix": {
+          "sys": 70,
+          "bind": 31,
+          "read": 14,
+          "set": 12,
+          "write": 11,
+          "sched": 10,
+          "access": 9,
+          "rt": 7,
+          "request": 6,
+          "clock": 5,
+          "timer": 5,
+          "change": 5,
+          "epoll": 4,
+          "broadcast": 4,
+          "get": 4,
+          "receive": 4,
+          "use": 4,
+          "mount": 3,
+          "timerfd": 3,
+          "delete": 3,
+          "inotify": 3,
+          "nr": 3,
+          "bluetooth": 3,
+          "call": 3,
+          "install": 3
+        },
+        "numeric_columns": 479,
+        "binary_columns": 144
+      }
+    ]
+  }
+}
