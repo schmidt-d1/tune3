@@ -180,7 +180,7 @@ def run_dataset(name, configs, args):
         perm = arng.permutation(idx); h = len(perm) // 2
         halves[key] = (perm[:h], perm[h:2 * h])
     tc = PlainTrialConfig(max_epochs=args.epochs, patience=args.patience, device=args.device,
-                          gamma=0.95, seed=args.seed, stop_train_loss=stop)
+                          gamma=0.95, seed=args.seed, stop_train_loss=stop, curvature_probes=args.probes)
     # --- medidas geometricas extras (Cenario 2, out/2026): sharpness adaptativa, lambda_max, segunda
     # estimativa de Tr(H^2) (confiabilidade) e Tr(H^2) num segundo lote; geradores proprios, logo a
     # curvatura primaria e os CVaRs reproduzem bit a bit as rodadas sem --measures ---
@@ -195,7 +195,7 @@ def run_dataset(name, configs, args):
             second = (torch.as_tensor(Xtr[j], dtype=torch.float32, device=args.device),
                       torch.as_tensor(ytr[j], dtype=torch.long, device=args.device))
         extra = make_extra_measures(args.measures, sharp_rho=args.sharp_rho, sharp_steps=args.sharp_steps,
-                                    lmax_iters=args.lmax_iters, probes=tc.curvature_probes, second_batch=second,
+                                    lmax_iters=args.lmax_iters, probes=args.probes2, second_batch=second,
                                     seed=args.seed)
     extra_keys = ([f"sharp_{r_:g}" for r_ in args.sharp_rho] if "sharp" in (args.measures or []) else []) + \
                  [k for k in ("lmax", "curv2", "curvb") if k in (args.measures or [])]
@@ -471,6 +471,8 @@ def main():
     ap.add_argument("--sharp-rho", type=float, nargs="+", default=[0.1, 0.5])
     ap.add_argument("--sharp-steps", type=int, default=10)
     ap.add_argument("--lmax-iters", type=int, default=20)
+    ap.add_argument("--probes", type=int, default=5, help="sondas de Hutchinson da Tr(H^2) primaria (5 em todas as rodadas ate' out/2026)")
+    ap.add_argument("--probes2", type=int, default=200, help="sondas da 2a estimativa (curv2/curvb): estimativa PRECISA, para medir a confiabilidade da primaria")
     ap.add_argument("--device", default="cpu", choices=["cpu", "cuda"])
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--tag", default=None)

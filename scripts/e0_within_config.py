@@ -154,6 +154,8 @@ def main():
     ap.add_argument("--measures", nargs="*", default=["sharp", "lmax", "curv2"], choices=["sharp", "lmax", "curv2", "curvb"])
     ap.add_argument("--sharp-rho", type=float, nargs="+", default=[0.1, 0.5]); ap.add_argument("--sharp-steps", type=int, default=10)
     ap.add_argument("--lmax-iters", type=int, default=20)
+    ap.add_argument("--probes", type=int, default=5, help="sondas de Hutchinson da Tr(H^2) PRIMARIA (o E0 usa 5)")
+    ap.add_argument("--probes2", type=int, default=5, help="sondas da 2a estimativa (curv2/curvb)")
     ap.add_argument("--B", type=int, default=1000)
     # argumentos de dados (iguais ao E0)
     ap.add_argument("--n-clusters", type=int, default=5); ap.add_argument("--cluster-fold", type=int, default=0); ap.add_argument("--cluster-seed", type=int, default=0)
@@ -179,7 +181,8 @@ def main():
     e0 = _e0()
     Xtr, ytr, Xv, yv, Xte, yte, novel = e0.load(dataset, args, args.seed)
     print(f"[within-config] {dataset}: {len(selected)} configuracoes (de {n_pool} elegiveis em {os.path.basename(src)}) x {args.n_seeds} sementes; "
-          f"treino {Xtr.shape}, val {Xv.shape}, teste {Xte.shape}; parada em perda <= {args.stop_train_loss} (teto {args.epochs}); device={args.device}")
+          f"treino {Xtr.shape}, val {Xv.shape}, teste {Xte.shape}; parada em perda <= {args.stop_train_loss} (teto {args.epochs}); "
+          f"sondas Tr(H2) primaria {args.probes}, 2a estimativa {args.probes2}; device={args.device}")
     import torch
     from tune3.curvature.measures import make_extra_measures
     second = None
@@ -197,12 +200,14 @@ def main():
             else:
                 tseed = args.seed_base + s
                 extra = make_extra_measures(args.measures, sharp_rho=args.sharp_rho, sharp_steps=args.sharp_steps, lmax_iters=args.lmax_iters,
-                                            probes=5, second_batch=second, seed=tseed)
-                tc = PlainTrialConfig(max_epochs=args.epochs, device=args.device, gamma=0.95, seed=tseed, stop_train_loss=args.stop_train_loss)
+                                            probes=args.probes2, second_batch=second, seed=tseed)
+                tc = PlainTrialConfig(max_epochs=args.epochs, device=args.device, gamma=0.95, seed=tseed, stop_train_loss=args.stop_train_loss,
+                                      curvature_probes=args.probes)
                 t1 = time.time()
                 r = plain_trial(c["hparams"], (Xtr, ytr, Xv, yv), tc, test_data=(Xte, yte), return_test_losses=True, return_val_losses=True, extra_measures=extra)
                 tl = np.asarray(r["test_losses"], float); vl = np.asarray(r["val_losses"], float)
-                row = {"cfg": c["cfg"], "hparams": c["hparams"], "seed": s, "torch_seed": tseed, "reached": bool(r["reached_train_loss"]),
+                row = {"cfg": c["cfg"], "hparams": c["hparams"], "seed": s, "torch_seed": tseed, "probes": args.probes, "probes2": args.probes2,
+                       "reached": bool(r["reached_train_loss"]),
                        "epochs_run": int(r["epochs_run"]), "train_loss_final": float(r["train_loss_final"]), "seconds": round(time.time() - t1, 1),
                        "curvature": float(r["curvature"]), "cvar_val": float(r["cvar"]), "cvar_test": float(r["cvar_test"])}
                 for k in extra_keys:
