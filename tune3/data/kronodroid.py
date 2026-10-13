@@ -134,9 +134,20 @@ class KronoDroidLoader:
         self.cfg = config or KronoDroidConfig()
 
     # ------------------------------------------------------------------ leitura
+    def _resolve_files(self) -> Tuple[Path, Path]:
+        """real device (real_*_v1.zip) por padrao; se nao existirem na pasta, usa os do emulador
+        (emu_*_v1.zip) -- mesma estrutura, datas em FirstModDate/LastModDate (aceitas em TIME_COLS)."""
+        d = Path(self.cfg.data_dir); mal = d / self.cfg.malware_file; leg = d / self.cfg.legit_file
+        if not mal.exists() and not leg.exists():
+            alt = (d / "emu_malware_v1.zip", d / "emu_legitimate_v1.zip")
+            if alt[0].exists() and alt[1].exists():
+                return alt
+        return mal, leg
+
     def _load_frame(self) -> Tuple[pd.DataFrame, np.ndarray, str]:
-        d = Path(self.cfg.data_dir)
-        mal = _read_zip_csv(d / self.cfg.malware_file); leg = _read_zip_csv(d / self.cfg.legit_file)
+        fm, fl = self._resolve_files()
+        self._files = (fm.name, fl.name)
+        mal = _read_zip_csv(fm); leg = _read_zip_csv(fl)
         if LABEL in mal.columns and not (mal[LABEL] == 1).all():
             raise ValueError("arquivo de malware com rotulo != 1")
         if LABEL in leg.columns and not (leg[LABEL] == 0).all():
@@ -207,7 +218,7 @@ class KronoDroidLoader:
 
         Xtr, (Xva, Xte), names, const, groups = self._fit_transform(df.iloc[tr_idx], [df.iloc[va_idx], df.iloc[te_idx]])
         ytr, yva, yte = y[tr_idx], y[va_idx], y[te_idx]
-        meta = {"time_col": tcol, "cut_year": cfg.cut_year, "far_year": cfg.far_year, "match_ratio": cfg.match_ratio,
+        meta = {"files": list(self._files), "time_col": tcol, "cut_year": cfg.cut_year, "far_year": cfg.far_year, "match_ratio": cfg.match_ratio,
                 "n_rows_valid": int(len(df)), "n_rows_bad_year": self._n_bad_year, "dropped_columns": self._dropped_cols,
                 "p_mal_train_period": p_mal, "n_train": int(len(tr_idx)), "n_val": int(len(va_idx)),
                 "n_test": int(len(te_idx)), "n_test_near": int((~novel).sum()), "n_test_far": int(novel.sum()),

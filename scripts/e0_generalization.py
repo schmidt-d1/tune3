@@ -181,15 +181,36 @@ def run_dataset(name, configs, args):
         halves[key] = (perm[:h], perm[h:2 * h])
     tc = PlainTrialConfig(max_epochs=args.epochs, patience=args.patience, device=args.device,
                           gamma=0.95, seed=args.seed, stop_train_loss=stop)
+    # --- medidas geometricas extras (Cenario 2, out/2026): sharpness adaptativa, lambda_max, segunda
+    # estimativa de Tr(H^2) (confiabilidade) e Tr(H^2) num segundo lote; geradores proprios, logo a
+    # curvatura primaria e os CVaRs reproduzem bit a bit as rodadas sem --measures ---
+    extra = None
+    if args.measures:
+        import torch
+        from tune3.curvature.measures import make_extra_measures
+        second = None
+        if "curvb" in args.measures:
+            rng2 = np.random.default_rng(args.seed + 3000); cb = min(tc.batch_size, len(ytr))
+            j = rng2.choice(len(ytr), cb, replace=False)
+            second = (torch.as_tensor(Xtr[j], dtype=torch.float32, device=args.device),
+                      torch.as_tensor(ytr[j], dtype=torch.long, device=args.device))
+        extra = make_extra_measures(args.measures, sharp_rho=args.sharp_rho, sharp_steps=args.sharp_steps,
+                                    lmax_iters=args.lmax_iters, probes=tc.curvature_probes, second_batch=second,
+                                    seed=args.seed)
+    extra_keys = ([f"sharp_{r_:g}" for r_ in args.sharp_rho] if "sharp" in (args.measures or []) else []) + \
+                 [k for k in ("lmax", "curv2", "curvb") if k in (args.measures or [])]
     rows = []; losses_val, losses_test = [], []
     for i, hp in enumerate(configs):
         r = plain_trial(hp, (Xtr, ytr, Xv, yv), tc, test_data=(Xte, yte),
-                        return_test_losses=True, holdout_data=hold, return_val_losses=True)
+                        return_test_losses=True, holdout_data=hold, return_val_losses=True,
+                        extra_measures=extra)
         tl = r.get("test_losses")
         row = {"cfg": i, "hparams": hp, "curvature": float(r["curvature"]),
                "cvar_val": float(r["cvar"]), "cvar_test": float(r["cvar_test"]),
                "best_epoch": int(r.get("best_epoch", -1)), "epochs_run": int(r.get("epochs_run", -1)),
                "train_loss_final": float(r.get("train_loss_final", float("nan")))}
+        for k in extra_keys:
+            row[k] = float(r[k]) if np.isfinite(r.get(k, float("nan"))) else float("nan")
         if hold is not None:
             row["cvar_val_hold"] = float(r["cvar_holdout"])
         if args.crossfit:                      # papeis trocados: HOLD escolhe a epoca, SEL so' e' medida
@@ -442,6 +463,14 @@ def main():
                     help="parada por perda de treino <= T (Jiang et al. 2020); a validacao nao escolhe nada")
     ap.add_argument("--match-reps", type=int, default=30,
                     help="subamostras para o CVaR com n pareado (checagem de artefato)")
+    ap.add_argument("--measures", nargs="*", default=[], choices=["sharp", "lmax", "curv2", "curvb"],
+                    help="medidas geometricas extras no modelo final (gravadas nas linhas; a analise do E0 segue na "
+                         "Tr(H^2); use scripts/e0_measures.py): sharp = sharpness adaptativa (rhos de --sharp-rho), "
+                         "lmax = maior autovalor da Hessiana, curv2 = 2a estimativa de Tr(H^2) no mesmo lote, "
+                         "curvb = Tr(H^2) num 2o lote de treino")
+    ap.add_argument("--sharp-rho", type=float, nargs="+", default=[0.1, 0.5])
+    ap.add_argument("--sharp-steps", type=int, default=10)
+    ap.add_argument("--lmax-iters", type=int, default=20)
     ap.add_argument("--device", default="cpu", choices=["cpu", "cuda"])
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--tag", default=None)

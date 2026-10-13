@@ -832,3 +832,87 @@ def test_A30_e0_carrega_kronodroid_e_rotula_alvos(tmp_path):
                        "cvar_test_novel": {"partial_given_val": -0.3, "partial_ci95": [-0.5, -0.1]}}}
     v = e0.verdict(res)
     assert "SUSTENTA H_G" in v and "FUTURO" in v and "CONTRADIZ" not in v       # usou cvar_test, nao o 'novel'
+
+
+# ---------------------------------------------------------------- Cenarios 1-3 (out/2026): medidas e intra-configuracao
+def test_A31_lambda_max_e_segunda_estimativa_exatas_e_sem_tocar_no_rng():
+    """lambda_max por iteracao de potencia e Tr(H^2) por Hutchinson (gerador proprio) batem com a Hessiana
+    EXATA de uma forma quadratica; o RNG global do torch nao e' consumido (reprodutibilidade bit a bit da
+    curvatura primaria quando as medidas extras sao ligadas); make_extra_measures devolve as chaves pedidas."""
+    from tune3.curvature.measures import lambda_max, tr_h2_hutchinson, make_extra_measures
+    A = torch.tensor([[4.0, 1.0, 0.0], [1.0, 2.0, 0.5], [0.0, 0.5, 1.0]])
+
+    class Q(nn.Module):
+        def __init__(self):
+            super().__init__(); self.w = nn.Parameter(torch.tensor([1.0, -2.0, 0.5]))
+        def forward(self, x=None):
+            return 0.5 * self.w @ A @ self.w
+    m = Q(); lf = lambda model: model()
+    assert abs(lambda_max(m, lf, iters=300, tol=1e-12) - float(torch.linalg.eigvalsh(A).max())) < 1e-4
+    assert abs(tr_h2_hutchinson(m, lf, probes=3000, seed=1) - float((A @ A).trace())) < 0.5
+    s0 = torch.random.get_rng_state()
+    _ = tr_h2_hutchinson(m, lf, probes=5, seed=3); _ = lambda_max(m, lf, iters=5)
+    assert torch.equal(s0, torch.random.get_rng_state())
+    net = nn.Sequential(nn.Linear(6, 8), nn.ReLU(), nn.Linear(8, 2)); X = torch.randn(64, 6); y = (X[:, 0] > 0).long(); crit = nn.CrossEntropyLoss()
+    extra = make_extra_measures(["sharp", "lmax", "curv2", "curvb"], sharp_rho=(0.1,), second_batch=(X[:32], y[:32]), probes=3)
+    out = extra(net, X, y, crit)
+    assert set(out) == {"sharp_0.1", "lmax", "curv2", "curvb"} and all(np.isfinite(v) for v in out.values()) and out["curv2"] > 0
+
+
+def test_A32_analise_intra_configuracao_separa_geometria_de_arquitetura():
+    """analyze() do e0_within_config: num cenario sintetico em que a curvatura varia ENTRE configuracoes junto com
+    o alvo (confundimento por arquitetura) mas NAO dentro delas, a parcial intra e' nula e a entre e' positiva;
+    com um efeito intra verdadeiro, o veredito passa a SUSTENTA; o ICC reflete a fracao entre configuracoes."""
+    import importlib.util, pathlib
+    p = pathlib.Path(__file__).resolve().parents[2] / "scripts" / "e0_within_config.py"
+    spec = importlib.util.spec_from_file_location("e0w", p); w = importlib.util.module_from_spec(spec); spec.loader.exec_module(w)
+    rng = np.random.default_rng(0); K, S = 12, 20
+
+    def make(within_effect):
+        rows = []
+        for c in range(K):
+            base_curv = 10 ** rng.uniform(0.5, 2.5); base_y = 2.0 + 0.6 * np.log10(base_curv)     # confundimento ENTRE
+            for s in range(S):
+                dc = rng.normal(0, 0.15); dv = rng.normal(0, 0.1)
+                y = base_y + dv + within_effect * dc + rng.normal(0, 0.05)
+                rows.append({"cfg": c, "seed": s, "reached": True, "curvature": base_curv * 10 ** dc, "curv2": base_curv * 10 ** (dc + rng.normal(0, 0.02)),
+                             "cvar_val": 1.0 + dv + rng.normal(0, 0.03), "cvar_test": y, "hparams": {}})
+        return rows
+    r0 = w.analyze(make(0.0), "kronodroid", B=200, seed=0)
+    m0 = r0["measures"]["curvature"]
+    assert m0["ci95_within"][0] < 0 < m0["ci95_within"][1] and m0["partial_between"] > 0.5 and m0["icc_between"] > 0.9
+    assert "nulo" in r0["verdict"]
+    r1 = w.analyze(make(1.0), "kronodroid", B=200, seed=0)
+    assert r1["measures"]["curvature"]["ci95_within"][0] > 0 and "SUSTENTA" in r1["verdict"]
+    assert r1["reliability_curv2"]["spearman_within"] > 0.9
+
+
+def test_A33_select_configs_estratifica_e_loader_aceita_emulador(tmp_path):
+    """select_configs: K configuracoes elegiveis (atingiram T com folga), ordenadas e espalhadas pelos quantis da
+    curvatura; loader do KronoDroid: sem os arquivos do real device, usa os do emulador (FirstModDate/LastModDate)."""
+    import importlib.util, pathlib, json, zipfile
+    p = pathlib.Path(__file__).resolve().parents[2] / "scripts" / "e0_within_config.py"
+    spec = importlib.util.spec_from_file_location("e0w", p); w = importlib.util.module_from_spec(spec); spec.loader.exec_module(w)
+    rows = [{"cfg": i, "reached": i % 3 != 0, "curvature": float(10 ** (i / 20)), "cvar_test": 1.0, "cvar_val": 1.0, "epochs_run": 100 + 10 * i,
+             "hparams": {"learning_rate": 1e-3, "weight_decay": 1e-5, "dropout": 0.0, "hidden_dim": 64, "n_layers": 2}} for i in range(60)]
+    J = {"meta": {"args": {"epochs": 1000, "seed": 0}}, "payload": {"datasets": [{"dataset": "kronodroid", "rows": rows}]}}
+    f = tmp_path / "e0.json"; json.dump(J, open(f, "w"))
+    sel, ds, _, n_pool = w.select_configs(str(f), 5)
+    assert ds == "kronodroid" and n_pool == 40 and len(sel) == 5
+    cs = [s["e0_curvature"] for s in sel]
+    assert cs == sorted(cs) and all(s["cfg"] % 3 != 0 for s in sel) and all(s["e0_epochs_run"] <= 800 for s in sel)
+    assert cs[0] < 10 ** 0.8 and cs[-1] > 10 ** 2.2                                  # espalhadas pelos quantis
+    # emulador: mesma fixture do A28, renomeada e com as colunas de data do emulador
+    import pandas as pd
+    _krono_fake(tmp_path)
+    for name, emu in (("real_malware_v1", "emu_malware_v1"), ("real_legitimate_v1", "emu_legitimate_v1")):
+        with zipfile.ZipFile(tmp_path / f"{name}.zip") as z, z.open(f"{name}.csv") as fh:
+            d = pd.read_csv(fh)
+        d = d.rename(columns={"EarliestModDate": "FirstModDate", "HighestModDate": "LastModDate"})
+        with zipfile.ZipFile(tmp_path / f"{emu}.zip", "w") as z:
+            z.writestr(f"{emu}.csv", d.to_csv(index=False))
+        (tmp_path / f"{name}.zip").unlink()
+    from tune3.data.kronodroid import KronoDroidLoader, KronoDroidConfig
+    m = KronoDroidLoader(KronoDroidConfig(data_dir=str(tmp_path), max_train=600, n_val=200)).load_splits_with_meta()
+    assert m["meta"]["files"] == ["emu_malware_v1.zip", "emu_legitimate_v1.zip"] and m["meta"]["time_col"] == "LastModDate"
+    assert "FirstModDate" not in m["feature_names"] and "LastModDate" not in m["feature_names"]
