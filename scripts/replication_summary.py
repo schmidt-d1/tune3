@@ -10,13 +10,17 @@ Le os JSONs de cada semente e aplica, POR SEMENTE, o padrao pre-registrado:
   DREBIN por cluster (E0, 5 folds):       combinado por efeitos aleatorios (parcial | val) com IC contendo 0
                                           E  combinado | val, 5hp com IC contendo 0
   CIFAR (D2, grade):                      (A) positivo com a Tr(H^2) pela regra da D2  E  (B) IC95 contendo 0
+  KronoDroid (E0, divisao temporal, F3):  alvo = teste futuro INTEIRO (cvar_test); parcial | val com IC95 que NAO
+                                          fica inteiramente acima de zero  E  | val, 5hp com IC95 (bootstrap sobre
+                                          modelos) contendo 0 -- a regra fixada em 11/10/2026 ("F3 -- regra fixada")
 Uma semente que viole o padrao e' reportada como NAO REPLICADO naquele cenario -- nenhuma e' excluida.
 
 Uso:
     python scripts/replication_summary.py \\
         --nsl  results/e0_generalization/*k600-stop-s0.json results/e0_generalization/*k600-stop-s1.json results/e0_generalization/*k600-stop-s2.json \\
         --drebin-cluster "results/e0_generalization/*drebin-cluster-f*.json" "results/e0_generalization/*drebin-cluster-s1-f*.json" "results/e0_generalization/*drebin-cluster-s2-f*.json" \\
-        --cifar results/d2_cifar/*dionatan-grid.json results/d2_cifar/*grid-s1.json results/d2_cifar/*grid-s2.json --tag dionatan
+        --cifar results/d2_cifar/*dionatan-grid.json results/d2_cifar/*grid-s1.json results/d2_cifar/*grid-s2.json \\
+        --kronodroid "results/e0_generalization/*krono-s0.json" "results/e0_generalization/*krono-s1.json" "results/e0_generalization/*krono-s2.json" --tag dionatan
 """
 from __future__ import annotations
 
@@ -61,6 +65,18 @@ def nsl(paths):
     return out
 
 
+def kronodroid(paths):
+    out = []
+    for p in paths:
+        J = json.load(open(p)); d = [x for x in J["payload"]["datasets"] if x["dataset"] == "kronodroid"][0]
+        r = d["results"]["cvar_test"]; rows = _rows_ok(d)
+        p5, ci5 = _partial_5hp_ci(rows, "cvar_test")
+        ok = (not r["partial_ci95"][0] > 0) and (ci5[0] <= 0 <= ci5[1])
+        out.append({"src": os.path.basename(p), "seed": J["meta"]["args"].get("seed"), "git": _git(J), "n": len(rows),
+                    "partial_val": r["partial_given_val"], "ci_val": r["partial_ci95"], "partial_5hp": p5, "ci_5hp": ci5, "replica": bool(ok)})
+    return out
+
+
 def drebin_cluster(globs):
     out = []
     for g in globs:
@@ -90,7 +106,8 @@ def cifar(paths):
 def main():
     ap = argparse.ArgumentParser(description="F2: resumo da replicacao com varias sementes.")
     ap.add_argument("--nsl", nargs="*", default=[]); ap.add_argument("--drebin-cluster", nargs="*", default=[])
-    ap.add_argument("--cifar", nargs="*", default=[]); ap.add_argument("--tag", default=None)
+    ap.add_argument("--cifar", nargs="*", default=[]); ap.add_argument("--kronodroid", nargs="*", default=[])
+    ap.add_argument("--tag", default=None)
     args = ap.parse_args(); t0 = time.time(); out = {}
     if args.nsl:
         out["nsl"] = nsl(sorted({f for pat in args.nsl for f in glob.glob(pat)}))
@@ -114,6 +131,13 @@ def main():
         for r in out["cifar"]:
             print(f"  {str(r['seed']):>7} {r['git']:>10} {r['n']:>4} {r['tau_gap']:>+9.3f} [{r['tau_ci'][0]:+.2f}, {r['tau_ci'][1]:+.2f}] {r['Psi']:>+6.2f} "
                   f"{'pos' if r['A_positive'] else 'nao':>4} {r['partial_B']:>+12.3f} [{r['ci_B'][0]:+.2f}, {r['ci_B'][1]:+.2f}]  {'sim' if r['replica'] else 'NAO'}")
+    if args.kronodroid:
+        out["kronodroid"] = kronodroid(sorted({f for pat in args.kronodroid for f in glob.glob(pat)}))
+        print("\n== KronoDroid (E0, divisao temporal; alvo = teste futuro inteiro) ==")
+        print(f"  {'semente':>7} {'git':>10} {'n':>4} {'parcial|val':>12} {'IC95':>16} {'|val,5hp':>9} {'IC95':>16}  replica?")
+        for r in out["kronodroid"]:
+            print(f"  {str(r['seed']):>7} {r['git']:>10} {r['n']:>4} {r['partial_val']:>+12.3f} [{r['ci_val'][0]:+.2f}, {r['ci_val'][1]:+.2f}] "
+                  f"{r['partial_5hp']:>+9.3f} [{r['ci_5hp'][0]:+.2f}, {r['ci_5hp'][1]:+.2f}]  {'sim' if r['replica'] else 'NAO'}")
     print("\nVEREDITO DA REPLICACAO (regra pre-registrada, por semente):")
     for k, v in out.items():
         bad = [str(r["seed"]) for r in v if not r["replica"]]
