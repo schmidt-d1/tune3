@@ -1,0 +1,775 @@
+{
+  "meta": {
+    "experiment": "e0_measures",
+    "tag": "dionatan-drebin-m1",
+    "timestamp": "2026-10-19T20:41:38",
+    "duration_s": 165.1,
+    "args": {
+      "files": [
+        "results/e0_generalization/*drebin-cluster-m1-f*.json"
+      ],
+      "target": "cvar_test_novel",
+      "B": 2000,
+      "B2": 500,
+      "seed": 0,
+      "tag": "dionatan-drebin-m1"
+    },
+    "git": {
+      "commit": "b67f44aaf73299b6066d7ac801d693093ce5a385",
+      "commit_short": "b67f44a",
+      "branch": "main",
+      "dirty": false,
+      "dirty_files": []
+    },
+    "env": {
+      "python": "3.14.7",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "hostname": "DRS",
+      "user": "diona",
+      "torch": "2.14.0+cu130",
+      "cuda_available": true,
+      "gpu": "NVIDIA GeForce RTX 5070 Ti",
+      "numpy": "2.5.3",
+      "scipy": "1.18.1",
+      "botorch": "0.18.1",
+      "gpytorch": "1.15.2",
+      "statsmodels": "0.15.0",
+      "sklearn": "1.9.1"
+    },
+    "schema_version": 1
+  },
+  "payload": {
+    "runs": [
+      {
+        "target": "cvar_test_novel",
+        "n": 210,
+        "measures": {
+          "curvature": {
+            "label": "log Tr(H2)",
+            "n_ok": 210,
+            "rho_raw": 0.5883444069026508,
+            "partial_val": 0.5507485086034629,
+            "ci95_configs": [
+              0.44370863159998425,
+              0.6445726795503969
+            ],
+            "ci95_two_level": [
+              0.4276977168354458,
+              0.6383793164319781
+            ],
+            "partial_val_lr_wd": 0.5599775310011421,
+            "partial_val_5hp": 0.20747920688683275,
+            "ci95_5hp": [
+              0.037201178311282425,
+              0.36653189987619855
+            ],
+            "verdict": "SUSTENTA (alem dos hiperparametros)"
+          },
+          "sharp_0.1": {
+            "label": "log sharp 0.1",
+            "n_ok": 210,
+            "rho_raw": -0.07489903395899683,
+            "partial_val": 0.06211456503151735,
+            "ci95_configs": [
+              -0.09000836044679356,
+              0.21368836446857722
+            ],
+            "ci95_two_level": [
+              -0.08422206461097288,
+              0.3001027449104918
+            ],
+            "partial_val_lr_wd": 0.05515664421235387,
+            "partial_val_5hp": 0.01964663451536742,
+            "ci95_5hp": [
+              -0.11246697956362879,
+              0.1571488055522996
+            ],
+            "verdict": "nao sustenta"
+          },
+          "sharp_0.5": {
+            "label": "log sharp 0.5",
+            "n_ok": 210,
+            "rho_raw": 0.005330214808887794,
+            "partial_val": 0.08533748727176936,
+            "ci95_configs": [
+              -0.06323793711296236,
+              0.23843388686112113
+            ],
+            "ci95_two_level": [
+              -0.07601291240173232,
+              0.30923123563377386
+            ],
+            "partial_val_lr_wd": 0.06744820927350771,
+            "partial_val_5hp": -0.021389607711883668,
+            "ci95_5hp": [
+              -0.15358213201037138,
+              0.11203510035105822
+            ],
+            "verdict": "nao sustenta"
+          },
+          "lmax": {
+            "label": "log lambda_max",
+            "n_ok": 210,
+            "rho_raw": 0.7515810206256701,
+            "partial_val": 0.6739315009394825,
+            "ci95_configs": [
+              0.5839564594715123,
+              0.7470391625928078
+            ],
+            "ci95_two_level": [
+              0.5566023732526203,
+              0.7685194603915716
+            ],
+            "partial_val_lr_wd": 0.721594127293132,
+            "partial_val_5hp": 0.14542355352073905,
+            "ci95_5hp": [
+              0.00023229191390488355,
+              0.2776136329096892
+            ],
+            "verdict": "SUSTENTA (alem dos hiperparametros)"
+          },
+          "curv2": {
+            "label": "log Tr(H2) 2a est.",
+            "n_ok": 210,
+            "rho_raw": 0.7494792560893833,
+            "partial_val": 0.6761286071824626,
+            "ci95_configs": [
+              0.5931183562802065,
+              0.7424924866074687
+            ],
+            "ci95_two_level": [
+              0.5620662618892172,
+              0.7710088349919123
+            ],
+            "partial_val_lr_wd": 0.7219956680948155,
+            "partial_val_5hp": 0.1687329296932401,
+            "ci95_5hp": [
+              0.02350253422748692,
+              0.2991191940002344
+            ],
+            "verdict": "SUSTENTA (alem dos hiperparametros)"
+          },
+          "curvb": {
+            "label": "log Tr(H2) 2o lote",
+            "n_ok": 210,
+            "rho_raw": 0.7496269756683824,
+            "partial_val": 0.6490586928243719,
+            "ci95_configs": [
+              0.5494413747162684,
+              0.7238220866870901
+            ],
+            "ci95_two_level": [
+              0.5157642286246651,
+              0.7576649046575769
+            ],
+            "partial_val_lr_wd": 0.6973784130636815,
+            "partial_val_5hp": 0.029385963404856438,
+            "ci95_5hp": [
+              -0.11360604691036422,
+              0.17682315612401223
+            ],
+            "verdict": "proxy de hiperparametros (some dados os 5 hp)"
+          }
+        },
+        "reliability": {
+          "curv2": {
+            "spearman": 0.7077730949519425,
+            "pearson_log": 0.6891969193413113,
+            "attenuation_sqrt_r": 0.841292514498936
+          },
+          "curvb": {
+            "spearman": 0.6955875254702892,
+            "pearson_log": 0.6850563909436563,
+            "attenuation_sqrt_r": 0.8340188999478904
+          }
+        },
+        "name": "drebin_cluster fold 0",
+        "src": "20261019-160056_0b25308_dionatan-drebin-cluster-m1-f0"
+      },
+      {
+        "target": "cvar_test_novel",
+        "n": 189,
+        "measures": {
+          "curvature": {
+            "label": "log Tr(H2)",
+            "n_ok": 189,
+            "rho_raw": 0.11689507456584726,
+            "partial_val": 0.1665335728826021,
+            "ci95_configs": [
+              0.010701075352591623,
+              0.3217337626085054
+            ],
+            "ci95_two_level": [
+              0.012592724571925597,
+              0.3055990463371456
+            ],
+            "partial_val_lr_wd": 0.17830771073069815,
+            "partial_val_5hp": 0.02406158619218299,
+            "ci95_5hp": [
+              -0.12285153749406169,
+              0.17358140899534633
+            ],
+            "verdict": "proxy de hiperparametros (some dados os 5 hp)"
+          },
+          "sharp_0.1": {
+            "label": "log sharp 0.1",
+            "n_ok": 189,
+            "rho_raw": -0.06402175651895697,
+            "partial_val": -0.05003363521646867,
+            "ci95_configs": [
+              -0.19476600075371764,
+              0.09928632264574161
+            ],
+            "ci95_two_level": [
+              -0.1949568467746614,
+              0.08553787414166159
+            ],
+            "partial_val_lr_wd": -0.04963576338325884,
+            "partial_val_5hp": 0.07854034168666865,
+            "ci95_5hp": [
+              -0.0784671079624728,
+              0.23312950671578925
+            ],
+            "verdict": "nao sustenta"
+          },
+          "sharp_0.5": {
+            "label": "log sharp 0.5",
+            "n_ok": 189,
+            "rho_raw": 0.027881761140439755,
+            "partial_val": 0.04920854755255983,
+            "ci95_configs": [
+              -0.10471212786283546,
+              0.18885219488266314
+            ],
+            "ci95_two_level": [
+              -0.0876870700520571,
+              0.1793227260574885
+            ],
+            "partial_val_lr_wd": 0.030324343867697983,
+            "partial_val_5hp": 0.051840223475533846,
+            "ci95_5hp": [
+              -0.1045219175199107,
+              0.18993587353256555
+            ],
+            "verdict": "nao sustenta"
+          },
+          "lmax": {
+            "label": "log lambda_max",
+            "n_ok": 189,
+            "rho_raw": 0.12930375584350948,
+            "partial_val": 0.18605268685609863,
+            "ci95_configs": [
+              0.03587536461223681,
+              0.32337186638864357
+            ],
+            "ci95_two_level": [
+              0.03705665999794499,
+              0.304442485089864
+            ],
+            "partial_val_lr_wd": 0.20801328668258537,
+            "partial_val_5hp": -0.001778867320310884,
+            "ci95_5hp": [
+              -0.13323229342375492,
+              0.1307899567697109
+            ],
+            "verdict": "proxy de hiperparametros (some dados os 5 hp)"
+          },
+          "curv2": {
+            "label": "log Tr(H2) 2a est.",
+            "n_ok": 189,
+            "rho_raw": 0.12074690271778737,
+            "partial_val": 0.1781041425509997,
+            "ci95_configs": [
+              0.0374750663118003,
+              0.3113920015718163
+            ],
+            "ci95_two_level": [
+              0.034585174557327014,
+              0.2998787510046035
+            ],
+            "partial_val_lr_wd": 0.1986302190554535,
+            "partial_val_5hp": -0.057006993605582056,
+            "ci95_5hp": [
+              -0.18832854678074948,
+              0.0801774695419435
+            ],
+            "verdict": "proxy de hiperparametros (some dados os 5 hp)"
+          },
+          "curvb": {
+            "label": "log Tr(H2) 2o lote",
+            "n_ok": 189,
+            "rho_raw": 0.1513802236086671,
+            "partial_val": 0.2171177409745011,
+            "ci95_configs": [
+              0.06819347341801105,
+              0.34921245831931486
+            ],
+            "ci95_two_level": [
+              0.0492037311227818,
+              0.32874237963611175
+            ],
+            "partial_val_lr_wd": 0.23993967987995388,
+            "partial_val_5hp": 0.13033885525484348,
+            "ci95_5hp": [
+              -0.008181376045866854,
+              0.2597675878824354
+            ],
+            "verdict": "proxy de hiperparametros (some dados os 5 hp)"
+          }
+        },
+        "reliability": {
+          "curv2": {
+            "spearman": 0.7826907694768837,
+            "pearson_log": 0.7901947567974793,
+            "attenuation_sqrt_r": 0.8846981233601006
+          },
+          "curvb": {
+            "spearman": 0.7901331342540749,
+            "pearson_log": 0.7935718349798536,
+            "attenuation_sqrt_r": 0.8888943324456934
+          }
+        },
+        "name": "drebin_cluster fold 1",
+        "src": "20261019-163312_0b25308_dionatan-drebin-cluster-m1-f1"
+      },
+      {
+        "target": "cvar_test_novel",
+        "n": 202,
+        "measures": {
+          "curvature": {
+            "label": "log Tr(H2)",
+            "n_ok": 202,
+            "rho_raw": 0.3029633086093699,
+            "partial_val": -0.009552694452016602,
+            "ci95_configs": [
+              -0.14136189444043656,
+              0.1265518714842071
+            ],
+            "ci95_two_level": [
+              -0.1779832609001694,
+              0.2104353907125873
+            ],
+            "partial_val_lr_wd": -0.02310980016692032,
+            "partial_val_5hp": -0.03170237353267199,
+            "ci95_5hp": [
+              -0.19240817425186574,
+              0.12475344338725994
+            ],
+            "verdict": "nao sustenta"
+          },
+          "sharp_0.1": {
+            "label": "log sharp 0.1",
+            "n_ok": 202,
+            "rho_raw": -0.0015956898901908715,
+            "partial_val": -0.5969940081451676,
+            "ci95_configs": [
+              -0.6664020026505357,
+              -0.5024385395313308
+            ],
+            "ci95_two_level": [
+              -0.6290940337165969,
+              -0.371310203418101
+            ],
+            "partial_val_lr_wd": -0.5986629773637119,
+            "partial_val_5hp": -0.22856815200501276,
+            "ci95_5hp": [
+              -0.33619694847411263,
+              -0.11432236276544361
+            ],
+            "verdict": "CONTRADIZ"
+          },
+          "sharp_0.5": {
+            "label": "log sharp 0.5",
+            "n_ok": 202,
+            "rho_raw": 0.0664489579610119,
+            "partial_val": -0.5393093077348642,
+            "ci95_configs": [
+              -0.6259568162310942,
+              -0.4330468845178433
+            ],
+            "ci95_two_level": [
+              -0.5842325145867812,
+              -0.2717757346187807
+            ],
+            "partial_val_lr_wd": -0.5421301801040322,
+            "partial_val_5hp": -0.24754535700276073,
+            "ci95_5hp": [
+              -0.3794502529536951,
+              -0.11286928122163148
+            ],
+            "verdict": "CONTRADIZ"
+          },
+          "lmax": {
+            "label": "log lambda_max",
+            "n_ok": 202,
+            "rho_raw": 0.44707472732421394,
+            "partial_val": 0.08520115276377177,
+            "ci95_configs": [
+              -0.06736231109724528,
+              0.23351123475204866
+            ],
+            "ci95_two_level": [
+              -0.12906656968513908,
+              0.33365451460683476
+            ],
+            "partial_val_lr_wd": 0.0661239063291603,
+            "partial_val_5hp": 0.055606579013229684,
+            "ci95_5hp": [
+              -0.09597098140673453,
+              0.19485196602384802
+            ],
+            "verdict": "nao sustenta"
+          },
+          "curv2": {
+            "label": "log Tr(H2) 2a est.",
+            "n_ok": 202,
+            "rho_raw": 0.465230060981247,
+            "partial_val": 0.11443940341438058,
+            "ci95_configs": [
+              -0.03164316425727631,
+              0.25902922404413364
+            ],
+            "ci95_two_level": [
+              -0.10757382119857638,
+              0.3854095131351188
+            ],
+            "partial_val_lr_wd": 0.09800571291721434,
+            "partial_val_5hp": 0.11292085473251849,
+            "ci95_5hp": [
+              -0.044412203282113615,
+              0.2446997962488234
+            ],
+            "verdict": "nao sustenta"
+          },
+          "curvb": {
+            "label": "log Tr(H2) 2o lote",
+            "n_ok": 202,
+            "rho_raw": 0.46665686346592156,
+            "partial_val": 0.09381773339456671,
+            "ci95_configs": [
+              -0.04398772689903808,
+              0.23784191302865074
+            ],
+            "ci95_two_level": [
+              -0.11784369709498163,
+              0.36466862063191124
+            ],
+            "partial_val_lr_wd": 0.07536729397700168,
+            "partial_val_5hp": 0.02716619199225309,
+            "ci95_5hp": [
+              -0.1311908437437143,
+              0.16655625545089264
+            ],
+            "verdict": "nao sustenta"
+          }
+        },
+        "reliability": {
+          "curv2": {
+            "spearman": 0.7789679122312644,
+            "pearson_log": 0.7817630203714399,
+            "attenuation_sqrt_r": 0.882591588579488
+          },
+          "curvb": {
+            "spearman": 0.7703415808825937,
+            "pearson_log": 0.7716450576474579,
+            "attenuation_sqrt_r": 0.877691050929992
+          }
+        },
+        "name": "drebin_cluster fold 2",
+        "src": "20261019-170505_0b25308_dionatan-drebin-cluster-m1-f2"
+      },
+      {
+        "target": "cvar_test_novel",
+        "n": 208,
+        "measures": {
+          "curvature": {
+            "label": "log Tr(H2)",
+            "n_ok": 208,
+            "rho_raw": 0.5334008097165992,
+            "partial_val": 0.4030415265725689,
+            "ci95_configs": [
+              0.28049873226603295,
+              0.5211714877913359
+            ],
+            "ci95_two_level": [
+              0.29226189364307686,
+              0.5469239812823068
+            ],
+            "partial_val_lr_wd": 0.41238048113498793,
+            "partial_val_5hp": 0.2607384993046428,
+            "ci95_5hp": [
+              0.12696904185112037,
+              0.39073651916797986
+            ],
+            "verdict": "SUSTENTA (alem dos hiperparametros)"
+          },
+          "sharp_0.1": {
+            "label": "log sharp 0.1",
+            "n_ok": 208,
+            "rho_raw": -0.22960906370517353,
+            "partial_val": -0.322963511630051,
+            "ci95_configs": [
+              -0.45596233668449776,
+              -0.18939465994319468
+            ],
+            "ci95_two_level": [
+              -0.42859282248135544,
+              -0.12398241373460003
+            ],
+            "partial_val_lr_wd": -0.3225492740223993,
+            "partial_val_5hp": 0.023030414280540926,
+            "ci95_5hp": [
+              -0.13485798787604691,
+              0.1699895700082545
+            ],
+            "verdict": "CONTRADIZ"
+          },
+          "sharp_0.5": {
+            "label": "log sharp 0.5",
+            "n_ok": 208,
+            "rho_raw": -0.02003088444736042,
+            "partial_val": -0.15925446437145488,
+            "ci95_configs": [
+              -0.2926229058195464,
+              -0.009923826277451869
+            ],
+            "ci95_two_level": [
+              -0.26659974095904493,
+              0.04378069644888846
+            ],
+            "partial_val_lr_wd": -0.1641517221762856,
+            "partial_val_5hp": 0.09126976564845726,
+            "ci95_5hp": [
+              -0.04848695614205535,
+              0.228476458181772
+            ],
+            "verdict": "nao sustenta"
+          },
+          "lmax": {
+            "label": "log lambda_max",
+            "n_ok": 208,
+            "rho_raw": 0.5467240615982034,
+            "partial_val": 0.404417626780651,
+            "ci95_configs": [
+              0.2892988300022957,
+              0.5095387151489027
+            ],
+            "ci95_two_level": [
+              0.2779474579233972,
+              0.5657947329273502
+            ],
+            "partial_val_lr_wd": 0.4198145895009393,
+            "partial_val_5hp": 0.24018883297034066,
+            "ci95_5hp": [
+              0.09041844212280532,
+              0.36229551253979764
+            ],
+            "verdict": "SUSTENTA (alem dos hiperparametros)"
+          },
+          "curv2": {
+            "label": "log Tr(H2) 2a est.",
+            "n_ok": 208,
+            "rho_raw": 0.5614341798552325,
+            "partial_val": 0.42236117081311164,
+            "ci95_configs": [
+              0.3015629129724682,
+              0.535119044370871
+            ],
+            "ci95_two_level": [
+              0.29904705937813014,
+              0.5667490510937903
+            ],
+            "partial_val_lr_wd": 0.43682584010175074,
+            "partial_val_5hp": 0.21343012391970625,
+            "ci95_5hp": [
+              0.06821791314871412,
+              0.3423688081807905
+            ],
+            "verdict": "SUSTENTA (alem dos hiperparametros)"
+          },
+          "curvb": {
+            "label": "log Tr(H2) 2o lote",
+            "n_ok": 208,
+            "rho_raw": 0.5615381948333893,
+            "partial_val": 0.41331878751139534,
+            "ci95_configs": [
+              0.29107620502834763,
+              0.5223759812284295
+            ],
+            "ci95_two_level": [
+              0.2771020465733119,
+              0.5859083285986938
+            ],
+            "partial_val_lr_wd": 0.4277845908109592,
+            "partial_val_5hp": 0.19591937560230166,
+            "ci95_5hp": [
+              0.046046966477619224,
+              0.3276744879648654
+            ],
+            "verdict": "SUSTENTA (alem dos hiperparametros)"
+          }
+        },
+        "reliability": {
+          "curv2": {
+            "spearman": 0.775613021608445,
+            "pearson_log": 0.7861579418330411,
+            "attenuation_sqrt_r": 0.8806889471365273
+          },
+          "curvb": {
+            "spearman": 0.7646967830034191,
+            "pearson_log": 0.7803250826796267,
+            "attenuation_sqrt_r": 0.8744694294275924
+          }
+        },
+        "name": "drebin_cluster fold 3",
+        "src": "20261019-173625_0b25308_dionatan-drebin-cluster-m1-f3"
+      },
+      {
+        "target": "cvar_test_novel",
+        "n": 195,
+        "measures": {
+          "curvature": {
+            "label": "log Tr(H2)",
+            "n_ok": 195,
+            "rho_raw": 0.2829079609639256,
+            "partial_val": -0.045595214770165635,
+            "ci95_configs": [
+              -0.22038196120041273,
+              0.11444207500823256
+            ],
+            "ci95_two_level": [
+              -0.2167384914863517,
+              0.18792322842587195
+            ],
+            "partial_val_lr_wd": -0.030919886432463198,
+            "partial_val_5hp": -0.012845876043758631,
+            "ci95_5hp": [
+              -0.15475024802596393,
+              0.11986932187805409
+            ],
+            "verdict": "nao sustenta"
+          },
+          "sharp_0.1": {
+            "label": "log sharp 0.1",
+            "n_ok": 195,
+            "rho_raw": 0.07498829686040882,
+            "partial_val": -0.10719172715613276,
+            "ci95_configs": [
+              -0.25341771856643,
+              0.03505919416859943
+            ],
+            "ci95_two_level": [
+              -0.2942398037243193,
+              0.11381392531103866
+            ],
+            "partial_val_lr_wd": -0.09991512392119367,
+            "partial_val_5hp": -0.1351456997122089,
+            "ci95_5hp": [
+              -0.2701160961816347,
+              0.0019205118868422348
+            ],
+            "verdict": "nao sustenta"
+          },
+          "sharp_0.5": {
+            "label": "log sharp 0.5",
+            "n_ok": 195,
+            "rho_raw": 0.07744906051238894,
+            "partial_val": -0.14525636114309326,
+            "ci95_configs": [
+              -0.28885687663587833,
+              0.007245067451355894
+            ],
+            "ci95_two_level": [
+              -0.32328725385259055,
+              0.09846380806241847
+            ],
+            "partial_val_lr_wd": -0.13051351130223157,
+            "partial_val_5hp": -0.15651090809699997,
+            "ci95_5hp": [
+              -0.2917658964949333,
+              -0.023085516323252266
+            ],
+            "verdict": "nao sustenta"
+          },
+          "lmax": {
+            "label": "log lambda_max",
+            "n_ok": 195,
+            "rho_raw": 0.2826781465956723,
+            "partial_val": -0.09638866258657791,
+            "ci95_configs": [
+              -0.24907726054836846,
+              0.0642443103625185
+            ],
+            "ci95_two_level": [
+              -0.27618100218491237,
+              0.1548498059405485
+            ],
+            "partial_val_lr_wd": -0.06866733777754716,
+            "partial_val_5hp": -0.09350706529185204,
+            "ci95_5hp": [
+              -0.24049696606808452,
+              0.06337459889019023
+            ],
+            "verdict": "nao sustenta"
+          },
+          "curv2": {
+            "label": "log Tr(H2) 2a est.",
+            "n_ok": 195,
+            "rho_raw": 0.2799365582870737,
+            "partial_val": -0.1068994370177301,
+            "ci95_configs": [
+              -0.25314173105840093,
+              0.04969621984295411
+            ],
+            "ci95_two_level": [
+              -0.29080986197911185,
+              0.14119896597492673
+            ],
+            "partial_val_lr_wd": -0.08014713854582996,
+            "partial_val_5hp": -0.13856538756429432,
+            "ci95_5hp": [
+              -0.2813117302638798,
+              0.013828698454928429
+            ],
+            "verdict": "nao sustenta"
+          },
+          "curvb": {
+            "label": "log Tr(H2) 2o lote",
+            "n_ok": 195,
+            "rho_raw": 0.3100390037061612,
+            "partial_val": -0.08412504160211665,
+            "ci95_configs": [
+              -0.2451264317528013,
+              0.07973188661674506
+            ],
+            "ci95_two_level": [
+              -0.2630280891102326,
+              0.16085490595931975
+            ],
+            "partial_val_lr_wd": -0.060474883082520775,
+            "partial_val_5hp": -0.07585137890222074,
+            "ci95_5hp": [
+              -0.2304703589952314,
+              0.07241400620430255
+            ],
+            "verdict": "nao sustenta"
+          }
+        },
+        "reliability": {
+          "curv2": {
+            "spearman": 0.7632475036009645,
+            "pearson_log": 0.7730768250104295,
+            "attenuation_sqrt_r": 0.8736403742965205
+          },
+          "curvb": {
+            "spearman": 0.763046820631504,
+            "pearson_log": 0.7677187182127676,
+            "attenuation_sqrt_r": 0.8735255122957223
+          }
+        },
+        "name": "drebin_cluster fold 4",
+        "src": "20261019-180800_0b25308_dionatan-drebin-cluster-m1-f4"
+      }
+    ]
+  }
+}
