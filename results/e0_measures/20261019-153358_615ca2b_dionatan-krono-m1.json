@@ -1,0 +1,191 @@
+{
+  "meta": {
+    "experiment": "e0_measures",
+    "tag": "dionatan-krono-m1",
+    "timestamp": "2026-10-19T15:33:57",
+    "duration_s": 104.4,
+    "args": {
+      "files": [
+        "results/e0_generalization/*krono-m1.json"
+      ],
+      "target": "cvar_test_novel",
+      "B": 2000,
+      "B2": 500,
+      "seed": 0,
+      "tag": "dionatan-krono-m1"
+    },
+    "git": {
+      "commit": "615ca2bc8df075254159f6c22e986f00d83300b8",
+      "commit_short": "615ca2b",
+      "branch": "main",
+      "dirty": false,
+      "dirty_files": []
+    },
+    "env": {
+      "python": "3.14.7",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "hostname": "DRS",
+      "user": "diona",
+      "torch": "2.14.0+cu130",
+      "cuda_available": true,
+      "gpu": "NVIDIA GeForce RTX 5070 Ti",
+      "numpy": "2.5.3",
+      "scipy": "1.18.1",
+      "botorch": "0.18.1",
+      "gpytorch": "1.15.2",
+      "statsmodels": "0.15.0",
+      "sklearn": "1.9.1"
+    },
+    "schema_version": 1
+  },
+  "payload": {
+    "runs": [
+      {
+        "target": "cvar_test",
+        "n": 188,
+        "measures": {
+          "curvature": {
+            "label": "log Tr(H2)",
+            "n_ok": 188,
+            "rho_raw": 0.15309179764749223,
+            "partial_val": 0.04074580391216655,
+            "ci95_configs": [
+              -0.08970132378859516,
+              0.17460460324711657
+            ],
+            "ci95_two_level": [
+              -0.1557820307983012,
+              0.23666662636902192
+            ],
+            "partial_val_lr_wd": 0.07065689193990508,
+            "partial_val_5hp": 0.014898606472315773,
+            "ci95_5hp": [
+              -0.12622372240113572,
+              0.15050707144551406
+            ],
+            "verdict": "nao sustenta"
+          },
+          "sharp_0.1": {
+            "label": "log sharp 0.1",
+            "n_ok": 188,
+            "rho_raw": 0.2624095415084151,
+            "partial_val": 0.13504665765182824,
+            "ci95_configs": [
+              -0.015696142209561798,
+              0.2818639835002336
+            ],
+            "ci95_two_level": [
+              -0.07690795355750431,
+              0.34764736468207214
+            ],
+            "partial_val_lr_wd": 0.12370995919798189,
+            "partial_val_5hp": -0.034217183019203484,
+            "ci95_5hp": [
+              -0.16290994521051827,
+              0.11581046755673258
+            ],
+            "verdict": "nao sustenta"
+          },
+          "sharp_0.5": {
+            "label": "log sharp 0.5",
+            "n_ok": 188,
+            "rho_raw": 0.14756360313306496,
+            "partial_val": 0.12777572546251154,
+            "ci95_configs": [
+              -0.028074786900044103,
+              0.2793458190557543
+            ],
+            "ci95_two_level": [
+              -0.0856416871480317,
+              0.32098974185093937
+            ],
+            "partial_val_lr_wd": 0.11276167565602467,
+            "partial_val_5hp": -0.016928770847965742,
+            "ci95_5hp": [
+              -0.16277321974618125,
+              0.14479244787527434
+            ],
+            "verdict": "nao sustenta"
+          },
+          "lmax": {
+            "label": "log lambda_max",
+            "n_ok": 188,
+            "rho_raw": 0.09767801382319528,
+            "partial_val": 0.01751313323162627,
+            "ci95_configs": [
+              -0.11435916811684635,
+              0.1501855345536983
+            ],
+            "ci95_two_level": [
+              -0.1969885055187433,
+              0.22328177424890525
+            ],
+            "partial_val_lr_wd": 0.037846471076920934,
+            "partial_val_5hp": -0.009092729449931567,
+            "ci95_5hp": [
+              -0.12825341673560103,
+              0.10162494853472709
+            ],
+            "verdict": "nao sustenta"
+          },
+          "curv2": {
+            "label": "log Tr(H2) 2a est.",
+            "n_ok": 188,
+            "rho_raw": 0.1623060571746429,
+            "partial_val": 0.019009613647360438,
+            "ci95_configs": [
+              -0.11988873051915738,
+              0.15980257560273362
+            ],
+            "ci95_two_level": [
+              -0.19137057227502918,
+              0.23102040404607144
+            ],
+            "partial_val_lr_wd": 0.044899969482830954,
+            "partial_val_5hp": -0.03275912651537991,
+            "ci95_5hp": [
+              -0.15919787275803587,
+              0.08959482462476072
+            ],
+            "verdict": "nao sustenta"
+          },
+          "curvb": {
+            "label": "log Tr(H2) 2o lote",
+            "n_ok": 188,
+            "rho_raw": 0.13636815138692482,
+            "partial_val": 0.0217204986062641,
+            "ci95_configs": [
+              -0.11185194222083657,
+              0.1537763496478674
+            ],
+            "ci95_two_level": [
+              -0.19683113355406415,
+              0.23054666784920308
+            ],
+            "partial_val_lr_wd": 0.045067051513510724,
+            "partial_val_5hp": -0.030218150189018005,
+            "ci95_5hp": [
+              -0.1429144449110543,
+              0.08029435615399273
+            ],
+            "verdict": "nao sustenta"
+          }
+        },
+        "reliability": {
+          "curv2": {
+            "spearman": 0.911384540921462,
+            "pearson_log": 0.9227126562759244,
+            "attenuation_sqrt_r": 0.9546646222215748
+          },
+          "curvb": {
+            "spearman": 0.8988255521421978,
+            "pearson_log": 0.9110193488960342,
+            "attenuation_sqrt_r": 0.9480641076120316
+          }
+        },
+        "name": "kronodroid semente 1",
+        "src": "20261019-141338_04ef921_dionatan-krono-m1"
+      }
+    ]
+  }
+}
