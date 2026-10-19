@@ -916,3 +916,99 @@ def test_A33_select_configs_estratifica_e_loader_aceita_emulador(tmp_path):
     m = KronoDroidLoader(KronoDroidConfig(data_dir=str(tmp_path), max_train=600, n_val=200)).load_splits_with_meta()
     assert m["meta"]["files"] == ["emu_malware_v1.zip", "emu_legitimate_v1.zip"] and m["meta"]["time_col"] == "LastModDate"
     assert "FirstModDate" not in m["feature_names"] and "LastModDate" not in m["feature_names"]
+
+
+def _load_script(name):
+    import importlib.util, pathlib
+    p = pathlib.Path(__file__).resolve().parents[2] / "scripts" / name
+    spec = importlib.util.spec_from_file_location(name[:-3], p); mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
+    return mod
+
+
+def test_A34_check_reproduction_detecta_qualquer_diferenca():
+    """check_reproduction.compare_dataset: linhas iguais -> IDENTICO em todos os campos; 1 ulp num CVaR -> falha com rtol 0
+    e passa com rtol 1e-6; hiperparametro diferente ou linha faltando -> falha mesmo com tolerancia."""
+    import copy
+    c = _load_script("check_reproduction.py"); rng = np.random.default_rng(0)
+    rows = [{"cfg": i, "hparams": {"learning_rate": 10 ** rng.uniform(-3, -1), "n_layers": int(rng.integers(1, 4))}, "curvature": float(10 ** rng.uniform(0, 3)),
+             "cvar_val": float(rng.uniform(0.5, 2)), "cvar_test": float(rng.uniform(0.5, 3)), "best_epoch": int(rng.integers(1, 100)),
+             "epochs_run": int(rng.integers(1, 100)), "cvar_test_novel": float(rng.uniform(0.5, 3)), "reached": True} for i in range(40)]
+    A = {"rows": rows}; B = copy.deepcopy(A)
+    s = c.compare_dataset(A, B, 0.0)
+    assert s["ok"] and all(f["identical"] for f in s["fields"].values() if f["present"]) and s["hparams_diff"] == 0
+    B2 = copy.deepcopy(A); B2["rows"][7]["cvar_test"] = np.nextafter(B2["rows"][7]["cvar_test"], 10.0)
+    s0 = c.compare_dataset(A, B2, 0.0); s6 = c.compare_dataset(A, B2, 1e-6)
+    assert not s0["ok"] and s0["fields"]["cvar_test"]["n_equal"] == 39 and not s0["fields"]["cvar_test"]["identical"]
+    assert s6["ok"] and s6["fields"]["cvar_test"]["within_rtol"] and not s6["fields"]["cvar_test"]["identical"]
+    B3 = copy.deepcopy(A); B3["rows"][3]["hparams"]["n_layers"] += 1
+    assert not c.compare_dataset(A, B3, 1e-6)["ok"]
+    B4 = copy.deepcopy(A); B4["rows"].pop()
+    assert not c.compare_dataset(A, B4, 1e-6)["ok"]
+    B5 = copy.deepcopy(A); B5["rows"][0]["curvature"] *= 1.5
+    assert not c.compare_dataset(A, B5, 1e-6)["ok"]
+
+
+def test_A35_measures_replication_regra_3_de_3_e_ordem_dos_folds(tmp_path):
+    """measures_replication: veredito identico em todas as sementes -> replicado; qualquer mistura -> NAO replicado;
+    uma semente -> 'nao replicado por desenho'; combinacao de Fisher com o sinal das parciais; semente/fold resolvidos
+    do JSON de origem do E0 (ou da tag); tau de Kendall da ordem dos folds = 1 para ordens iguais."""
+    import json
+    m = _load_script("measures_replication.py")
+    assert [m.code(v) for v in ("SUSTENTA (alem dos hiperparametros)", "proxy de hiperparametros (some dados os 5 hp)", "CONTRADIZ", "nao sustenta")] == ["S", "P", "C", "0"]
+    assert m.rule(["S", "S", "S"]).startswith("S em 3/3") and "NAO replicado (S/S/0)" == m.rule(["S", "S", "0"]) and "por desenho" in m.rule(["C"])
+
+    def meas(p, p5, verdict, ci2=True):
+        return {"label": "x", "n_ok": 200, "rho_raw": p, "partial_val": p, "ci95_configs": [p - 0.1, p + 0.1],
+                "ci95_two_level": [p - 0.15, p + 0.15] if ci2 else [float("nan")] * 2,
+                "partial_val_lr_wd": p, "partial_val_5hp": p5, "ci95_5hp": [p5 - 0.1, p5 + 0.1], "verdict": verdict}
+    S, P, Z = "SUSTENTA (alem dos hiperparametros)", "proxy de hiperparametros (some dados os 5 hp)", "nao sustenta"
+    runs = []
+    for seed, (p, p5, v) in enumerate([(0.3, 0.2, S), (0.25, 0.15, S), (0.35, 0.05, Z)]):
+        runs.append({"scenario": "kronodroid", "dataset": "kronodroid", "fold": None, "seed": seed, "src": f"x-krono-m{seed}", "file": "f", "target": "cvar_test",
+                     "measures": {"curvature": meas(0.05, 0.0, Z), "sharp_0.1": meas(p, p5, v)}})
+    out = m.analyze(runs); e = out[0]["measures"]
+    assert e["curvature"]["rule"].startswith("0 em 3/3") and e["sharp_0.1"]["rule"] == "NAO replicado (S/S/0)"
+    assert e["sharp_0.1"]["n_val_above0"] == 3 and e["sharp_0.1"]["n_5hp_above0"] == 2 and 0.25 < e["sharp_0.1"]["fe_val"]["r"] < 0.35
+    assert e["sharp_0.1"]["fe_val"]["ci95"][0] > 0 and m.analyze(runs[:1])[0]["measures"]["sharp_0.1"]["rule"].endswith("por desenho)")
+    # mesma semente duas vezes no mesmo cenario -> erro (nao soma rodadas repetidas)
+    with pytest.raises(SystemExit):
+        m.analyze(runs + [dict(runs[0])])
+    # semente/fold: do JSON de origem do E0 quando existe; da tag quando nao
+    e0 = tmp_path / "e0"; e0.mkdir()
+    json.dump({"meta": {"args": {"seed": 2, "cluster_fold": 3}}, "payload": {}}, open(e0 / "20261013_abc_dionatan-drebin-cluster-m2-f3.json", "w"))
+    assert m.resolve_seed_fold({"src": "20261013_abc_dionatan-drebin-cluster-m2-f3", "name": "drebin_cluster fold 3"}, str(e0)) == (2, 3)
+    assert m.resolve_seed_fold({"src": "20261013_abc_dionatan-krono-m1", "name": "kronodroid semente 1"}, str(e0)) == (1, None)
+    assert m.resolve_seed_fold({"src": "20261013_abc_dionatan-drebin-cluster-m0-f4", "name": "drebin_cluster fold 4"}, str(e0)) == (0, 4)
+    # ordem dos folds entre sementes
+    dre = []
+    for seed in (0, 1):
+        for fold, p in enumerate([0.5, 0.1, -0.1, 0.2, 0.0]):
+            dre.append({"scenario": f"drebin_cluster fold {fold}", "dataset": "drebin_cluster", "fold": fold, "seed": seed, "src": "", "file": "f",
+                        "target": "cvar_test_novel", "measures": {"curvature": meas(p + 0.01 * seed, 0.0, Z)}})
+    t = m.fold_ordering(dre)
+    assert abs(t["curvature"]["tau"]["0-1"] - 1.0) < 1e-12 and t["curvature"]["order_by_seed"]["0"] == [0, 3, 1, 4, 2]
+
+
+def test_A36_halves_baseline_grava_json_igual_ao_impresso(tmp_path, monkeypatch, capsys):
+    """e0_halves_baseline --tag: o JSON gravado traz as mesmas medias/desvios impressos; sem --tag, nada e' gravado;
+    o calculo (media sobre R divisoes da parcial(H2, curv | H1)) nao muda com a opcao."""
+    import json, sys
+    hb = _load_script("e0_halves_baseline.py"); rng = np.random.default_rng(0); n, nt, nv = 60, 400, 200
+    curv = 10 ** rng.uniform(0, 3, n); L = rng.exponential(1.0, (n, nt)) * (1 + 0.3 * np.log10(curv))[:, None]; V = rng.exponential(1.0, (n, nv))
+    rows = [{"cfg": i, "curvature": float(curv[i]), "cvar_val": 1.0, "cvar_test": 1.0, "reached": True} for i in range(n)]
+    monkeypatch.chdir(tmp_path); (tmp_path / "results" / "raw").mkdir(parents=True); (tmp_path / "results" / "e0_generalization").mkdir()
+    stem = "20261014-000000_abc_dionatan-x"
+    json.dump({"meta": {"args": {"seed": 0}}, "payload": {"datasets": [{"dataset": "kronodroid", "rows": rows, "results": {"cvar_test": {"partial_given_val": 0.1}}}]}},
+              open(tmp_path / "results" / "e0_generalization" / f"{stem}.json", "w"))
+    np.savez(tmp_path / "results" / "raw" / f"{stem}_kronodroid.npz", val=V.astype(np.float16), test=L.astype(np.float16), test_novel_mask=np.zeros(nt, bool))
+    monkeypatch.setattr(sys, "argv", ["x", f"results/e0_generalization/{stem}.json", "--R", "30"]); hb.main()
+    printed = capsys.readouterr().out; assert "kronodroid semente 0" in printed and not (tmp_path / "results" / "e0_halves_baseline").exists()
+    monkeypatch.setattr(sys, "argv", ["x", f"results/e0_generalization/{stem}.json", "--R", "30", "--tag", "t"]); hb.main()
+    printed2 = capsys.readouterr().out
+    files = list((tmp_path / "results" / "e0_halves_baseline").glob("*_t.json")); assert len(files) == 1
+    row = json.load(open(files[0]))["payload"]["rows"][0]
+    assert row["target"] == "cvar_test" and row["n"] == n and row["R"] == 30 and row["partial_val_e0"] == 0.1
+    line = [l for l in printed2.splitlines() if l.strip().startswith("kronodroid semente 0")][0].split()
+    assert f"{row['halves_mean']:+.3f}" == line[-4] and f"{row['halves_std']:.3f}" == line[-3] and f"{row['halves_q97_5']:+.2f}" == line[-1]
+    line1 = [l for l in printed.splitlines() if l.strip().startswith("kronodroid semente 0")][0].split()
+    assert line1[-4:] == line[-4:]                                                    # mesmo calculo com e sem --tag

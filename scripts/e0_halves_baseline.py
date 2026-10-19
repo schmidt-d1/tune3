@@ -20,9 +20,10 @@ Uso:
 """
 from __future__ import annotations
 
-import argparse, glob, json, os
+import argparse, glob, json, os, time
 import numpy as np
 
+from tune3.experiments.results_io import save_result
 from tune3.experiments.stats import partial_spearman
 
 
@@ -48,7 +49,8 @@ def main():
     ap.add_argument("files", nargs="+")
     ap.add_argument("--R", type=int, default=300)
     ap.add_argument("--seed", type=int, default=0)
-    args = ap.parse_args()
+    ap.add_argument("--tag", default=None, help="grava results/e0_halves_baseline/<ts>_<commit>_<tag>.json (C3-C, 14/10/2026; o calculo nao muda)")
+    args = ap.parse_args(); t0 = time.time(); out = []
     files = sorted({f for pat in args.files for f in glob.glob(pat)})
     rng = np.random.default_rng(args.seed)
     print(f"[metades i.i.d.: media sobre {args.R} divisoes]  (ler a parcial|val contra a MEDIA, nao contra zero)\n")
@@ -80,8 +82,14 @@ def main():
                 one = d.get("artifact_checks", {}).get(key, {}).get("partial_iid_halves", float("nan"))
                 q = np.percentile(vals, [2.5, 97.5])
                 print(f"  {name:30s} {key:16s} {len(ok):>4} {raw:>+9.3f} {pv:>+11.3f} {one:>+11.3f} {vals.mean():>+7.3f} {vals.std():>7.3f} {q[0]:>+6.2f} {q[1]:>+6.2f}")
+                out.append({"src": stem, "run": name, "dataset": d["dataset"], "seed": a_.get("seed"), "fold": a_.get("cluster_fold"),
+                            "target": key, "n": len(ok), "rho_raw": float(raw), "partial_val_e0": float(pv), "halves_one_split_e0": float(one),
+                            "halves_mean": float(vals.mean()), "halves_std": float(vals.std()), "halves_q2_5": float(q[0]), "halves_q97_5": float(q[1]),
+                            "R": int(len(vals))})
     print("\n  leitura: 'E0 (1 div.)' e' o valor de uma divisao so' (nao e' checagem); a media e' o vies esperado do controle"
           " ruidoso; a parcial|val do E0 so' indica algo alem da validacao se ficar claramente fora do intervalo [q2.5, q97.5].")
+    if args.tag is not None:
+        save_result({"rows": out}, experiment="e0_halves_baseline", tag=args.tag, args=vars(args), started_at=t0)
 
 
 if __name__ == "__main__":
