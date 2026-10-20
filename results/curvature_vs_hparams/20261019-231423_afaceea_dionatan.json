@@ -1,0 +1,1742 @@
+{
+  "meta": {
+    "experiment": "curvature_vs_hparams",
+    "tag": "dionatan",
+    "timestamp": "2026-10-19T23:14:23",
+    "duration_s": 0.3,
+    "args": {
+      "files": [
+        "results/e0_generalization/*k600-stop-s*.json",
+        "results/e0_generalization/*dionatan-drebin-cluster-f*.json",
+        "results/e0_generalization/*drebin-cluster-s*-f*.json",
+        "results/e0_generalization/*krono-s*.json",
+        "results/e0_generalization/*-m[0-2]*.json",
+        "results/d2_cifar/*grid*.json"
+      ],
+      "tag": "dionatan"
+    },
+    "git": {
+      "commit": "afaceea48b6e3425d4c126274bebb83dab249008",
+      "commit_short": "afaceea",
+      "branch": "main",
+      "dirty": false,
+      "dirty_files": []
+    },
+    "env": {
+      "python": "3.14.7",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "hostname": "DRS",
+      "user": "diona",
+      "torch": "2.14.0+cu130",
+      "cuda_available": true,
+      "gpu": "NVIDIA GeForce RTX 5070 Ti",
+      "numpy": "2.5.3",
+      "scipy": "1.18.1",
+      "botorch": "0.18.1",
+      "gpytorch": "1.15.2",
+      "statsmodels": "0.15.0",
+      "sklearn": "1.9.1"
+    },
+    "schema_version": 1
+  },
+  "payload": {
+    "rows": [
+      {
+        "src": "20261007-211209_995071b_dionatan-grid.json",
+        "run": "cifar semente 0",
+        "measure": "curvature",
+        "n": 225,
+        "r2_linear": 0.76242810053879,
+        "r2_adj": 0.757004084569356,
+        "r2_quadratic": 0.8092033287733381,
+        "r2_single": {
+          "log_lr": 0.3451685651337394,
+          "log_wd": 0.006990258569433694,
+          "dropout": 0.1471557831311222,
+          "largura": 0.012566449034622784,
+          "prof.": 0.23550940595087433
+        }
+      },
+      {
+        "src": "20261007-211209_995071b_dionatan-grid.json",
+        "run": "cifar semente 0",
+        "measure": "sharp_0.1",
+        "n": 225,
+        "r2_linear": 0.3114034579876338,
+        "r2_adj": 0.29568207574990857,
+        "r2_quadratic": 0.40245987569427966,
+        "r2_single": {
+          "log_lr": 8.924993793790748e-06,
+          "log_wd": 0.012233065978106694,
+          "dropout": 0.001534788248316321,
+          "largura": 0.2690251535481538,
+          "prof.": 0.018468123611294796
+        }
+      },
+      {
+        "src": "20261007-211209_995071b_dionatan-grid.json",
+        "run": "cifar semente 0",
+        "measure": "sharp_0.5",
+        "n": 225,
+        "r2_linear": 0.6430317602012539,
+        "r2_adj": 0.6348818003884971,
+        "r2_quadratic": 0.7644118552369056,
+        "r2_single": {
+          "log_lr": 0.21562895313031227,
+          "log_wd": 0.014694769676396824,
+          "dropout": 0.016567042264437948,
+          "largura": 0.4379229156754443,
+          "prof.": 0.019102234854251554
+        }
+      },
+      {
+        "src": "20261010-152547_0a7a9bd_dionatan-grid-s1.json",
+        "run": "cifar semente 1",
+        "measure": "curvature",
+        "n": 225,
+        "r2_linear": 0.7728727687117313,
+        "r2_adj": 0.7676872154859717,
+        "r2_quadratic": 0.8247367140922589,
+        "r2_single": {
+          "log_lr": 0.46868748019118767,
+          "log_wd": 0.002856467717102129,
+          "dropout": 0.11397512761503958,
+          "largura": 0.004715315696292577,
+          "prof.": 0.16808684836197763
+        }
+      },
+      {
+        "src": "20261010-152547_0a7a9bd_dionatan-grid-s1.json",
+        "run": "cifar semente 1",
+        "measure": "sharp_0.1",
+        "n": 225,
+        "r2_linear": 0.30180723572780177,
+        "r2_adj": 0.28586676165766023,
+        "r2_quadratic": 0.4033206279155328,
+        "r2_single": {
+          "log_lr": 0.03852532682571819,
+          "log_wd": 1.9815664716316128e-05,
+          "dropout": 0.0030072450700706632,
+          "largura": 0.2793414523018286,
+          "prof.": 0.0004248199906285999
+        }
+      },
+      {
+        "src": "20261010-152547_0a7a9bd_dionatan-grid-s1.json",
+        "run": "cifar semente 1",
+        "measure": "sharp_0.5",
+        "n": 225,
+        "r2_linear": 0.629182401128836,
+        "r2_adj": 0.620716245903467,
+        "r2_quadratic": 0.7251162822428832,
+        "r2_single": {
+          "log_lr": 0.25981385188673856,
+          "log_wd": 0.00011242189977700434,
+          "dropout": 0.018485941736409828,
+          "largura": 0.41581694422461757,
+          "prof.": 0.0024415000333987136
+        }
+      },
+      {
+        "src": "20261010-192354_4225b1b_dionatan-grid-s2.json",
+        "run": "cifar semente 2",
+        "measure": "curvature",
+        "n": 224,
+        "r2_linear": 0.7656003335829964,
+        "r2_adj": 0.7602241944449917,
+        "r2_quadratic": 0.7915497988563596,
+        "r2_single": {
+          "log_lr": 0.3831010905866652,
+          "log_wd": 0.009903680992368047,
+          "dropout": 0.16784916382182713,
+          "largura": 0.007098059116413591,
+          "prof.": 0.17677667514640094
+        }
+      },
+      {
+        "src": "20261010-192354_4225b1b_dionatan-grid-s2.json",
+        "run": "cifar semente 2",
+        "measure": "sharp_0.1",
+        "n": 224,
+        "r2_linear": 0.33585136937932925,
+        "r2_adj": 0.3206186026219744,
+        "r2_quadratic": 0.4038332516735095,
+        "r2_single": {
+          "log_lr": 0.01685101101589248,
+          "log_wd": 0.010711570659995395,
+          "dropout": 0.013254625109514029,
+          "largura": 0.29342976639002405,
+          "prof.": 0.009450982831531451
+        }
+      },
+      {
+        "src": "20261010-192354_4225b1b_dionatan-grid-s2.json",
+        "run": "cifar semente 2",
+        "measure": "sharp_0.5",
+        "n": 224,
+        "r2_linear": 0.6459822403956358,
+        "r2_adj": 0.6378625670102146,
+        "r2_quadratic": 0.758154294567872,
+        "r2_single": {
+          "log_lr": 0.24503163967627684,
+          "log_wd": 0.0015463957876641343,
+          "dropout": 0.019439478399627896,
+          "largura": 0.4412345123527863,
+          "prof.": 0.006405351665066283
+        }
+      },
+      {
+        "src": "20260925-154956_908c435_dionatan-drebin-cluster-f0.json",
+        "run": "drebin_cluster fold 0",
+        "measure": "curvature",
+        "n": 229,
+        "r2_linear": 0.4733244138925041,
+        "r2_adj": 0.46151554424883834,
+        "r2_quadratic": 0.5323803573187357,
+        "r2_single": {
+          "log_lr": 0.0003103878190751086,
+          "log_wd": 1.6753109878253625e-06,
+          "dropout": 0.12730801576517403,
+          "largura": 0.02295791090126087,
+          "prof.": 0.33314137836952407
+        }
+      },
+      {
+        "src": "20260925-161517_908c435_dionatan-drebin-cluster-f1.json",
+        "run": "drebin_cluster fold 1",
+        "measure": "curvature",
+        "n": 212,
+        "r2_linear": 0.5963127335591248,
+        "r2_adj": 0.5865144989367734,
+        "r2_quadratic": 0.6294515373402505,
+        "r2_single": {
+          "log_lr": 0.009990957873856066,
+          "log_wd": 0.0007136461971889441,
+          "dropout": 0.19923969266058927,
+          "largura": 0.006432952933945635,
+          "prof.": 0.41936316683836794
+        }
+      },
+      {
+        "src": "20260925-164025_908c435_dionatan-drebin-cluster-f2.json",
+        "run": "drebin_cluster fold 2",
+        "measure": "curvature",
+        "n": 216,
+        "r2_linear": 0.5921868710318308,
+        "r2_adj": 0.5824770346278267,
+        "r2_quadratic": 0.6616594470447003,
+        "r2_single": {
+          "log_lr": 0.0011826804876041708,
+          "log_wd": 0.0006713490584949744,
+          "dropout": 0.18322417997114782,
+          "largura": 0.014857814840180228,
+          "prof.": 0.41226872801296466
+        }
+      },
+      {
+        "src": "20260925-170519_908c435_dionatan-drebin-cluster-f3.json",
+        "run": "drebin_cluster fold 3",
+        "measure": "curvature",
+        "n": 230,
+        "r2_linear": 0.48360395327864025,
+        "r2_adj": 0.4720772558071814,
+        "r2_quadratic": 0.529760016675312,
+        "r2_single": {
+          "log_lr": 0.003546057125270119,
+          "log_wd": 0.0013613301112437304,
+          "dropout": 0.08505219909187667,
+          "largura": 0.012606001174048864,
+          "prof.": 0.4072642537304856
+        }
+      },
+      {
+        "src": "20260925-173121_908c435_dionatan-drebin-cluster-f4.json",
+        "run": "drebin_cluster fold 4",
+        "measure": "curvature",
+        "n": 218,
+        "r2_linear": 0.6019717149785397,
+        "r2_adj": 0.5925842554261468,
+        "r2_quadratic": 0.6287090533455075,
+        "r2_single": {
+          "log_lr": 0.012138450539857404,
+          "log_wd": 0.003608397143691766,
+          "dropout": 0.14815302962644994,
+          "largura": 0.009971178814369597,
+          "prof.": 0.4666699367300171
+        }
+      },
+      {
+        "src": "20261008-163706_03e25ff_dionatan-k600-stop-s0.json",
+        "run": "nslkdd semente 0",
+        "measure": "curvature",
+        "n": 303,
+        "r2_linear": 0.6385791034753374,
+        "r2_adj": 0.6324945765978178,
+        "r2_quadratic": 0.6604604571042669,
+        "r2_single": {
+          "log_lr": 0.0023002085835260866,
+          "log_wd": 0.005893376490222368,
+          "dropout": 0.11249403283595483,
+          "largura": 0.02701417421317831,
+          "prof.": 0.503954902901284
+        }
+      },
+      {
+        "src": "20261008-171346_03e25ff_dionatan-k600-stop-s1.json",
+        "run": "nslkdd semente 1",
+        "measure": "curvature",
+        "n": 266,
+        "r2_linear": 0.7127262285706628,
+        "r2_adj": 0.7072017329662525,
+        "r2_quadratic": 0.7258432219112401,
+        "r2_single": {
+          "log_lr": 0.01299732403858056,
+          "log_wd": 0.000183835532063803,
+          "dropout": 0.019003880615922064,
+          "largura": 0.07831194389354823,
+          "prof.": 0.6114890265984858
+        }
+      },
+      {
+        "src": "20261008-174650_03e25ff_dionatan-k600-stop-s2.json",
+        "run": "nslkdd semente 2",
+        "measure": "curvature",
+        "n": 288,
+        "r2_linear": 0.7639075721634125,
+        "r2_adj": 0.7597215362088632,
+        "r2_quadratic": 0.7762110822894772,
+        "r2_single": {
+          "log_lr": 0.020812942184841865,
+          "log_wd": 0.0011601088788700809,
+          "dropout": 0.09743874112862982,
+          "largura": 0.02157875360601602,
+          "prof.": 0.6221462797627784
+        }
+      },
+      {
+        "src": "20261009-135714_3c01d30_dionatan-drebin-cluster-s1-f0.json",
+        "run": "drebin_cluster fold 0",
+        "measure": "curvature",
+        "n": 210,
+        "r2_linear": 0.45395947988696905,
+        "r2_adj": 0.4405761338057673,
+        "r2_quadratic": 0.4985400025374238,
+        "r2_single": {
+          "log_lr": 0.0066585910683979455,
+          "log_wd": 0.009248304316881728,
+          "dropout": 0.07925702844324423,
+          "largura": 0.019332802217382317,
+          "prof.": 0.3388960430960407
+        }
+      },
+      {
+        "src": "20261009-142218_3c01d30_dionatan-drebin-cluster-s1-f1.json",
+        "run": "drebin_cluster fold 1",
+        "measure": "curvature",
+        "n": 189,
+        "r2_linear": 0.6108443475660501,
+        "r2_adj": 0.6002116794667618,
+        "r2_quadratic": 0.6787801547260108,
+        "r2_single": {
+          "log_lr": 0.013361639910642986,
+          "log_wd": 0.019133257463858633,
+          "dropout": 0.10247737030232351,
+          "largura": 0.005633920742096676,
+          "prof.": 0.4858163552924205
+        }
+      },
+      {
+        "src": "20261009-144649_3c01d30_dionatan-drebin-cluster-s1-f2.json",
+        "run": "drebin_cluster fold 2",
+        "measure": "curvature",
+        "n": 202,
+        "r2_linear": 0.6163046928930631,
+        "r2_adj": 0.6065165473036005,
+        "r2_quadratic": 0.6579843070491032,
+        "r2_single": {
+          "log_lr": 0.006095205749827137,
+          "log_wd": 0.002155304091272736,
+          "dropout": 0.12541423726663736,
+          "largura": 0.002831571034985325,
+          "prof.": 0.45181745107711035
+        }
+      },
+      {
+        "src": "20261009-151101_3c01d30_dionatan-drebin-cluster-s1-f3.json",
+        "run": "drebin_cluster fold 3",
+        "measure": "curvature",
+        "n": 208,
+        "r2_linear": 0.5958763869067543,
+        "r2_adj": 0.5858733271767234,
+        "r2_quadratic": 0.6491686344991271,
+        "r2_single": {
+          "log_lr": 0.00811355598298491,
+          "log_wd": 0.013864826072350178,
+          "dropout": 0.07934338927180284,
+          "largura": 0.0061177917346126875,
+          "prof.": 0.4915752296390715
+        }
+      },
+      {
+        "src": "20261009-153522_3c01d30_dionatan-drebin-cluster-s1-f4.json",
+        "run": "drebin_cluster fold 4",
+        "measure": "curvature",
+        "n": 195,
+        "r2_linear": 0.5811868108521647,
+        "r2_adj": 0.5701070968535448,
+        "r2_quadratic": 0.630642647407108,
+        "r2_single": {
+          "log_lr": 0.007284686589189127,
+          "log_wd": 0.0013963674961287031,
+          "dropout": 0.05784642796084738,
+          "largura": 0.01645139513467131,
+          "prof.": 0.4845557709558449
+        }
+      },
+      {
+        "src": "20261009-155247_d53f976_dionatan-drebin-cluster-s2-f0.json",
+        "run": "drebin_cluster fold 0",
+        "measure": "curvature",
+        "n": 232,
+        "r2_linear": 0.49931779674232,
+        "r2_adj": 0.48824075684723856,
+        "r2_quadratic": 0.518987479120707,
+        "r2_single": {
+          "log_lr": 0.012405208157747594,
+          "log_wd": 0.005715041870172577,
+          "dropout": 0.11184319277915356,
+          "largura": 0.0033076270154321907,
+          "prof.": 0.376838870590256
+        }
+      },
+      {
+        "src": "20261009-161720_d53f976_dionatan-drebin-cluster-s2-f1.json",
+        "run": "drebin_cluster fold 1",
+        "measure": "curvature",
+        "n": 215,
+        "r2_linear": 0.5500801783286947,
+        "r2_adj": 0.539316546231295,
+        "r2_quadratic": 0.6073167669580712,
+        "r2_single": {
+          "log_lr": 0.009618416184857925,
+          "log_wd": 0.00136910695197634,
+          "dropout": 0.07767798771885137,
+          "largura": 0.002951888159279825,
+          "prof.": 0.4639518617291982
+        }
+      },
+      {
+        "src": "20261009-164124_d53f976_dionatan-drebin-cluster-s2-f2.json",
+        "run": "drebin_cluster fold 2",
+        "measure": "curvature",
+        "n": 230,
+        "r2_linear": 0.5833270548783789,
+        "r2_adj": 0.5740263194961999,
+        "r2_quadratic": 0.6347329767869163,
+        "r2_single": {
+          "log_lr": 0.001160190209179346,
+          "log_wd": 1.3227219769929022e-05,
+          "dropout": 0.11112582598906307,
+          "largura": 0.013525601163904999,
+          "prof.": 0.45981070789249334
+        }
+      },
+      {
+        "src": "20261009-170713_d53f976_dionatan-drebin-cluster-s2-f3.json",
+        "run": "drebin_cluster fold 3",
+        "measure": "curvature",
+        "n": 237,
+        "r2_linear": 0.59433905002789,
+        "r2_adj": 0.5855585099852036,
+        "r2_quadratic": 0.6486987315344115,
+        "r2_single": {
+          "log_lr": 0.01145297845871518,
+          "log_wd": 0.00015680325541067575,
+          "dropout": 0.149575397481718,
+          "largura": 0.008150795023650903,
+          "prof.": 0.4358493987614417
+        }
+      },
+      {
+        "src": "20261009-173434_d53f976_dionatan-drebin-cluster-s2-f4.json",
+        "run": "drebin_cluster fold 4",
+        "measure": "curvature",
+        "n": 223,
+        "r2_linear": 0.5572768411634315,
+        "r2_adj": 0.5470758467201926,
+        "r2_quadratic": 0.6262671569119482,
+        "r2_single": {
+          "log_lr": 1.5040653641440471e-06,
+          "log_wd": 1.081838200822638e-05,
+          "dropout": 0.1221188240892952,
+          "largura": 0.0002297925243873733,
+          "prof.": 0.4340125393959636
+        }
+      },
+      {
+        "src": "20261011-114448_d163b0d_dionatan-krono-s0.json",
+        "run": "kronodroid semente 0",
+        "measure": "curvature",
+        "n": 206,
+        "r2_linear": 0.8118070934755754,
+        "r2_adj": 0.8071022708124649,
+        "r2_quadratic": 0.8534215393225677,
+        "r2_single": {
+          "log_lr": 0.023999058767744108,
+          "log_wd": 0.01871984111398106,
+          "dropout": 0.42064479584176084,
+          "largura": 0.019638607554869347,
+          "prof.": 0.4158604493459729
+        }
+      },
+      {
+        "src": "20261011-170706_8f2ac06_dionatan-krono-s1.json",
+        "run": "kronodroid semente 1",
+        "measure": "curvature",
+        "n": 188,
+        "r2_linear": 0.7836673390578404,
+        "r2_adj": 0.7777241340869019,
+        "r2_quadratic": 0.8430540864657927,
+        "r2_single": {
+          "log_lr": 0.056036997089657925,
+          "log_wd": 0.009221884585575713,
+          "dropout": 0.3029782925891218,
+          "largura": 0.002024686816465615,
+          "prof.": 0.4281682860102246
+        }
+      },
+      {
+        "src": "20261011-181852_aacfa3e_dionatan-krono-s2.json",
+        "run": "kronodroid semente 2",
+        "measure": "curvature",
+        "n": 216,
+        "r2_linear": 0.7695419337370493,
+        "r2_adj": 0.7640548369212647,
+        "r2_quadratic": 0.8172952293857061,
+        "r2_single": {
+          "log_lr": 0.027599788627252764,
+          "log_wd": 0.017918335366176374,
+          "dropout": 0.360728552853243,
+          "largura": 0.00037124408930655495,
+          "prof.": 0.3923265507967656
+        }
+      },
+      {
+        "src": "20261013-143233_0755024_dionatan-k600-stop-m0.json",
+        "run": "nslkdd semente 0",
+        "measure": "curvature",
+        "n": 303,
+        "r2_linear": 0.6385791034753374,
+        "r2_adj": 0.6324945765978178,
+        "r2_quadratic": 0.6604604571042669,
+        "r2_single": {
+          "log_lr": 0.0023002085835260866,
+          "log_wd": 0.005893376490222368,
+          "dropout": 0.11249403283595483,
+          "largura": 0.02701417421317831,
+          "prof.": 0.503954902901284
+        }
+      },
+      {
+        "src": "20261013-143233_0755024_dionatan-k600-stop-m0.json",
+        "run": "nslkdd semente 0",
+        "measure": "sharp_0.1",
+        "n": 303,
+        "r2_linear": 0.5241207536042911,
+        "r2_adj": 0.5161093184797843,
+        "r2_quadratic": 0.6402104142941406,
+        "r2_single": {
+          "log_lr": 0.005702630012387022,
+          "log_wd": 3.356218144601186e-05,
+          "dropout": 0.0012352746058695852,
+          "largura": 0.31444755022648674,
+          "prof.": 0.24389030664040656
+        }
+      },
+      {
+        "src": "20261013-143233_0755024_dionatan-k600-stop-m0.json",
+        "run": "nslkdd semente 0",
+        "measure": "sharp_0.5",
+        "n": 303,
+        "r2_linear": 0.6162778225777434,
+        "r2_adj": 0.6098178532608705,
+        "r2_quadratic": 0.722120935198424,
+        "r2_single": {
+          "log_lr": 0.0030988681425077047,
+          "log_wd": 8.411733452895476e-05,
+          "dropout": 0.01239340205206052,
+          "largura": 0.38104359095276663,
+          "prof.": 0.2590507389742619
+        }
+      },
+      {
+        "src": "20261013-143233_0755024_dionatan-k600-stop-m0.json",
+        "run": "nslkdd semente 0",
+        "measure": "lmax",
+        "n": 303,
+        "r2_linear": 0.7763317061303949,
+        "r2_adj": 0.7725662466376406,
+        "r2_quadratic": 0.797191864369877,
+        "r2_single": {
+          "log_lr": 0.002646579110181513,
+          "log_wd": 0.004907896016953517,
+          "dropout": 0.15547248874276653,
+          "largura": 0.03223376996824856,
+          "prof.": 0.5991063027358767
+        }
+      },
+      {
+        "src": "20261013-155117_0755024_dionatan-krono-m0.json",
+        "run": "kronodroid semente 0",
+        "measure": "curvature",
+        "n": 206,
+        "r2_linear": 0.8118070934755754,
+        "r2_adj": 0.8071022708124649,
+        "r2_quadratic": 0.8534215393225677,
+        "r2_single": {
+          "log_lr": 0.023999058767744108,
+          "log_wd": 0.01871984111398106,
+          "dropout": 0.42064479584176084,
+          "largura": 0.019638607554869347,
+          "prof.": 0.4158604493459729
+        }
+      },
+      {
+        "src": "20261013-155117_0755024_dionatan-krono-m0.json",
+        "run": "kronodroid semente 0",
+        "measure": "sharp_0.1",
+        "n": 206,
+        "r2_linear": 0.560029905167936,
+        "r2_adj": 0.5490306527971345,
+        "r2_quadratic": 0.6329829955434243,
+        "r2_single": {
+          "log_lr": 0.005320559178187079,
+          "log_wd": 0.003871027773091784,
+          "dropout": 0.0705771451908006,
+          "largura": 0.1264998150875668,
+          "prof.": 0.31574170789999134
+        }
+      },
+      {
+        "src": "20261013-155117_0755024_dionatan-krono-m0.json",
+        "run": "kronodroid semente 0",
+        "measure": "sharp_0.5",
+        "n": 206,
+        "r2_linear": 0.6450315096469426,
+        "r2_adj": 0.6361572973881161,
+        "r2_quadratic": 0.7571861869155638,
+        "r2_single": {
+          "log_lr": 0.018680821946430393,
+          "log_wd": 0.004851509906092177,
+          "dropout": 0.25205086988898606,
+          "largura": 0.0941268666403271,
+          "prof.": 0.22831112328580783
+        }
+      },
+      {
+        "src": "20261013-155117_0755024_dionatan-krono-m0.json",
+        "run": "kronodroid semente 0",
+        "measure": "lmax",
+        "n": 206,
+        "r2_linear": 0.8902007222825344,
+        "r2_adj": 0.8874557403395978,
+        "r2_quadratic": 0.9519619918603739,
+        "r2_single": {
+          "log_lr": 0.03974390589629251,
+          "log_wd": 0.027644819325211234,
+          "dropout": 0.5213420951000085,
+          "largura": 0.02003142863736307,
+          "prof.": 0.39474868935529583
+        }
+      },
+      {
+        "src": "20261013-161724_0755024_dionatan-drebin-cluster-m0-f0.json",
+        "run": "drebin_cluster fold 0",
+        "measure": "curvature",
+        "n": 229,
+        "r2_linear": 0.4733244138925041,
+        "r2_adj": 0.46151554424883834,
+        "r2_quadratic": 0.5323803573187357,
+        "r2_single": {
+          "log_lr": 0.0003103878190751086,
+          "log_wd": 1.6753109878253625e-06,
+          "dropout": 0.12730801576517403,
+          "largura": 0.02295791090126087,
+          "prof.": 0.33314137836952407
+        }
+      },
+      {
+        "src": "20261013-161724_0755024_dionatan-drebin-cluster-m0-f0.json",
+        "run": "drebin_cluster fold 0",
+        "measure": "sharp_0.1",
+        "n": 229,
+        "r2_linear": 0.7108779261185927,
+        "r2_adj": 0.7043953684082472,
+        "r2_quadratic": 0.8097843500551857,
+        "r2_single": {
+          "log_lr": 0.009707578701792174,
+          "log_wd": 0.00047007211359950674,
+          "dropout": 0.012195885620026714,
+          "largura": 0.6910644425463031,
+          "prof.": 0.0043384516221890435
+        }
+      },
+      {
+        "src": "20261013-161724_0755024_dionatan-drebin-cluster-m0-f0.json",
+        "run": "drebin_cluster fold 0",
+        "measure": "sharp_0.5",
+        "n": 229,
+        "r2_linear": 0.6278542778572371,
+        "r2_adj": 0.6195102033697313,
+        "r2_quadratic": 0.7242843624186064,
+        "r2_single": {
+          "log_lr": 0.004649469627779013,
+          "log_wd": 0.0010087589611319503,
+          "dropout": 5.907837888341483e-06,
+          "largura": 0.6086573966599886,
+          "prof.": 0.0015860739677571178
+        }
+      },
+      {
+        "src": "20261013-161724_0755024_dionatan-drebin-cluster-m0-f0.json",
+        "run": "drebin_cluster fold 0",
+        "measure": "lmax",
+        "n": 229,
+        "r2_linear": 0.942310531576089,
+        "r2_adj": 0.9410170457369879,
+        "r2_quadratic": 0.9755597177589725,
+        "r2_single": {
+          "log_lr": 0.002836400912715753,
+          "log_wd": 0.002985878073451742,
+          "dropout": 0.2510411959947587,
+          "largura": 0.028493017282349764,
+          "prof.": 0.6821672142759939
+        }
+      },
+      {
+        "src": "20261013-165124_0755024_dionatan-drebin-cluster-m0-f1.json",
+        "run": "drebin_cluster fold 1",
+        "measure": "curvature",
+        "n": 212,
+        "r2_linear": 0.5963127335591248,
+        "r2_adj": 0.5865144989367734,
+        "r2_quadratic": 0.6294515373402505,
+        "r2_single": {
+          "log_lr": 0.009990957873856066,
+          "log_wd": 0.0007136461971889441,
+          "dropout": 0.19923969266058927,
+          "largura": 0.006432952933945635,
+          "prof.": 0.41936316683836794
+        }
+      },
+      {
+        "src": "20261013-165124_0755024_dionatan-drebin-cluster-m0-f1.json",
+        "run": "drebin_cluster fold 1",
+        "measure": "sharp_0.1",
+        "n": 212,
+        "r2_linear": 0.5344154489016927,
+        "r2_adj": 0.5231148530012484,
+        "r2_quadratic": 0.6292604282006311,
+        "r2_single": {
+          "log_lr": 0.0034251570356050864,
+          "log_wd": 1.8734967938360825e-05,
+          "dropout": 0.0029064724582815726,
+          "largura": 0.44739616509175695,
+          "prof.": 0.0644085575199238
+        }
+      },
+      {
+        "src": "20261013-165124_0755024_dionatan-drebin-cluster-m0-f1.json",
+        "run": "drebin_cluster fold 1",
+        "measure": "sharp_0.5",
+        "n": 212,
+        "r2_linear": 0.5863769249616454,
+        "r2_adj": 0.5763375299364426,
+        "r2_quadratic": 0.6752724246765351,
+        "r2_single": {
+          "log_lr": 0.004491084196898698,
+          "log_wd": 0.006628539257941823,
+          "dropout": 0.08654313495116783,
+          "largura": 0.28899448280101114,
+          "prof.": 0.16370082823586551
+        }
+      },
+      {
+        "src": "20261013-165124_0755024_dionatan-drebin-cluster-m0-f1.json",
+        "run": "drebin_cluster fold 1",
+        "measure": "lmax",
+        "n": 212,
+        "r2_linear": 0.9457699768053199,
+        "r2_adj": 0.94445371410642,
+        "r2_quadratic": 0.9818434443042574,
+        "r2_single": {
+          "log_lr": 0.02465798345403336,
+          "log_wd": 0.003028023979260608,
+          "dropout": 0.27076675259232086,
+          "largura": 0.0220865213876561,
+          "prof.": 0.7018763656281242
+        }
+      },
+      {
+        "src": "20261013-172459_0755024_dionatan-drebin-cluster-m0-f2.json",
+        "run": "drebin_cluster fold 2",
+        "measure": "curvature",
+        "n": 216,
+        "r2_linear": 0.5921868710318308,
+        "r2_adj": 0.5824770346278267,
+        "r2_quadratic": 0.6616594470447003,
+        "r2_single": {
+          "log_lr": 0.0011826804876041708,
+          "log_wd": 0.0006713490584949744,
+          "dropout": 0.18322417997114782,
+          "largura": 0.014857814840180228,
+          "prof.": 0.41226872801296466
+        }
+      },
+      {
+        "src": "20261013-172459_0755024_dionatan-drebin-cluster-m0-f2.json",
+        "run": "drebin_cluster fold 2",
+        "measure": "sharp_0.1",
+        "n": 216,
+        "r2_linear": 0.5975752643204664,
+        "r2_adj": 0.5879937229947632,
+        "r2_quadratic": 0.7509341786881149,
+        "r2_single": {
+          "log_lr": 0.004951326232840114,
+          "log_wd": 0.0012094973214761273,
+          "dropout": 0.00015992606919879027,
+          "largura": 0.4868380141937735,
+          "prof.": 0.10454554782262016
+        }
+      },
+      {
+        "src": "20261013-172459_0755024_dionatan-drebin-cluster-m0-f2.json",
+        "run": "drebin_cluster fold 2",
+        "measure": "sharp_0.5",
+        "n": 216,
+        "r2_linear": 0.5652566178145364,
+        "r2_adj": 0.5549055849053587,
+        "r2_quadratic": 0.7268828450096863,
+        "r2_single": {
+          "log_lr": 0.0014996189507694435,
+          "log_wd": 0.003602817047029694,
+          "dropout": 0.03509004065438592,
+          "largura": 0.3371380924767007,
+          "prof.": 0.1600454638435812
+        }
+      },
+      {
+        "src": "20261013-172459_0755024_dionatan-drebin-cluster-m0-f2.json",
+        "run": "drebin_cluster fold 2",
+        "measure": "lmax",
+        "n": 216,
+        "r2_linear": 0.948106214331324,
+        "r2_adj": 0.9468706480058794,
+        "r2_quadratic": 0.9848941374968819,
+        "r2_single": {
+          "log_lr": 0.01244358800766543,
+          "log_wd": 0.0007650701219809042,
+          "dropout": 0.24601232000291073,
+          "largura": 0.02071917419968139,
+          "prof.": 0.7151935319299811
+        }
+      },
+      {
+        "src": "20261013-175755_0755024_dionatan-drebin-cluster-m0-f3.json",
+        "run": "drebin_cluster fold 3",
+        "measure": "curvature",
+        "n": 230,
+        "r2_linear": 0.48360395327864025,
+        "r2_adj": 0.4720772558071814,
+        "r2_quadratic": 0.529760016675312,
+        "r2_single": {
+          "log_lr": 0.003546057125270119,
+          "log_wd": 0.0013613301112437304,
+          "dropout": 0.08505219909187667,
+          "largura": 0.012606001174048864,
+          "prof.": 0.4072642537304856
+        }
+      },
+      {
+        "src": "20261013-175755_0755024_dionatan-drebin-cluster-m0-f3.json",
+        "run": "drebin_cluster fold 3",
+        "measure": "sharp_0.1",
+        "n": 230,
+        "r2_linear": 0.575426104814376,
+        "r2_adj": 0.5659490089396968,
+        "r2_quadratic": 0.706940937255846,
+        "r2_single": {
+          "log_lr": 0.0010771720129616469,
+          "log_wd": 3.7787880218242975e-06,
+          "dropout": 1.4025299581832407e-05,
+          "largura": 0.49291388970792904,
+          "prof.": 0.0692086000281934
+        }
+      },
+      {
+        "src": "20261013-175755_0755024_dionatan-drebin-cluster-m0-f3.json",
+        "run": "drebin_cluster fold 3",
+        "measure": "sharp_0.5",
+        "n": 230,
+        "r2_linear": 0.5867864409662934,
+        "r2_adj": 0.5775629240235767,
+        "r2_quadratic": 0.7081453276520924,
+        "r2_single": {
+          "log_lr": 8.309288958263661e-05,
+          "log_wd": 0.0044302644386016166,
+          "dropout": 0.02655001399277679,
+          "largura": 0.38764809473433925,
+          "prof.": 0.13885155405427085
+        }
+      },
+      {
+        "src": "20261013-175755_0755024_dionatan-drebin-cluster-m0-f3.json",
+        "run": "drebin_cluster fold 3",
+        "measure": "lmax",
+        "n": 230,
+        "r2_linear": 0.9479704561833082,
+        "r2_adj": 0.9468090824373999,
+        "r2_quadratic": 0.9839037347279237,
+        "r2_single": {
+          "log_lr": 0.017946372389204934,
+          "log_wd": 0.002650592008410335,
+          "dropout": 0.2556175553488981,
+          "largura": 0.028079238776048898,
+          "prof.": 0.7147403797879026
+        }
+      },
+      {
+        "src": "20261013-183113_0755024_dionatan-drebin-cluster-m0-f4.json",
+        "run": "drebin_cluster fold 4",
+        "measure": "curvature",
+        "n": 218,
+        "r2_linear": 0.6019717149785397,
+        "r2_adj": 0.5925842554261468,
+        "r2_quadratic": 0.6287090533455075,
+        "r2_single": {
+          "log_lr": 0.012138450539857404,
+          "log_wd": 0.003608397143691766,
+          "dropout": 0.14815302962644994,
+          "largura": 0.009971178814369597,
+          "prof.": 0.4666699367300171
+        }
+      },
+      {
+        "src": "20261013-183113_0755024_dionatan-drebin-cluster-m0-f4.json",
+        "run": "drebin_cluster fold 4",
+        "measure": "sharp_0.1",
+        "n": 218,
+        "r2_linear": 0.5259865330204196,
+        "r2_adj": 0.5148069701199578,
+        "r2_quadratic": 0.6628080941597696,
+        "r2_single": {
+          "log_lr": 0.0009478451608224692,
+          "log_wd": 0.0003275395608206555,
+          "dropout": 8.171467982509562e-05,
+          "largura": 0.4533484578788187,
+          "prof.": 0.05985283779156059
+        }
+      },
+      {
+        "src": "20261013-183113_0755024_dionatan-drebin-cluster-m0-f4.json",
+        "run": "drebin_cluster fold 4",
+        "measure": "sharp_0.5",
+        "n": 218,
+        "r2_linear": 0.5732127409534615,
+        "r2_adj": 0.5631470037117978,
+        "r2_quadratic": 0.6852904445621637,
+        "r2_single": {
+          "log_lr": 0.00037134978936192997,
+          "log_wd": 0.004784069826963333,
+          "dropout": 0.05189100855419859,
+          "largura": 0.3583977914551567,
+          "prof.": 0.11607731783199005
+        }
+      },
+      {
+        "src": "20261013-183113_0755024_dionatan-drebin-cluster-m0-f4.json",
+        "run": "drebin_cluster fold 4",
+        "measure": "lmax",
+        "n": 218,
+        "r2_linear": 0.9421515537027205,
+        "r2_adj": 0.9407872035541998,
+        "r2_quadratic": 0.9803941228388191,
+        "r2_single": {
+          "log_lr": 0.012672246116962271,
+          "log_wd": 0.002789864269437947,
+          "dropout": 0.27100308231607273,
+          "largura": 0.02639053926691648,
+          "prof.": 0.6903582630673777
+        }
+      },
+      {
+        "src": "20261019-141338_04ef921_dionatan-krono-m1.json",
+        "run": "kronodroid semente 1",
+        "measure": "curvature",
+        "n": 188,
+        "r2_linear": 0.7836673390578404,
+        "r2_adj": 0.7777241340869019,
+        "r2_quadratic": 0.8430540864657927,
+        "r2_single": {
+          "log_lr": 0.056036997089657925,
+          "log_wd": 0.009221884585575713,
+          "dropout": 0.3029782925891218,
+          "largura": 0.002024686816465615,
+          "prof.": 0.4281682860102246
+        }
+      },
+      {
+        "src": "20261019-141338_04ef921_dionatan-krono-m1.json",
+        "run": "kronodroid semente 1",
+        "measure": "sharp_0.1",
+        "n": 188,
+        "r2_linear": 0.5735943708627831,
+        "r2_adj": 0.5618799305018705,
+        "r2_quadratic": 0.6011768888745255,
+        "r2_single": {
+          "log_lr": 0.014009488815106885,
+          "log_wd": 0.03270444233845771,
+          "dropout": 0.14405858043451714,
+          "largura": 0.17930313035704504,
+          "prof.": 0.23451099695334365
+        }
+      },
+      {
+        "src": "20261019-141338_04ef921_dionatan-krono-m1.json",
+        "run": "kronodroid semente 1",
+        "measure": "sharp_0.5",
+        "n": 188,
+        "r2_linear": 0.6538152485044828,
+        "r2_adj": 0.6443046784084521,
+        "r2_quadratic": 0.7342201554564514,
+        "r2_single": {
+          "log_lr": 0.028713604171119678,
+          "log_wd": 0.045373248332454263,
+          "dropout": 0.30571595275265584,
+          "largura": 0.1538612416273425,
+          "prof.": 0.17598522862427557
+        }
+      },
+      {
+        "src": "20261019-141338_04ef921_dionatan-krono-m1.json",
+        "run": "kronodroid semente 1",
+        "measure": "lmax",
+        "n": 188,
+        "r2_linear": 0.8954927385972621,
+        "r2_adj": 0.8926216599872967,
+        "r2_quadratic": 0.9534603719401703,
+        "r2_single": {
+          "log_lr": 0.06833273519206151,
+          "log_wd": 0.0019752027293268304,
+          "dropout": 0.4422205281416739,
+          "largura": 3.853405032339108e-05,
+          "prof.": 0.4091942267979849
+        }
+      },
+      {
+        "src": "20261019-153143_04ef921_dionatan-krono-m2.json",
+        "run": "kronodroid semente 2",
+        "measure": "curvature",
+        "n": 216,
+        "r2_linear": 0.7695419337370493,
+        "r2_adj": 0.7640548369212647,
+        "r2_quadratic": 0.8172952293857061,
+        "r2_single": {
+          "log_lr": 0.027599788627252764,
+          "log_wd": 0.017918335366176374,
+          "dropout": 0.360728552853243,
+          "largura": 0.00037124408930655495,
+          "prof.": 0.3923265507967656
+        }
+      },
+      {
+        "src": "20261019-153143_04ef921_dionatan-krono-m2.json",
+        "run": "kronodroid semente 2",
+        "measure": "sharp_0.1",
+        "n": 216,
+        "r2_linear": 0.5200591410759214,
+        "r2_adj": 0.5086319777682052,
+        "r2_quadratic": 0.5975450781444915,
+        "r2_single": {
+          "log_lr": 0.0013119246134509766,
+          "log_wd": 0.010902242124283923,
+          "dropout": 0.1013326260290136,
+          "largura": 0.20035854364559602,
+          "prof.": 0.2420390687449787
+        }
+      },
+      {
+        "src": "20261019-153143_04ef921_dionatan-krono-m2.json",
+        "run": "kronodroid semente 2",
+        "measure": "sharp_0.5",
+        "n": 216,
+        "r2_linear": 0.6329694925085816,
+        "r2_adj": 0.624230670901643,
+        "r2_quadratic": 0.7384001995418867,
+        "r2_single": {
+          "log_lr": 0.009252203665243597,
+          "log_wd": 0.018272899437692502,
+          "dropout": 0.3028273267164212,
+          "largura": 0.16990419960014114,
+          "prof.": 0.17974921015223277
+        }
+      },
+      {
+        "src": "20261019-153143_04ef921_dionatan-krono-m2.json",
+        "run": "kronodroid semente 2",
+        "measure": "lmax",
+        "n": 216,
+        "r2_linear": 0.8951241223186578,
+        "r2_adj": 0.8926270776119591,
+        "r2_quadratic": 0.9544218961351607,
+        "r2_single": {
+          "log_lr": 0.04367487857649677,
+          "log_wd": 0.009683084381613694,
+          "dropout": 0.5130008546239818,
+          "largura": 0.00046142474063792793,
+          "prof.": 0.37084913314419543
+        }
+      },
+      {
+        "src": "20261019-160056_0b25308_dionatan-drebin-cluster-m1-f0.json",
+        "run": "drebin_cluster fold 0",
+        "measure": "curvature",
+        "n": 210,
+        "r2_linear": 0.45395947988696905,
+        "r2_adj": 0.4405761338057673,
+        "r2_quadratic": 0.4985400025374238,
+        "r2_single": {
+          "log_lr": 0.0066585910683979455,
+          "log_wd": 0.009248304316881728,
+          "dropout": 0.07925702844324423,
+          "largura": 0.019332802217382317,
+          "prof.": 0.3388960430960407
+        }
+      },
+      {
+        "src": "20261019-160056_0b25308_dionatan-drebin-cluster-m1-f0.json",
+        "run": "drebin_cluster fold 0",
+        "measure": "sharp_0.1",
+        "n": 210,
+        "r2_linear": 0.7265330051892651,
+        "r2_adj": 0.7198303827674334,
+        "r2_quadratic": 0.8361726332388494,
+        "r2_single": {
+          "log_lr": 0.0005351275923071164,
+          "log_wd": 0.0017026280884367972,
+          "dropout": 0.02322280806553556,
+          "largura": 0.7085958005274778,
+          "prof.": 0.009455666804529028
+        }
+      },
+      {
+        "src": "20261019-160056_0b25308_dionatan-drebin-cluster-m1-f0.json",
+        "run": "drebin_cluster fold 0",
+        "measure": "sharp_0.5",
+        "n": 210,
+        "r2_linear": 0.6597122525350836,
+        "r2_adj": 0.6513718665678062,
+        "r2_quadratic": 0.7829475021358596,
+        "r2_single": {
+          "log_lr": 0.0032686621142010708,
+          "log_wd": 0.007391308967204746,
+          "dropout": 0.043962787461388375,
+          "largura": 0.6394788177641961,
+          "prof.": 0.0014993108176266645
+        }
+      },
+      {
+        "src": "20261019-160056_0b25308_dionatan-drebin-cluster-m1-f0.json",
+        "run": "drebin_cluster fold 0",
+        "measure": "lmax",
+        "n": 210,
+        "r2_linear": 0.9384507859725059,
+        "r2_adj": 0.9369422268051654,
+        "r2_quadratic": 0.9785794054409184,
+        "r2_single": {
+          "log_lr": 0.00019540759260572305,
+          "log_wd": 0.00748065812910359,
+          "dropout": 0.16031860091893235,
+          "largura": 0.02774448943918617,
+          "prof.": 0.7345655464670493
+        }
+      },
+      {
+        "src": "20261019-163312_0b25308_dionatan-drebin-cluster-m1-f1.json",
+        "run": "drebin_cluster fold 1",
+        "measure": "curvature",
+        "n": 189,
+        "r2_linear": 0.6108443475660501,
+        "r2_adj": 0.6002116794667618,
+        "r2_quadratic": 0.6787801547260108,
+        "r2_single": {
+          "log_lr": 0.013361639910642986,
+          "log_wd": 0.019133257463858633,
+          "dropout": 0.10247737030232351,
+          "largura": 0.005633920742096676,
+          "prof.": 0.4858163552924205
+        }
+      },
+      {
+        "src": "20261019-163312_0b25308_dionatan-drebin-cluster-m1-f1.json",
+        "run": "drebin_cluster fold 1",
+        "measure": "sharp_0.1",
+        "n": 189,
+        "r2_linear": 0.4806234429745564,
+        "r2_adj": 0.4664328266623857,
+        "r2_quadratic": 0.6677751270170846,
+        "r2_single": {
+          "log_lr": 0.0003213501307125499,
+          "log_wd": 4.337409124000047e-05,
+          "dropout": 0.038139315666354756,
+          "largura": 0.3764969249785758,
+          "prof.": 0.0735117206980116
+        }
+      },
+      {
+        "src": "20261019-163312_0b25308_dionatan-drebin-cluster-m1-f1.json",
+        "run": "drebin_cluster fold 1",
+        "measure": "sharp_0.5",
+        "n": 189,
+        "r2_linear": 0.5695996449428666,
+        "r2_adj": 0.5578400724003221,
+        "r2_quadratic": 0.6948116522825014,
+        "r2_single": {
+          "log_lr": 0.003018582206781195,
+          "log_wd": 0.02290750058963764,
+          "dropout": 0.21817912509197646,
+          "largura": 0.21719731130253628,
+          "prof.": 0.14790368833797862
+        }
+      },
+      {
+        "src": "20261019-163312_0b25308_dionatan-drebin-cluster-m1-f1.json",
+        "run": "drebin_cluster fold 1",
+        "measure": "lmax",
+        "n": 189,
+        "r2_linear": 0.9292772168208694,
+        "r2_adj": 0.9273449003405653,
+        "r2_quadratic": 0.9852194529408322,
+        "r2_single": {
+          "log_lr": 0.026316995305929347,
+          "log_wd": 0.0082858820770908,
+          "dropout": 0.15886150164612367,
+          "largura": 0.007332865754663631,
+          "prof.": 0.7373542191123638
+        }
+      },
+      {
+        "src": "20261019-170505_0b25308_dionatan-drebin-cluster-m1-f2.json",
+        "run": "drebin_cluster fold 2",
+        "measure": "curvature",
+        "n": 202,
+        "r2_linear": 0.6163046928930631,
+        "r2_adj": 0.6065165473036005,
+        "r2_quadratic": 0.6579843070491032,
+        "r2_single": {
+          "log_lr": 0.006095205749827137,
+          "log_wd": 0.002155304091272736,
+          "dropout": 0.12541423726663736,
+          "largura": 0.002831571034985325,
+          "prof.": 0.45181745107711035
+        }
+      },
+      {
+        "src": "20261019-170505_0b25308_dionatan-drebin-cluster-m1-f2.json",
+        "run": "drebin_cluster fold 2",
+        "measure": "sharp_0.1",
+        "n": 202,
+        "r2_linear": 0.6675304913429596,
+        "r2_adj": 0.6590491263261984,
+        "r2_quadratic": 0.7931930416858004,
+        "r2_single": {
+          "log_lr": 0.003213591809341776,
+          "log_wd": 0.0035270899793741206,
+          "dropout": 0.023428111156703957,
+          "largura": 0.5016686327677938,
+          "prof.": 0.1487339684028136
+        }
+      },
+      {
+        "src": "20261019-170505_0b25308_dionatan-drebin-cluster-m1-f2.json",
+        "run": "drebin_cluster fold 2",
+        "measure": "sharp_0.5",
+        "n": 202,
+        "r2_linear": 0.6632733379018875,
+        "r2_adj": 0.6546833720320376,
+        "r2_quadratic": 0.794046269475946,
+        "r2_single": {
+          "log_lr": 0.008113220489610051,
+          "log_wd": 0.026636756766237224,
+          "dropout": 0.07891015771227272,
+          "largura": 0.34444610763804573,
+          "prof.": 0.2392428152223809
+        }
+      },
+      {
+        "src": "20261019-170505_0b25308_dionatan-drebin-cluster-m1-f2.json",
+        "run": "drebin_cluster fold 2",
+        "measure": "lmax",
+        "n": 202,
+        "r2_linear": 0.9397920296835065,
+        "r2_adj": 0.9382561120733919,
+        "r2_quadratic": 0.9856113936105415,
+        "r2_single": {
+          "log_lr": 0.020922959854698386,
+          "log_wd": 0.003785040625174596,
+          "dropout": 0.13074690098780062,
+          "largura": 0.0130609146315398,
+          "prof.": 0.7654908443243702
+        }
+      },
+      {
+        "src": "20261019-173625_0b25308_dionatan-drebin-cluster-m1-f3.json",
+        "run": "drebin_cluster fold 3",
+        "measure": "curvature",
+        "n": 208,
+        "r2_linear": 0.5958763869067543,
+        "r2_adj": 0.5858733271767234,
+        "r2_quadratic": 0.6491686344991271,
+        "r2_single": {
+          "log_lr": 0.00811355598298491,
+          "log_wd": 0.013864826072350178,
+          "dropout": 0.07934338927180284,
+          "largura": 0.0061177917346126875,
+          "prof.": 0.4915752296390715
+        }
+      },
+      {
+        "src": "20261019-173625_0b25308_dionatan-drebin-cluster-m1-f3.json",
+        "run": "drebin_cluster fold 3",
+        "measure": "sharp_0.1",
+        "n": 208,
+        "r2_linear": 0.5607397002317404,
+        "r2_adj": 0.5498669205345063,
+        "r2_quadratic": 0.6720271713501045,
+        "r2_single": {
+          "log_lr": 0.0021057794330991975,
+          "log_wd": 0.007532141906141598,
+          "dropout": 0.03946526107806858,
+          "largura": 0.4823943217694543,
+          "prof.": 0.027177904370834782
+        }
+      },
+      {
+        "src": "20261019-173625_0b25308_dionatan-drebin-cluster-m1-f3.json",
+        "run": "drebin_cluster fold 3",
+        "measure": "sharp_0.5",
+        "n": 208,
+        "r2_linear": 0.5754287483815195,
+        "r2_adj": 0.5649195589850224,
+        "r2_quadratic": 0.6726881031784006,
+        "r2_single": {
+          "log_lr": 0.009470262803853657,
+          "log_wd": 5.1151152157702384e-05,
+          "dropout": 0.12404305765890233,
+          "largura": 0.34140661003962647,
+          "prof.": 0.11769730126773914
+        }
+      },
+      {
+        "src": "20261019-173625_0b25308_dionatan-drebin-cluster-m1-f3.json",
+        "run": "drebin_cluster fold 3",
+        "measure": "lmax",
+        "n": 208,
+        "r2_linear": 0.9425748582618141,
+        "r2_adj": 0.941153443862354,
+        "r2_quadratic": 0.9825038444460092,
+        "r2_single": {
+          "log_lr": 0.015506413227710736,
+          "log_wd": 0.0030103353641766084,
+          "dropout": 0.13845129983275928,
+          "largura": 0.013674225356212544,
+          "prof.": 0.7635982697897097
+        }
+      },
+      {
+        "src": "20261019-180800_0b25308_dionatan-drebin-cluster-m1-f4.json",
+        "run": "drebin_cluster fold 4",
+        "measure": "curvature",
+        "n": 195,
+        "r2_linear": 0.5811868108521647,
+        "r2_adj": 0.5701070968535448,
+        "r2_quadratic": 0.630642647407108,
+        "r2_single": {
+          "log_lr": 0.007284686589189127,
+          "log_wd": 0.0013963674961287031,
+          "dropout": 0.05784642796084738,
+          "largura": 0.01645139513467131,
+          "prof.": 0.4845557709558449
+        }
+      },
+      {
+        "src": "20261019-180800_0b25308_dionatan-drebin-cluster-m1-f4.json",
+        "run": "drebin_cluster fold 4",
+        "measure": "sharp_0.1",
+        "n": 195,
+        "r2_linear": 0.566755366771081,
+        "r2_adj": 0.5552938685375117,
+        "r2_quadratic": 0.6735619809958484,
+        "r2_single": {
+          "log_lr": 0.001784562111639021,
+          "log_wd": 0.0027592535555795994,
+          "dropout": 0.046820953934689324,
+          "largura": 0.4697111280378651,
+          "prof.": 0.062039108111996866
+        }
+      },
+      {
+        "src": "20261019-180800_0b25308_dionatan-drebin-cluster-m1-f4.json",
+        "run": "drebin_cluster fold 4",
+        "measure": "sharp_0.5",
+        "n": 195,
+        "r2_linear": 0.637367874851206,
+        "r2_adj": 0.6277744323869523,
+        "r2_quadratic": 0.7006323402085501,
+        "r2_single": {
+          "log_lr": 0.0035566963148254693,
+          "log_wd": 0.02295429692846973,
+          "dropout": 0.18567778951658642,
+          "largura": 0.308732692235434,
+          "prof.": 0.15415136186999223
+        }
+      },
+      {
+        "src": "20261019-180800_0b25308_dionatan-drebin-cluster-m1-f4.json",
+        "run": "drebin_cluster fold 4",
+        "measure": "lmax",
+        "n": 195,
+        "r2_linear": 0.9274498336038709,
+        "r2_adj": 0.9255305170325447,
+        "r2_quadratic": 0.9831152217853891,
+        "r2_single": {
+          "log_lr": 0.02436232157802176,
+          "log_wd": 0.007780985391491968,
+          "dropout": 0.15227621116853685,
+          "largura": 0.010676480491544793,
+          "prof.": 0.726080258055783
+        }
+      },
+      {
+        "src": "20261019-183242_0b25308_dionatan-drebin-cluster-m2-f0.json",
+        "run": "drebin_cluster fold 0",
+        "measure": "curvature",
+        "n": 232,
+        "r2_linear": 0.49931779674232,
+        "r2_adj": 0.48824075684723856,
+        "r2_quadratic": 0.518987479120707,
+        "r2_single": {
+          "log_lr": 0.012405208157747594,
+          "log_wd": 0.005715041870172577,
+          "dropout": 0.11184319277915356,
+          "largura": 0.0033076270154321907,
+          "prof.": 0.376838870590256
+        }
+      },
+      {
+        "src": "20261019-183242_0b25308_dionatan-drebin-cluster-m2-f0.json",
+        "run": "drebin_cluster fold 0",
+        "measure": "sharp_0.1",
+        "n": 232,
+        "r2_linear": 0.7237887131149217,
+        "r2_adj": 0.7176778439360483,
+        "r2_quadratic": 0.8348501078904333,
+        "r2_single": {
+          "log_lr": 0.003198318284945656,
+          "log_wd": 0.0010176922659204113,
+          "dropout": 0.008223395756464691,
+          "largura": 0.7099910627433116,
+          "prof.": 0.0015115101530353003
+        }
+      },
+      {
+        "src": "20261019-183242_0b25308_dionatan-drebin-cluster-m2-f0.json",
+        "run": "drebin_cluster fold 0",
+        "measure": "sharp_0.5",
+        "n": 232,
+        "r2_linear": 0.6695625945589629,
+        "r2_adj": 0.6622520324916834,
+        "r2_quadratic": 0.7795176552445536,
+        "r2_single": {
+          "log_lr": 0.004751525448768779,
+          "log_wd": 0.0004230207124356067,
+          "dropout": 0.03369250110706179,
+          "largura": 0.644086060494637,
+          "prof.": 0.007819111271382462
+        }
+      },
+      {
+        "src": "20261019-183242_0b25308_dionatan-drebin-cluster-m2-f0.json",
+        "run": "drebin_cluster fold 0",
+        "measure": "lmax",
+        "n": 232,
+        "r2_linear": 0.9467071376179603,
+        "r2_adj": 0.9455280919900391,
+        "r2_quadratic": 0.9735311801150286,
+        "r2_single": {
+          "log_lr": 0.004441435281512751,
+          "log_wd": 0.0005489037496916316,
+          "dropout": 0.24616261083667923,
+          "largura": 0.012236141616473128,
+          "prof.": 0.6987652274208049
+        }
+      },
+      {
+        "src": "20261019-190440_0b25308_dionatan-drebin-cluster-m2-f1.json",
+        "run": "drebin_cluster fold 1",
+        "measure": "curvature",
+        "n": 215,
+        "r2_linear": 0.5500801783286947,
+        "r2_adj": 0.539316546231295,
+        "r2_quadratic": 0.6073167669580712,
+        "r2_single": {
+          "log_lr": 0.009618416184857925,
+          "log_wd": 0.00136910695197634,
+          "dropout": 0.07767798771885137,
+          "largura": 0.002951888159279825,
+          "prof.": 0.4639518617291982
+        }
+      },
+      {
+        "src": "20261019-190440_0b25308_dionatan-drebin-cluster-m2-f1.json",
+        "run": "drebin_cluster fold 1",
+        "measure": "sharp_0.1",
+        "n": 215,
+        "r2_linear": 0.5829013745723279,
+        "r2_adj": 0.5729229385573119,
+        "r2_quadratic": 0.6869237603292236,
+        "r2_single": {
+          "log_lr": 0.0014094423364955366,
+          "log_wd": 0.007641876612475507,
+          "dropout": 0.04825046476879602,
+          "largura": 0.4872822753598701,
+          "prof.": 0.041876078977371556
+        }
+      },
+      {
+        "src": "20261019-190440_0b25308_dionatan-drebin-cluster-m2-f1.json",
+        "run": "drebin_cluster fold 1",
+        "measure": "sharp_0.5",
+        "n": 215,
+        "r2_linear": 0.642327062012588,
+        "r2_adj": 0.6337702931612146,
+        "r2_quadratic": 0.7172787210064797,
+        "r2_single": {
+          "log_lr": 4.148797622560707e-06,
+          "log_wd": 0.0018021603206063164,
+          "dropout": 0.20075442718243675,
+          "largura": 0.3369072671433043,
+          "prof.": 0.11687553595067146
+        }
+      },
+      {
+        "src": "20261019-190440_0b25308_dionatan-drebin-cluster-m2-f1.json",
+        "run": "drebin_cluster fold 1",
+        "measure": "lmax",
+        "n": 215,
+        "r2_linear": 0.9438687323004229,
+        "r2_adj": 0.9425258790061747,
+        "r2_quadratic": 0.9806170086815422,
+        "r2_single": {
+          "log_lr": 0.028763882219981385,
+          "log_wd": 7.06084995878431e-05,
+          "dropout": 0.17894904592004146,
+          "largura": 0.010948872895402473,
+          "prof.": 0.743138698786588
+        }
+      },
+      {
+        "src": "20261019-193609_0b25308_dionatan-drebin-cluster-m2-f2.json",
+        "run": "drebin_cluster fold 2",
+        "measure": "curvature",
+        "n": 230,
+        "r2_linear": 0.5833270548783789,
+        "r2_adj": 0.5740263194961999,
+        "r2_quadratic": 0.6347329767869163,
+        "r2_single": {
+          "log_lr": 0.001160190209179346,
+          "log_wd": 1.3227219769929022e-05,
+          "dropout": 0.11112582598906307,
+          "largura": 0.013525601163904999,
+          "prof.": 0.45981070789249334
+        }
+      },
+      {
+        "src": "20261019-193609_0b25308_dionatan-drebin-cluster-m2-f2.json",
+        "run": "drebin_cluster fold 2",
+        "measure": "sharp_0.1",
+        "n": 230,
+        "r2_linear": 0.5703198033723437,
+        "r2_adj": 0.5607287275547621,
+        "r2_quadratic": 0.6669406444343364,
+        "r2_single": {
+          "log_lr": 0.0077925417519004725,
+          "log_wd": 0.005534001838940927,
+          "dropout": 0.013419765970575814,
+          "largura": 0.48893755850586207,
+          "prof.": 0.06820135427895324
+        }
+      },
+      {
+        "src": "20261019-193609_0b25308_dionatan-drebin-cluster-m2-f2.json",
+        "run": "drebin_cluster fold 2",
+        "measure": "sharp_0.5",
+        "n": 230,
+        "r2_linear": 0.582258236281552,
+        "r2_adj": 0.5729336433414081,
+        "r2_quadratic": 0.6636224179541166,
+        "r2_single": {
+          "log_lr": 0.00481067950695846,
+          "log_wd": 0.000401241320823309,
+          "dropout": 0.0943589650351182,
+          "largura": 0.34539773033091026,
+          "prof.": 0.16489064673645837
+        }
+      },
+      {
+        "src": "20261019-193609_0b25308_dionatan-drebin-cluster-m2-f2.json",
+        "run": "drebin_cluster fold 2",
+        "measure": "lmax",
+        "n": 230,
+        "r2_linear": 0.9458969262156168,
+        "r2_adj": 0.944689268318644,
+        "r2_quadratic": 0.9825671131796697,
+        "r2_single": {
+          "log_lr": 0.014561246443668963,
+          "log_wd": 0.00026601858054542404,
+          "dropout": 0.20308120852049283,
+          "largura": 0.009875877619194506,
+          "prof.": 0.73810294241755
+        }
+      },
+      {
+        "src": "20261019-200702_0b25308_dionatan-drebin-cluster-m2-f3.json",
+        "run": "drebin_cluster fold 3",
+        "measure": "curvature",
+        "n": 237,
+        "r2_linear": 0.59433905002789,
+        "r2_adj": 0.5855585099852036,
+        "r2_quadratic": 0.6486987315344115,
+        "r2_single": {
+          "log_lr": 0.01145297845871518,
+          "log_wd": 0.00015680325541067575,
+          "dropout": 0.149575397481718,
+          "largura": 0.008150795023650903,
+          "prof.": 0.4358493987614417
+        }
+      },
+      {
+        "src": "20261019-200702_0b25308_dionatan-drebin-cluster-m2-f3.json",
+        "run": "drebin_cluster fold 3",
+        "measure": "sharp_0.1",
+        "n": 237,
+        "r2_linear": 0.5816062175386744,
+        "r2_adj": 0.5725500750611565,
+        "r2_quadratic": 0.6999784801623197,
+        "r2_single": {
+          "log_lr": 0.0009957638803158586,
+          "log_wd": 0.008558287995437674,
+          "dropout": 0.012472591110096132,
+          "largura": 0.5243356450474055,
+          "prof.": 0.049281240265395376
+        }
+      },
+      {
+        "src": "20261019-200702_0b25308_dionatan-drebin-cluster-m2-f3.json",
+        "run": "drebin_cluster fold 3",
+        "measure": "sharp_0.5",
+        "n": 237,
+        "r2_linear": 0.626397579776408,
+        "r2_adj": 0.6183109473040358,
+        "r2_quadratic": 0.7309473142364764,
+        "r2_single": {
+          "log_lr": 0.00047935816613398075,
+          "log_wd": 4.016267540685181e-05,
+          "dropout": 0.09407397244236271,
+          "largura": 0.4344490265861821,
+          "prof.": 0.1346306369269349
+        }
+      },
+      {
+        "src": "20261019-200702_0b25308_dionatan-drebin-cluster-m2-f3.json",
+        "run": "drebin_cluster fold 3",
+        "measure": "lmax",
+        "n": 237,
+        "r2_linear": 0.9528772343611965,
+        "r2_adj": 0.9518572610789714,
+        "r2_quadratic": 0.9829297472950793,
+        "r2_single": {
+          "log_lr": 0.012691677548203772,
+          "log_wd": 8.86493605889438e-06,
+          "dropout": 0.18140675803616257,
+          "largura": 0.008530456061580871,
+          "prof.": 0.7653285046828076
+        }
+      },
+      {
+        "src": "20261019-203829_0b25308_dionatan-drebin-cluster-m2-f4.json",
+        "run": "drebin_cluster fold 4",
+        "measure": "curvature",
+        "n": 223,
+        "r2_linear": 0.5572768411634315,
+        "r2_adj": 0.5470758467201926,
+        "r2_quadratic": 0.6262671569119482,
+        "r2_single": {
+          "log_lr": 1.5040653641440471e-06,
+          "log_wd": 1.081838200822638e-05,
+          "dropout": 0.1221188240892952,
+          "largura": 0.0002297925243873733,
+          "prof.": 0.4340125393959636
+        }
+      },
+      {
+        "src": "20261019-203829_0b25308_dionatan-drebin-cluster-m2-f4.json",
+        "run": "drebin_cluster fold 4",
+        "measure": "sharp_0.1",
+        "n": 223,
+        "r2_linear": 0.5636892095904995,
+        "r2_adj": 0.5536359655718475,
+        "r2_quadratic": 0.6683887389121819,
+        "r2_single": {
+          "log_lr": 0.012082027815113583,
+          "log_wd": 0.011821922510995786,
+          "dropout": 0.015282138760672193,
+          "largura": 0.489908474380925,
+          "prof.": 0.0488403003836847
+        }
+      },
+      {
+        "src": "20261019-203829_0b25308_dionatan-drebin-cluster-m2-f4.json",
+        "run": "drebin_cluster fold 4",
+        "measure": "sharp_0.5",
+        "n": 223,
+        "r2_linear": 0.603545897751875,
+        "r2_adj": 0.5944110106033007,
+        "r2_quadratic": 0.6867563675685702,
+        "r2_single": {
+          "log_lr": 0.01183955516687285,
+          "log_wd": 0.0013978701751988787,
+          "dropout": 0.1384106386812186,
+          "largura": 0.3485789188140297,
+          "prof.": 0.12968383765527192
+        }
+      },
+      {
+        "src": "20261019-203829_0b25308_dionatan-drebin-cluster-m2-f4.json",
+        "run": "drebin_cluster fold 4",
+        "measure": "lmax",
+        "n": 223,
+        "r2_linear": 0.9394534944007553,
+        "r2_adj": 0.9380584136265792,
+        "r2_quadratic": 0.9755801725666237,
+        "r2_single": {
+          "log_lr": 0.018796478372107073,
+          "log_wd": 8.190483967474016e-05,
+          "dropout": 0.20538106109295406,
+          "largura": 0.010229410346635714,
+          "prof.": 0.7176589821641194
+        }
+      }
+    ]
+  }
+}
