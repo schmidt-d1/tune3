@@ -1012,3 +1012,37 @@ def test_A36_halves_baseline_grava_json_igual_ao_impresso(tmp_path, monkeypatch,
     assert f"{row['halves_mean']:+.3f}" == line[-4] and f"{row['halves_std']:.3f}" == line[-3] and f"{row['halves_q97_5']:+.2f}" == line[-1]
     line1 = [l for l in printed.splitlines() if l.strip().startswith("kronodroid semente 0")][0].split()
     assert line1[-4:] == line[-4:]                                                    # mesmo calculo com e sem --tag
+
+
+def test_A37_e1_offline_criterio_de_escolha_detecta_informacao_alem_da_validacao():
+    """e1_offline: uma medida sem informacao alem da validacao ATRAPALHA tanto quanto o placebo (dilui a validacao); uma
+    medida que e' so' proxy da validacao e' nula; informativa alem da validacao, V+Tr ajuda (IC < 0); anti-informativa,
+    atrapalha (IC > 0); w = 0 reproduz V exatamente (pareado); oraculo <= todos; regra 3/3 entre sementes."""
+    m = _load_script("e1_offline.py"); rng = np.random.default_rng(0); n = 250
+
+    def pool(effect, proxy=False):
+        val = rng.normal(2.0, 0.3, n); meas = val + rng.normal(0, 0.01, n) if proxy else rng.normal(0, 1, n)
+        y = val + effect * meas + rng.normal(0, 0.15, n)
+        return {"name": "x", "dataset": "kronodroid", "seed": 0, "fold": None, "target": "cvar_test", "n": n,
+                "val": val, "y": y, "measures": {"curvature": meas}}
+    p0, p_help, p_hurt, p_proxy = pool(0.0), pool(0.4), pool(-0.4), pool(0.0, proxy=True)
+    r0 = m.analyze_pool(p0, [30], [1.0], R=1500, B=60, Rb=200, seed=0)["runs"][0]["arms"]
+    assert r0["V+Tr"]["verdict"] == "atrapalha" and r0["V+P"]["verdict"] == "atrapalha" and r0["V+P"]["delta_vs_V"] > 0
+    assert abs(r0["V+Tr"]["delta_vs_V"] - r0["V+P"]["delta_vs_V"]) < 0.1            # ruido independente ~ placebo
+    assert r0["oraculo"]["mean_target"] <= min(r0[a]["mean_target"] for a in r0) and r0["aleatorio"]["delta_vs_V"] > r0["V+Tr"]["delta_vs_V"]
+    rp = m.analyze_pool(p_proxy, [30], [1.0], R=1500, B=60, Rb=200, seed=0)["runs"][0]["arms"]
+    assert rp["V+Tr"]["verdict"] == "nulo" and abs(rp["V+Tr"]["delta_vs_V"]) < 0.01
+    rh = m.analyze_pool(p_help, [30], [1.0], R=1500, B=60, Rb=200, seed=0)["runs"][0]["arms"]
+    assert rh["V+Tr"]["verdict"] == "ajuda" and rh["V+Tr"]["delta_vs_V"] < 0 and rh["V+Tr"]["ci95_delta"][1] < 0
+    rw = m.analyze_pool(p_hurt, [30], [1.0], R=1500, B=60, Rb=200, seed=0)["runs"][0]["arms"]
+    assert rw["V+Tr"]["verdict"] == "atrapalha" and rw["V+Tr"]["ci95_delta"][0] > 0
+    sim = m.simulate(p_help, 30, 0.0, 500, np.random.default_rng(1))                 # w = 0: mesma escolha de V, pareada
+    assert np.array_equal(sim["V+Tr"], sim["V"]) and np.all(sim["oraculo"] <= sim["V"])
+    # regra 3/3 entre sementes
+    def res(seed, v):
+        return {"dataset": "kronodroid", "fold": None, "seed": seed, "n_pool": n,
+                "runs": [{"budget": 30, "w": 1.0, "arms": {"V+Tr": {"verdict": v}, "V+P": {"verdict": "atrapalha"}}}]}
+    t = m.rule_across_seeds([res(0, "ajuda"), res(1, "ajuda"), res(2, "ajuda")], 30, 1.0)["kronodroid"]["arms"]
+    assert t["V+Tr"]["rule"] == "ajuda em 3/3" and t["V+P"]["rule"] == "atrapalha em 3/3"
+    t2 = m.rule_across_seeds([res(0, "ajuda"), res(1, "nulo"), res(2, "ajuda")], 30, 1.0)["kronodroid"]["arms"]
+    assert t2["V+Tr"]["rule"].startswith("misto") and m.rule_across_seeds([res(0, "ajuda")], 30, 1.0)["kronodroid"]["arms"]["V+Tr"]["rule"].endswith("por desenho)")
