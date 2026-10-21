@@ -1046,3 +1046,49 @@ def test_A37_e1_offline_criterio_de_escolha_detecta_informacao_alem_da_validacao
     assert t["V+Tr"]["rule"] == "ajuda em 3/3" and t["V+P"]["rule"] == "atrapalha em 3/3"
     t2 = m.rule_across_seeds([res(0, "ajuda"), res(1, "nulo"), res(2, "ajuda")], 30, 1.0)["kronodroid"]["arms"]
     assert t2["V+Tr"]["rule"].startswith("misto") and m.rule_across_seeds([res(0, "ajuda")], 30, 1.0)["kronodroid"]["arms"]["V+Tr"]["rule"].endswith("por desenho)")
+
+
+def test_A38_paper_tables_fontes_formatos_e_ic_dois_niveis(tmp_path):
+    """paper_tables: (i) a conferencia de fontes falha com commit errado ou arvore suja e passa so' com check=False;
+    (ii) as tabelas Markdown nao levam '|' dentro das celulas e o LaTeX escapa os simbolos; (iii) two_level_ci reproduz
+    a receita (e a ordem de sorteios) do e0_bootstrap2 num caso sintetico; (iv) channel() acha o hiperparametro cujo
+    controle zera a parcial."""
+    import json
+    pt = _load_script("paper_tables.py"); b2 = _load_script("e0_bootstrap2.py")
+    # (i) fontes
+    d = tmp_path / "results" / "e1_offline"; d.mkdir(parents=True)
+    json.dump({"meta": {"git": {"commit_short": "deadbee", "dirty": False}}, "payload": {}}, open(d / "20261021-000000_deadbee_dionatan.json", "w"))
+    with pytest.raises(pt.SourceError):
+        pt.resolve(tmp_path, "e1_offline", check=True)
+    assert pt.resolve(tmp_path, "e1_offline", check=False)[0]["meta"]["git"]["commit_short"] == "deadbee"
+    json.dump({"meta": {"git": {"commit_short": "fa36555", "dirty": True}}, "payload": {}}, open(d / "20261021-000000_deadbee_dionatan.json", "w"))
+    with pytest.raises(pt.SourceError):
+        pt.resolve(tmp_path, "e1_offline", check=True)
+    json.dump({"meta": {"git": {"commit_short": "fa36555", "dirty": False}}, "payload": {}}, open(d / "20261021-000000_deadbee_dionatan.json", "w"))
+    assert pt.resolve(tmp_path, "e1_offline", check=True)[1].name.endswith("_dionatan.json")
+    # (ii) formatos
+    md = pt.md_table(["a", "partial " + pt.GIVEN + " val"], [["x", pt.fmt(-0.123)]])
+    assert md.count("|") == 3 * 3 and "−0.12" in md and pt.GIVEN in md
+    tex = pt.tex_table(["a_b", "ρ 50%"], [["x", "−0.5"]], "cap & tion", "tab:x")
+    assert r"a\_b" in tex and r"\%" in tex and r"$-$0.5" in tex and r"\&" in tex and r"\rho" in tex
+    # (iii) IC em dois niveis == receita do e0_bootstrap2
+    rng = np.random.default_rng(3); n, nv, nt = 40, 60, 80
+    rows = [{"cfg": i, "curvature": float(10 ** rng.uniform(0, 2)), "cvar_val": 1.0, "cvar_test": 1.0, "reached": True,
+             "hparams": {"learning_rate": float(10 ** rng.uniform(-4, -2)), "weight_decay": float(10 ** rng.uniform(-6, -2)), "dropout": float(rng.uniform(0, .5)), "hidden_dim": int(rng.integers(32, 257)), "n_layers": int(rng.integers(1, 5))}} for i in range(n)]
+    Z = {"val": rng.exponential(1, (n, nv)).astype(np.float16), "test": rng.exponential(1, (n, nt)).astype(np.float16), "test_novel_mask": np.arange(nt) % 2 == 0}
+    ci, ci5 = pt.two_level_ci(rows, Z, "cvar_test_novel", B=25, seed=7)
+    # replica literal do laco do e0_bootstrap2 para uma rodada
+    idx = np.array([r["cfg"] for r in rows]); V = Z["val"][idx].astype(np.float64); T = Z["test"][idx].astype(np.float64); TT = T[:, Z["test_novel_mask"]]
+    h = lambda k: np.array([r["hparams"][k] for r in rows], float)
+    H = [np.log10(h("learning_rate")), np.log10(h("weight_decay") + 1e-6), h("dropout"), h("hidden_dim"), h("n_layers")]
+    lc = np.log10([r["curvature"] for r in rows]); rr = np.random.default_rng(7); a_, b_ = [], []; ntt = TT.shape[1]
+    for _ in range(25):
+        v = b2.cvar_rows(V[:, rr.integers(0, nv, nv)]); y = b2.cvar_rows(TT[:, rr.integers(0, ntt, ntt)]); ic = rr.integers(0, n, n)
+        a_.append(pt.partial_spearman(y[ic], lc[ic], [v[ic]])); b_.append(pt.partial_spearman(y[ic], lc[ic], [v[ic]] + [x[ic] for x in H]))
+    assert np.allclose(ci, np.nanpercentile(a_, [2.5, 97.5])) and np.allclose(ci5, np.nanpercentile(b_, [2.5, 97.5]))
+    # (iv) canal
+    depth = rng.integers(1, 5, 300); val = rng.normal(2, .3, 300); curv = 10 ** (0.4 * depth + rng.normal(0, .2, 300)); y = val + 0.3 * depth + rng.normal(0, .1, 300)
+    rows2 = [{"cfg": i, "curvature": float(curv[i]), "cvar_val": float(val[i]), "cvar_test": float(y[i]), "reached": True,
+              "hparams": {"learning_rate": 1e-3, "weight_decay": 1e-5, "dropout": float(rng.uniform(0, .5)), "hidden_dim": int(rng.integers(32, 257)), "n_layers": int(depth[i])}} for i in range(300)]
+    pv, with_hp, hp_own, ch = pt.channel(rows2, "cvar_test")
+    assert pv > 0.5 and ch == "depth" and abs(with_hp["depth"]) < 0.15 and hp_own["depth"] > 0.5
