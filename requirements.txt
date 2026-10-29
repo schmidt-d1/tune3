@@ -1,5 +1,5 @@
 # Espelho de pyproject.toml (fonte da verdade). Instale com:
-#   pip install -e ".[dev,vision]"      (recomendado)
+#   pip install -e ".[dev,vision,paper]"      (recomendado)
 # ou, se preferir este arquivo:  pip install -r requirements.txt
 torch>=2.2
 numpy>=1.24
@@ -13,3 +13,4 @@ structlog>=24.1
 pytest>=7.4
 pytest-cov>=4.0
 torchvision>=0.17
+matplotlib>=3.10

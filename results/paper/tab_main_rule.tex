@@ -1,0 +1,24 @@
+% fontes: replication_summary 4exp
+\begin{table}[t]
+\centering\small
+\caption{Table 2b. Pre-registered replication rule per experiment and seed (replication\_summary, four experiments).}
+\label{tab:main_rule}
+\begin{tabular}{lrlllc}
+\toprule
+Experiment & seed & pre-registered pattern & statistic 1 & statistic 2 & replicated? \\
+\midrule
+NSL-KDD & 0 & partial $\mid$ val not > 0 and $\mid$ val, 5hp $\ni$ 0 & $-$0.43 [$-$0.54; $-$0.32] & +0.08 [$-$0.06; +0.20] & yes \\
+NSL-KDD & 1 & partial $\mid$ val not > 0 and $\mid$ val, 5hp $\ni$ 0 & $-$0.29 [$-$0.38; $-$0.18] & +0.06 [$-$0.06; +0.19] & yes \\
+NSL-KDD & 2 & partial $\mid$ val not > 0 and $\mid$ val, 5hp $\ni$ 0 & $-$0.54 [$-$0.62; $-$0.44] & +0.01 [$-$0.09; +0.13] & yes \\
+DREBIN cluster (5 folds, RE) & 0 & RE $\mid$ val $\ni$ 0 and RE $\mid$ val, 5hp $\ni$ 0 & +0.13 [$-$0.07; +0.33], I$^2$=92\% & +0.03 [$-$0.03; +0.09] & yes \\
+DREBIN cluster (5 folds, RE) & 1 & RE $\mid$ val $\ni$ 0 and RE $\mid$ val, 5hp $\ni$ 0 & +0.23 [$-$0.02; +0.45], I$^2$=94\% & +0.09 [$-$0.03; +0.21] & yes \\
+DREBIN cluster (5 folds, RE) & 2 & RE $\mid$ val $\ni$ 0 and RE $\mid$ val, 5hp $\ni$ 0 & +0.11 [$-$0.14; +0.35], I$^2$=95\% & +0.03 [$-$0.05; +0.10] & yes \\
+CIFAR-10 $\rightarrow$ 10.1 & 0 & (A) $\tau$(gap) > 0; (B) partial $\mid$ val, arch $\ni$ 0 & (A) $\tau$=+0.46 [+0.38; +0.53], $\Psi$=+0.31 & (B) $-$0.07 [$-$0.19; +0.07] & yes \\
+CIFAR-10 $\rightarrow$ 10.1 & 1 & (A) $\tau$(gap) > 0; (B) partial $\mid$ val, arch $\ni$ 0 & (A) $\tau$=+0.48 [+0.42; +0.55], $\Psi$=+0.30 & (B) $-$0.08 [$-$0.20; +0.05] & yes \\
+CIFAR-10 $\rightarrow$ 10.1 & 2 & (A) $\tau$(gap) > 0; (B) partial $\mid$ val, arch $\ni$ 0 & (A) $\tau$=+0.54 [+0.48; +0.60], $\Psi$=+0.38 & (B) $-$0.28 [$-$0.39; $-$0.15] & NO \\
+KronoDroid & 0 & partial $\mid$ val not > 0 and $\mid$ val, 5hp $\ni$ 0 & $-$0.12 [$-$0.25; +0.03] & +0.05 [$-$0.12; +0.20] & yes \\
+KronoDroid & 1 & partial $\mid$ val not > 0 and $\mid$ val, 5hp $\ni$ 0 & +0.04 [$-$0.09; +0.17] & +0.01 [$-$0.12; +0.15] & yes \\
+KronoDroid & 2 & partial $\mid$ val not > 0 and $\mid$ val, 5hp $\ni$ 0 & $-$0.11 [$-$0.24; +0.02] & +0.01 [$-$0.12; +0.12] & yes \\
+\bottomrule
+\end{tabular}
+\end{table}

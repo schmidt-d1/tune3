@@ -1,0 +1,25 @@
+<!-- fontes: e0_measures (-m0/-m1/-m2) -->
+
+**Table 6b. Test–retest reliability of the Hutchinson estimator between configurations and the implied maximum attenuation of the partials.**
+
+| Run | n | r (same batch, M=5 vs M=200) | √r | r (second batch) | √r |
+|:--|--:|--:|--:|--:|--:|
+| nslkdd semente 0 | 303 | 0.93 | 0.96 | 0.81 | 0.90 |
+| kronodroid semente 0 | 206 | 0.92 | 0.96 | 0.91 | 0.95 |
+| kronodroid semente 1 | 188 | 0.91 | 0.95 | 0.90 | 0.95 |
+| kronodroid semente 2 | 216 | 0.88 | 0.94 | 0.88 | 0.94 |
+| drebin_cluster fold 0 | 229 | 0.68 | 0.83 | 0.68 | 0.82 |
+| drebin_cluster fold 1 | 212 | 0.78 | 0.89 | 0.75 | 0.87 |
+| drebin_cluster fold 2 | 216 | 0.77 | 0.88 | 0.75 | 0.87 |
+| drebin_cluster fold 3 | 230 | 0.68 | 0.82 | 0.67 | 0.82 |
+| drebin_cluster fold 4 | 218 | 0.78 | 0.88 | 0.77 | 0.88 |
+| drebin_cluster fold 0 | 210 | 0.71 | 0.84 | 0.70 | 0.83 |
+| drebin_cluster fold 1 | 189 | 0.78 | 0.88 | 0.79 | 0.89 |
+| drebin_cluster fold 2 | 202 | 0.78 | 0.88 | 0.77 | 0.88 |
+| drebin_cluster fold 3 | 208 | 0.78 | 0.88 | 0.76 | 0.87 |
+| drebin_cluster fold 4 | 195 | 0.76 | 0.87 | 0.76 | 0.87 |
+| drebin_cluster fold 0 | 232 | 0.71 | 0.84 | 0.71 | 0.85 |
+| drebin_cluster fold 1 | 215 | 0.73 | 0.86 | 0.73 | 0.86 |
+| drebin_cluster fold 2 | 230 | 0.77 | 0.88 | 0.76 | 0.87 |
+| drebin_cluster fold 3 | 237 | 0.76 | 0.87 | 0.75 | 0.87 |
+| drebin_cluster fold 4 | 223 | 0.75 | 0.87 | 0.74 | 0.86 |

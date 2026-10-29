@@ -1,0 +1,38 @@
+% fontes: E0 JSONs, D2 JSONs
+\begin{table}[t]
+\centering\small
+\caption{Table 3. The hyperparameter channel of the marginal signal: the single hyperparameter whose addition as a control brings the partial closest to zero, with its own partial correlation with the target given validation.}
+\label{tab:channels}
+\begin{tabular}{lrrlrrr}
+\toprule
+Scenario & seed & partial $\mid$ val & channel & partial $\mid$ val, channel & channel's own partial $\mid$ val & $\rho$(val, target) \\
+\midrule
+NSL-KDD (novel attacks) & 0 & $-$0.43 & depth & +0.00 & $-$0.61 & +0.33 \\
+NSL-KDD (novel attacks) & 1 & $-$0.29 & depth & +0.12 & $-$0.47 & +0.45 \\
+NSL-KDD (novel attacks) & 2 & $-$0.54 & depth & $-$0.11 & $-$0.62 & +0.16 \\
+KronoDroid (temporal) & 0 & $-$0.12 & dropout & +0.02 & +0.16 & +0.93 \\
+KronoDroid (temporal) & 1 & +0.04 & width & +0.02 & $-$0.30 & +0.92 \\
+KronoDroid (temporal) & 2 & $-$0.11 & dropout & +0.02 & +0.16 & +0.90 \\
+DREBIN cluster, fold 0 & 0 & +0.47 & depth & +0.13 & +0.78 & +0.75 \\
+DREBIN cluster, fold 0 & 1 & +0.55 & depth & +0.25 & +0.70 & +0.79 \\
+DREBIN cluster, fold 0 & 2 & +0.53 & depth & $-$0.01 & +0.82 & +0.70 \\
+DREBIN cluster, fold 1 & 0 & +0.10 & dropout & $-$0.06 & $-$0.23 & $-$0.01 \\
+DREBIN cluster, fold 1 & 1 & +0.17 & depth & +0.11 & +0.13 & $-$0.06 \\
+DREBIN cluster, fold 1 & 2 & +0.02 & log\_lr & +0.01 & $-$0.05 & +0.01 \\
+DREBIN cluster, fold 2 & 0 & $-$0.10 & log\_wd & $-$0.10 & +0.02 & +0.82 \\
+DREBIN cluster, fold 2 & 1 & $-$0.01 & log\_wd & $-$0.01 & +0.01 & +0.81 \\
+DREBIN cluster, fold 2 & 2 & $-$0.20 & dropout & +0.06 & +0.42 & +0.86 \\
+DREBIN cluster, fold 3 & 0 & +0.15 & depth & +0.03 & +0.24 & +0.51 \\
+DREBIN cluster, fold 3 & 1 & +0.40 & depth & +0.15 & +0.48 & +0.49 \\
+DREBIN cluster, fold 3 & 2 & +0.13 & width & +0.06 & +0.41 & +0.47 \\
+DREBIN cluster, fold 4 & 0 & $-$0.00 & log\_lr & +0.00 & +0.02 & +0.79 \\
+DREBIN cluster, fold 4 & 1 & $-$0.05 & dropout & +0.03 & +0.15 & +0.76 \\
+DREBIN cluster, fold 4 & 2 & +0.04 & width & +0.03 & +0.13 & +0.75 \\
+KronoDroid emulator & 0 & $-$0.18 & depth & $-$0.03 & $-$0.26 & +0.58 \\
+KronoDroid natural ratio & 0 & $-$0.20 & dropout & $-$0.02 & +0.23 & +0.93 \\
+CIFAR-10 $\rightarrow$ 10.1 & 0 & $-$0.22 & depth & $-$0.07 & $-$0.37 & +0.98 \\
+CIFAR-10 $\rightarrow$ 10.1 & 1 & $-$0.15 & depth & $-$0.07 & $-$0.23 & +0.98 \\
+CIFAR-10 $\rightarrow$ 10.1 & 2 & $-$0.32 & log\_lr & $-$0.03 & +0.40 & +0.98 \\
+\bottomrule
+\end{tabular}
+\end{table}

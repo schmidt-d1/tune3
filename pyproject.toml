@@ -24,10 +24,12 @@ dependencies = [
 dev = ["pytest>=7.4", "pytest-cov>=4.0"]
 # trilha Plano B (CIFAR-10 / ResNet-18) -- so' necessario para tune3.models.VisionResNet
 vision = ["torchvision>=0.17"]
+# tabelas e figuras do artigo (scripts/paper_tables.py)
+paper = ["matplotlib>=3.10"]
 # rastreamento e HPO externo (opcionais)
 extras = ["optuna>=3.5", "wandb>=0.16", "hydra-core>=1.3"]
 # tudo de uma vez
-all = ["tune3[dev,vision,extras]"]
+all = ["tune3[dev,vision,extras,paper]"]
 
 [tool.setuptools.packages.find]
 where = ["."]

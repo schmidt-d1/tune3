@@ -19,7 +19,7 @@ python -m venv .venv
 python -m pip install --upgrade pip
 # GPU NVIDIA: instale o torch com CUDA ANTES do passo seguinte (veja a tabela abaixo)
 #   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu130
-pip install -e ".[dev,vision]"        # dev = pytest; vision = torchvision (trilha CIFAR)
+pip install -e ".[dev,vision,paper]"  # dev = pytest; vision = torchvision (trilha CIFAR); paper = matplotlib (figuras do artigo)
 ```
 
 Requer Python ≥ 3.10 (testado em 3.11 e 3.14). `requirements.txt` é um espelho de

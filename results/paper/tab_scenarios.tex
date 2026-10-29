@@ -1,0 +1,22 @@
+% fontes: E0 JSONs, D2 JSONs, f1_val_size, results/raw/*.npz
+\begin{table}[t]
+\centering\small
+\caption{Table 1. Scenarios, splits and the number of configurations that reached the training-loss threshold.}
+\label{tab:scenarios}
+\begin{tabular}{lrrrrrrrr}
+\toprule
+Scenario & Shift & n train & n val & n target & p(mal) train & features & k & reached T (s0/s1/s2) \\
+\midrule
+NSL-KDD & novel attack categories (KDDTest+) & 25000 & 5000 & 3750 of 22544 & — & 41 (one-hot) & 600 & 303/266/288 \\
+DREBIN cluster, fold 0 & held-out malware family (k-means cluster) & 7780 & 1945 & 1964 (of 5311 test rows) & — & 215 & 600 & 229/210/232 \\
+DREBIN cluster, fold 1 & held-out malware family (k-means cluster) & 9655 & 2414 & 1097 (of 2967 test rows) & — & 215 & 600 & 212/189/215 \\
+DREBIN cluster, fold 2 & held-out malware family (k-means cluster) & 9686 & 2421 & 1083 (of 2929 test rows) & — & 215 & 600 & 216/202/230 \\
+DREBIN cluster, fold 3 & held-out malware family (k-means cluster) & 10050 & 2512 & 915 (of 2474 test rows) & — & 215 & 600 & 230/208/237 \\
+DREBIN cluster, fold 4 & held-out malware family (k-means cluster) & 10945 & 2736 & 501 (of 1355 test rows) & — & 215 & 600 & 218/195/223 \\
+KronoDroid (real device) & temporal: train $\leq$ 2014, test 2015–2020 & 25000 & 5000 & 10404 & 0.475 & 165 & 600 & 206/188/216 \\
+KronoDroid (emulator) & temporal, same cut & 25000 & 5000 & 9036 & 0.427 & 159 & 600 & 159 \\
+KronoDroid (natural class ratio) & temporal, same cut & 25000 & 5000 & 18927 & 0.475 & 165 & 600 & 206 \\
+CIFAR-10 $\rightarrow$ CIFAR-10.1 & dataset shift (Recht et al.) & 10000 & 5000 & 10000 + 2000 & — & 32$\times$32$\times$3 & 243 & 225/225/224 \\
+\bottomrule
+\end{tabular}
+\end{table}

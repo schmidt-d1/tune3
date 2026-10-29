@@ -1,0 +1,69 @@
+<!-- fontes: e0_halves_baseline -->
+
+**Table 6a. Baseline of the 'i.i.d. halves' check as the mean over 300 random splits of the target (the expected value of the partial given a noisy control is not zero); * marks the primary target of each run.**
+
+| Run | target | n | ρ raw | partial ∣ val (E0) | halves mean | sd | q2.5 | q97.5 | outside band? |
+|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| drebin_cluster fold 0 s0 | cvar_test | 229 | +0.51 | +0.41 | +0.11 | 0.09 | −0.06 | +0.27 | yes |
+| drebin_cluster fold 0 s0 | cvar_test_novel | 229 | +0.55 | +0.47 | +0.07 | 0.08 | −0.11 | +0.20 | yes* |
+| drebin_cluster fold 0 s0 | cvar_test_known | 229 | +0.18 | −0.25 | +0.03 | 0.15 | −0.25 | +0.32 | yes |
+| drebin_cluster fold 1 s0 | cvar_test | 212 | +0.23 | +0.17 | +0.05 | 0.07 | −0.08 | +0.18 | no |
+| drebin_cluster fold 1 s0 | cvar_test_novel | 212 | +0.09 | +0.10 | −0.00 | 0.17 | −0.30 | +0.28 | no* |
+| drebin_cluster fold 1 s0 | cvar_test_known | 212 | +0.16 | −0.14 | +0.07 | 0.16 | −0.24 | +0.38 | no |
+| drebin_cluster fold 2 s0 | cvar_test | 216 | +0.09 | −0.15 | +0.01 | 0.15 | −0.27 | +0.31 | no |
+| drebin_cluster fold 2 s0 | cvar_test_novel | 216 | +0.13 | −0.10 | +0.03 | 0.13 | −0.22 | +0.27 | no* |
+| drebin_cluster fold 2 s0 | cvar_test_known | 216 | +0.10 | −0.14 | +0.02 | 0.20 | −0.32 | +0.36 | no |
+| drebin_cluster fold 3 s0 | cvar_test | 230 | +0.31 | +0.01 | +0.03 | 0.08 | −0.11 | +0.18 | no |
+| drebin_cluster fold 3 s0 | cvar_test_novel | 230 | +0.31 | +0.15 | +0.05 | 0.07 | −0.08 | +0.17 | no* |
+| drebin_cluster fold 3 s0 | cvar_test_known | 230 | +0.27 | −0.13 | +0.07 | 0.14 | −0.21 | +0.35 | no |
+| drebin_cluster fold 4 s0 | cvar_test | 218 | +0.27 | +0.01 | +0.05 | 0.10 | −0.15 | +0.26 | no |
+| drebin_cluster fold 4 s0 | cvar_test_novel | 218 | +0.26 | −0.00 | +0.09 | 0.11 | −0.12 | +0.30 | no* |
+| drebin_cluster fold 4 s0 | cvar_test_known | 218 | +0.21 | −0.07 | +0.10 | 0.16 | −0.24 | +0.39 | no |
+| nslkdd semente 0 s0 | cvar_test | 303 | −0.24 | −0.38 | −0.01 | 0.14 | −0.28 | +0.23 | yes |
+| nslkdd semente 0 s0 | cvar_test_novel | 303 | −0.25 | −0.43 | −0.02 | 0.24 | −0.41 | +0.32 | yes* |
+| nslkdd semente 0 s0 | cvar_test_known | 303 | −0.24 | −0.38 | −0.00 | 0.13 | −0.26 | +0.23 | yes |
+| nslkdd semente 1 s1 | cvar_test | 266 | −0.07 | −0.31 | −0.01 | 0.32 | −0.47 | +0.49 | no |
+| nslkdd semente 1 s1 | cvar_test_novel | 266 | −0.04 | −0.29 | +0.05 | 0.34 | −0.50 | +0.48 | no* |
+| nslkdd semente 1 s1 | cvar_test_known | 266 | −0.09 | −0.32 | +0.02 | 0.31 | −0.46 | +0.46 | no |
+| nslkdd semente 2 s2 | cvar_test | 288 | −0.42 | −0.54 | −0.03 | 0.15 | −0.32 | +0.22 | yes |
+| nslkdd semente 2 s2 | cvar_test_novel | 288 | −0.42 | −0.54 | −0.06 | 0.16 | −0.34 | +0.22 | yes* |
+| nslkdd semente 2 s2 | cvar_test_known | 288 | −0.41 | −0.52 | −0.02 | 0.17 | −0.35 | +0.28 | yes |
+| drebin_cluster fold 0 s1 | cvar_test | 210 | +0.56 | +0.52 | +0.11 | 0.09 | −0.04 | +0.29 | yes |
+| drebin_cluster fold 0 s1 | cvar_test_novel | 210 | +0.59 | +0.55 | +0.08 | 0.11 | −0.14 | +0.29 | yes* |
+| drebin_cluster fold 0 s1 | cvar_test_known | 210 | +0.27 | −0.08 | +0.06 | 0.12 | −0.18 | +0.27 | no |
+| drebin_cluster fold 1 s1 | cvar_test | 189 | +0.25 | +0.15 | +0.08 | 0.09 | −0.13 | +0.25 | no |
+| drebin_cluster fold 1 s1 | cvar_test_novel | 189 | +0.12 | +0.17 | +0.01 | 0.08 | −0.15 | +0.16 | yes* |
+| drebin_cluster fold 1 s1 | cvar_test_known | 189 | +0.32 | −0.10 | +0.14 | 0.13 | −0.11 | +0.38 | no |
+| drebin_cluster fold 2 s1 | cvar_test | 202 | +0.28 | −0.03 | +0.05 | 0.17 | −0.25 | +0.35 | no |
+| drebin_cluster fold 2 s1 | cvar_test_novel | 202 | +0.30 | −0.01 | +0.06 | 0.15 | −0.22 | +0.34 | no* |
+| drebin_cluster fold 2 s1 | cvar_test_known | 202 | +0.29 | −0.04 | +0.11 | 0.16 | −0.19 | +0.41 | no |
+| drebin_cluster fold 3 s1 | cvar_test | 208 | +0.54 | +0.35 | +0.04 | 0.12 | −0.18 | +0.26 | yes |
+| drebin_cluster fold 3 s1 | cvar_test_novel | 208 | +0.53 | +0.40 | +0.07 | 0.10 | −0.13 | +0.24 | yes* |
+| drebin_cluster fold 3 s1 | cvar_test_known | 208 | +0.45 | +0.15 | +0.14 | 0.14 | −0.12 | +0.39 | no |
+| drebin_cluster fold 4 s1 | cvar_test | 195 | +0.30 | −0.02 | +0.07 | 0.13 | −0.16 | +0.31 | no |
+| drebin_cluster fold 4 s1 | cvar_test_novel | 195 | +0.28 | −0.05 | +0.09 | 0.14 | −0.15 | +0.36 | no* |
+| drebin_cluster fold 4 s1 | cvar_test_known | 195 | +0.23 | −0.01 | +0.13 | 0.16 | −0.18 | +0.40 | no |
+| drebin_cluster fold 0 s2 | cvar_test | 232 | +0.51 | +0.46 | +0.12 | 0.09 | −0.08 | +0.28 | yes |
+| drebin_cluster fold 0 s2 | cvar_test_novel | 232 | +0.57 | +0.53 | +0.09 | 0.08 | −0.08 | +0.23 | yes* |
+| drebin_cluster fold 0 s2 | cvar_test_known | 232 | −0.07 | −0.32 | −0.03 | 0.20 | −0.38 | +0.32 | no |
+| drebin_cluster fold 1 s2 | cvar_test | 215 | +0.03 | −0.03 | +0.01 | 0.08 | −0.15 | +0.16 | no |
+| drebin_cluster fold 1 s2 | cvar_test_novel | 215 | +0.02 | +0.02 | −0.01 | 0.13 | −0.24 | +0.21 | no* |
+| drebin_cluster fold 1 s2 | cvar_test_known | 215 | +0.24 | +0.03 | +0.13 | 0.16 | −0.16 | +0.39 | no |
+| drebin_cluster fold 2 s2 | cvar_test | 230 | +0.15 | −0.25 | +0.04 | 0.18 | −0.31 | +0.37 | no |
+| drebin_cluster fold 2 s2 | cvar_test_novel | 230 | +0.23 | −0.20 | +0.04 | 0.16 | −0.24 | +0.32 | no* |
+| drebin_cluster fold 2 s2 | cvar_test_known | 230 | +0.08 | −0.13 | +0.06 | 0.19 | −0.28 | +0.37 | no |
+| drebin_cluster fold 3 s2 | cvar_test | 237 | +0.30 | −0.04 | +0.03 | 0.11 | −0.19 | +0.21 | no |
+| drebin_cluster fold 3 s2 | cvar_test_novel | 237 | +0.29 | +0.13 | +0.06 | 0.07 | −0.07 | +0.17 | no* |
+| drebin_cluster fold 3 s2 | cvar_test_known | 237 | +0.21 | −0.13 | +0.09 | 0.18 | −0.24 | +0.38 | no |
+| drebin_cluster fold 4 s2 | cvar_test | 223 | +0.25 | +0.05 | +0.07 | 0.12 | −0.15 | +0.29 | no |
+| drebin_cluster fold 4 s2 | cvar_test_novel | 223 | +0.25 | +0.04 | +0.08 | 0.12 | −0.15 | +0.28 | no* |
+| drebin_cluster fold 4 s2 | cvar_test_known | 223 | +0.21 | −0.03 | +0.10 | 0.15 | −0.21 | +0.37 | no |
+| kronodroid semente 0 s0 | cvar_test | 206 | +0.03 | −0.12 | −0.03 | 0.22 | −0.41 | +0.38 | no* |
+| kronodroid semente 0 s0 | cvar_test_novel | 206 | +0.02 | −0.13 | −0.02 | 0.24 | −0.43 | +0.41 | no |
+| kronodroid semente 0 s0 | cvar_test_known | 206 | +0.04 | −0.08 | −0.00 | 0.24 | −0.42 | +0.42 | no |
+| kronodroid semente 1 s1 | cvar_test | 188 | +0.15 | +0.04 | +0.02 | 0.18 | −0.32 | +0.32 | no* |
+| kronodroid semente 1 s1 | cvar_test_novel | 188 | +0.16 | +0.07 | +0.03 | 0.19 | −0.30 | +0.34 | no |
+| kronodroid semente 1 s1 | cvar_test_known | 188 | +0.13 | −0.03 | +0.01 | 0.19 | −0.31 | +0.42 | no |
+| kronodroid semente 2 s2 | cvar_test | 216 | +0.05 | −0.11 | +0.00 | 0.17 | −0.32 | +0.31 | no* |
+| kronodroid semente 2 s2 | cvar_test_novel | 216 | +0.05 | −0.09 | +0.01 | 0.17 | −0.33 | +0.34 | no |
+| kronodroid semente 2 s2 | cvar_test_known | 216 | +0.03 | −0.18 | −0.01 | 0.22 | −0.42 | +0.40 | no |
